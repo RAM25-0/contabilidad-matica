@@ -15,6 +15,7 @@ import { AccountsTable } from "./accounts/AccountsTable";
 import { AccountsTabs } from "./accounts/AccountsTabs";
 import { AccountsSubcategoryGroup } from "./accounts/AccountsSubcategoryGroup";
 import { AccountsCompactList } from "./accounts/AccountsCompactList";
+import { getSubcategoryLabel } from "./accounts/AccountBadge";
 
 export default function AccountsList() {
   const { 
