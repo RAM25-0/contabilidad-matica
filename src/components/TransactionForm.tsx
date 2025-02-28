@@ -1,395 +1,352 @@
 
-import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Plus, CalendarIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { PlusCircle, Trash2, AlertCircle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import { useAccounting } from "@/contexts/AccountingContext";
-import { toast } from "@/components/ui/use-toast";
-import { v4 as uuidv4 } from "uuid";
 import { formatCurrency } from "@/lib/utils";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { AccountBadge, getTextColorForType, getBgColorForType } from "@/components/accounts/AccountBadge";
+import { Account, Transaction, TransactionEntry } from "@/types/accounting";
 
-const formSchema = z.object({
-  date: z.date({
-    required_error: "La fecha es requerida.",
-  }),
-  description: z.string().min(3, "La descripción debe tener al menos 3 caracteres."),
-  entries: z.array(
-    z.object({
-      accountId: z.string().min(1, "La cuenta es requerida."),
-      type: z.enum(["cargo", "abono"]),
-      amount: z.number().min(0.01, "El valor debe ser mayor a cero."),
-    })
-  ).refine(entries => entries.length >= 2, {
-    message: "Debes agregar al menos dos asientos contables.",
-  }).refine(entries => {
-    const totalCargo = entries
-      .filter(entry => entry.type === "cargo")
-      .reduce((sum, entry) => sum + entry.amount, 0);
-    
-    const totalAbono = entries
-      .filter(entry => entry.type === "abono")
-      .reduce((sum, entry) => sum + entry.amount, 0);
-    
-    return Math.abs(totalCargo - totalAbono) < 0.001; // Tolerancia para errores de punto flotante
-  }, {
-    message: "Los cargos deben ser iguales a los abonos.",
-  }),
-});
+interface TransactionFormProps {
+  onSuccess?: () => void;
+}
 
-type FormData = z.infer<typeof formSchema>;
-
-export function TransactionForm() {
+export function TransactionForm({ onSuccess }: TransactionFormProps) {
   const { state, addTransaction } = useAccounting();
+  const { toast } = useToast();
+  const [date, setDate] = useState<string>(new Date().toISOString().substring(0, 10));
+  const [description, setDescription] = useState<string>("");
+  const [entries, setEntries] = useState<Array<Partial<TransactionEntry & { isNew?: boolean }>>>([]);
+  const [selectedAccount, setSelectedAccount] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [isDebit, setIsDebit] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Función para calcular el saldo de débitos y créditos
+  const calculateBalance = () => {
+    const totalDebits = entries.reduce((sum, entry) => sum + (entry.debit || 0), 0);
+    const totalCredits = entries.reduce((sum, entry) => sum + (entry.credit || 0), 0);
+    return { totalDebits, totalCredits, balanced: Math.abs(totalDebits - totalCredits) < 0.001 };
+  };
+
+  const { totalDebits, totalCredits, balanced } = calculateBalance();
   
-  const defaultValues: FormData = {
-    date: new Date(),
-    description: "",
-    entries: [
-      { accountId: "", type: "cargo", amount: 0 },
-      { accountId: "", type: "abono", amount: 0 },
-    ],
+  const resetForm = () => {
+    setDate(new Date().toISOString().substring(0, 10));
+    setDescription("");
+    setEntries([]);
+    setSelectedAccount("");
+    setAmount("");
+    setIsDebit(true);
+    setError(null);
+  };
+
+  const addEntry = () => {
+    if (!selectedAccount || !amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      setError("Por favor selecciona una cuenta y un monto válido mayor a cero.");
+      return;
+    }
+    
+    const account = state.accounts.find(a => a.id === selectedAccount);
+    if (!account) {
+      setError("Cuenta no encontrada.");
+      return;
+    }
+    
+    const newEntry: Partial<TransactionEntry & { isNew?: boolean }> = {
+      accountId: account.id,
+      accountName: account.name,
+      accountType: account.type,
+      debit: isDebit ? Number(amount) : 0,
+      credit: !isDebit ? Number(amount) : 0,
+      isNew: true
+    };
+    
+    setEntries([...entries, newEntry]);
+    setSelectedAccount("");
+    setAmount("");
+    setError(null);
   };
   
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
-  });
+  const removeEntry = (index: number) => {
+    const newEntries = [...entries];
+    newEntries.splice(index, 1);
+    setEntries(newEntries);
+  };
   
-  const entries = form.watch("entries");
-  
-  const totalCargo = entries
-    .filter(entry => entry.type === "cargo")
-    .reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
-  
-  const totalAbono = entries
-    .filter(entry => entry.type === "abono")
-    .reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
-  
-  const difference = totalCargo - totalAbono;
-  const isBalanced = Math.abs(difference) < 0.001;
-  
-  const onSubmit = (data: FormData) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!description.trim()) {
+      setError("Por favor ingresa una descripción para la transacción.");
+      return;
+    }
+    
+    if (entries.length < 2) {
+      setError("La transacción debe tener al menos dos entradas.");
+      return;
+    }
+    
+    const { balanced } = calculateBalance();
+    if (!balanced) {
+      setError("La transacción debe estar balanceada. Los débitos deben ser iguales a los créditos.");
+      return;
+    }
+    
+    // Crear la transacción
+    const transaction: Omit<Transaction, "id" | "isBalanced"> = {
+      date: new Date(date),
+      description,
+      entries: entries.map((entry) => ({
+        id: "", // El ID se asignará en el contexto
+        accountId: entry.accountId!,
+        accountName: entry.accountName!,
+        accountType: entry.accountType!,
+        debit: entry.debit || 0,
+        credit: entry.credit || 0,
+      })),
+    };
+    
     try {
-      // Transformar las entradas al formato esperado por la función addTransaction
-      const transactionEntries = data.entries.map(entry => {
-        const account = state.accounts.find(a => a.id === entry.accountId);
-        if (!account) throw new Error("Cuenta no encontrada");
-        
-        return {
-          id: uuidv4(),
-          accountId: entry.accountId,
-          accountName: account.name,
-          accountType: account.type,
-          debit: entry.type === "cargo" ? entry.amount : 0,
-          credit: entry.type === "abono" ? entry.amount : 0,
-        };
-      });
+      addTransaction(transaction);
+      console.log("Transaction added successfully:", transaction);
       
-      // Añadir la transacción al contexto (esto actualizará el estado global)
-      addTransaction({
-        date: data.date,
-        description: data.description,
-        entries: transactionEntries,
-      });
-      
-      // Notificar al usuario
+      // Mostrar notificación de éxito
       toast({
         title: "Transacción registrada",
         description: "La transacción ha sido registrada exitosamente y está disponible en todos los módulos.",
       });
       
       // Limpiar el formulario
-      form.reset(defaultValues);
+      resetForm();
       
-      // Registrar en consola para depuración
-      console.log("Transacción guardada exitosamente:", {
-        date: data.date,
-        description: data.description,
-        entries: transactionEntries,
-      });
+      // Llamar a la función de éxito si se proporciona
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
-      console.error("Error al guardar la transacción:", error);
-      toast({
-        title: "Error",
-        description: "Ocurrió un error al registrar la transacción. Por favor intenta nuevamente.",
-        variant: "destructive",
-      });
+      console.error("Error adding transaction:", error);
+      setError(`Error al registrar la transacción: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   };
   
-  const addEntry = () => {
-    const currentEntries = form.getValues("entries");
-    form.setValue("entries", [
-      ...currentEntries, 
-      { accountId: "", type: "cargo", amount: 0 }
-    ]);
-  };
-  
-  const removeEntry = (index: number) => {
-    const currentEntries = form.getValues("entries");
-    if (currentEntries.length <= 2) {
-      toast({
-        title: "Error",
-        description: "Una transacción debe tener al menos dos asientos contables.",
-        variant: "destructive",
-      });
-      return;
+  // Helper para obtener el color de fondo según el tipo de cuenta
+  const getAccountTypeColor = (type: string) => {
+    switch (type) {
+      case "activo": return "bg-emerald-100 text-emerald-800";
+      case "pasivo": return "bg-rose-100 text-rose-800";
+      case "capital": return "bg-purple-100 text-purple-800";
+      case "ingreso": return "bg-blue-100 text-blue-800";
+      case "gasto": return "bg-amber-100 text-amber-800";
+      default: return "bg-gray-100 text-gray-800";
     }
-    
-    const newEntries = currentEntries.filter((_, i) => i !== index);
-    form.setValue("entries", newEntries);
   };
-  
+
   return (
-    <Card className="animate-fade-in shadow-sm">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Nueva Transacción</CardTitle>
+    <Card className="shadow-sm max-w-3xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-xl">Registrar Transacción</CardTitle>
       </CardHeader>
-      <CardContent className="pt-2">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Fecha</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            className="w-full pl-3 text-left font-normal h-9"
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP", { locale: es })
-                            ) : (
-                              <span>Seleccionar fecha</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descripción</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Describe la transacción" 
-                        className="resize-none h-9 py-2" 
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="date">Fecha</Label>
+              <Input
+                id="date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
               />
             </div>
-            
-            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-              {entries.map((entry, index) => (
-                <div key={index} className="grid grid-cols-[1fr,auto,1fr,auto] gap-2 items-center">
-                  <FormField
-                    control={form.control}
-                    name={`entries.${index}.accountId`}
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel className="sr-only">Cuenta</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="h-9">
-                              <SelectValue placeholder="Selecciona cuenta" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {state.accounts.map((account) => {
-                              const textColor = getTextColorForType(account.type, account.subcategory);
-                              const bgColor = getBgColorForType(account.type, account.subcategory);
-                              
-                              return (
-                                <SelectItem 
-                                  key={account.id} 
-                                  value={account.id}
-                                  className={`${textColor} ${bgColor} rounded my-1`}
-                                >
-                                  {account.name}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name={`entries.${index}.type`}
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel className="sr-only">Tipo</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="w-24 h-9">
-                              <SelectValue placeholder="Tipo" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="cargo" className="text-blue-600 bg-blue-50 rounded my-1">Cargo</SelectItem>
-                            <SelectItem value="abono" className="text-indigo-600 bg-indigo-50 rounded my-1">Abono</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name={`entries.${index}.amount`}
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel className="sr-only">Monto</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0.01"
-                            step="0.01"
-                            placeholder="Monto"
-                            className="h-9"
-                            {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                            value={field.value === 0 ? "" : field.value}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full h-8 w-8"
-                    onClick={() => removeEntry(index)}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </div>
-              ))}
+            <div>
+              <Label htmlFor="description">Descripción</Label>
+              <Input
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Descripción de la transacción"
+                required
+              />
             </div>
-            
-            <div className="flex justify-between items-center">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addEntry}
-                className="gap-1 h-8 text-sm"
-              >
-                <Plus className="h-3 w-3" />
-                Agregar entrada
-              </Button>
-              
-              <div className="text-sm text-muted-foreground">
-                <div className="flex justify-between gap-4">
-                  <span>Cargo:</span>
-                  <span className={isBalanced ? "text-green-600" : "text-red-600"}>
-                    {formatCurrency(totalCargo)}
-                  </span>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <span>Abono:</span>
-                  <span className={isBalanced ? "text-green-600" : "text-red-600"}>
-                    {formatCurrency(totalAbono)}
-                  </span>
-                </div>
-                {!isBalanced && (
-                  <div className="flex justify-between gap-4 font-semibold">
-                    <span>Diferencia:</span>
-                    <span className="text-red-600">
-                      {formatCurrency(Math.abs(difference))}
-                    </span>
-                  </div>
-                )}
+          </div>
+          
+          <Separator className="my-4" />
+          
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
+              <div className="md:col-span-5">
+                <Label htmlFor="account">Cuenta</Label>
+                <Select value={selectedAccount} onValueChange={setSelectedAccount}>
+                  <SelectTrigger id="account">
+                    <SelectValue placeholder="Seleccionar cuenta" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {state.accounts.map((account) => (
+                      <SelectItem 
+                        key={account.id} 
+                        value={account.id}
+                        className={getAccountTypeColor(account.type)}
+                      >
+                        {account.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="md:col-span-3">
+                <Label htmlFor="amount">Monto</Label>
+                <Input
+                  id="amount"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="md:col-span-3 flex gap-2">
+                <Button
+                  type="button"
+                  variant={isDebit ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setIsDebit(true)}
+                >
+                  Cargo
+                </Button>
+                <Button
+                  type="button"
+                  variant={!isDebit ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setIsDebit(false)}
+                >
+                  Abono
+                </Button>
+              </div>
+              <div className="md:col-span-1">
+                <Button
+                  type="button"
+                  size="icon"
+                  onClick={addEntry}
+                  title="Agregar entrada"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                </Button>
               </div>
             </div>
             
-            <div className="flex justify-end">
-              <Button 
-                type="submit" 
-                disabled={!isBalanced} 
-                className="px-4 py-2"
-              >
-                Registrar transacción
-              </Button>
-            </div>
-            
-            {form.formState.errors.entries?.message && (
-              <p className="text-sm font-medium text-destructive text-center">
-                {form.formState.errors.entries.message}
-              </p>
+            {error && (
+              <div className="bg-destructive/10 p-3 rounded-md flex items-start gap-2 text-sm text-destructive">
+                <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
             )}
-          </form>
-        </Form>
+
+            <div className="border rounded-md">
+              <ScrollArea className="h-60">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Cuenta</TableHead>
+                      <TableHead className="text-right">Cargo</TableHead>
+                      <TableHead className="text-right">Abono</TableHead>
+                      <TableHead className="w-[50px]"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {entries.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                          No hay entradas. Agrega una entrada para comenzar.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      entries.map((entry, index) => (
+                        <TableRow key={index} className={entry.isNew ? "bg-primary/5" : undefined}>
+                          <TableCell>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{entry.accountName}</span>
+                              <span className={`text-xs px-1.5 py-0.5 rounded-sm inline-block w-fit mt-1 ${getAccountTypeColor(entry.accountType || "")}`}>
+                                {entry.accountType}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {entry.debit ? formatCurrency(entry.debit) : "-"}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            {entry.credit ? formatCurrency(entry.credit) : "-"}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeEntry(index)}
+                              className="h-8 w-8"
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+              
+              <div className="bg-muted/40 p-2 border-t">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">Total:</span>
+                  <div className="space-x-4">
+                    <span>
+                      Cargos: <span className="font-bold">{formatCurrency(totalDebits)}</span>
+                    </span>
+                    <span>
+                      Abonos: <span className="font-bold">{formatCurrency(totalCredits)}</span>
+                    </span>
+                    <span className={balanced ? "text-green-600" : "text-red-600"}>
+                      {balanced ? "✓ Balanceado" : "✗ No balanceado"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end mt-4">
+            <Button 
+              type="submit" 
+              disabled={entries.length < 2 || !balanced}
+              className="w-full md:w-auto"
+            >
+              Registrar Transacción
+            </Button>
+          </div>
+        </form>
       </CardContent>
     </Card>
   );

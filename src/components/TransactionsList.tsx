@@ -1,5 +1,5 @@
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { 
   Card, 
@@ -41,7 +41,12 @@ export function TransactionsList({
   const { state, deleteTransaction } = useAccounting();
   const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null);
   
+  useEffect(() => {
+    console.log("TransactionsList mounted with transactions:", state.transactions.length);
+  }, []);
+  
   const filteredTransactions = useMemo(() => {
+    console.log("Filtering transactions:", state.transactions);
     let transactions = [...state.transactions];
     
     // Ordenar por fecha (más reciente primero)
@@ -88,6 +93,18 @@ export function TransactionsList({
       title: "Transacción eliminada",
       description: "La transacción ha sido eliminada exitosamente.",
     });
+  };
+  
+  // Función para obtener el color según el tipo de cuenta
+  const getAccountTypeColor = (type: string) => {
+    switch (type) {
+      case "activo": return "bg-emerald-100 text-emerald-800";
+      case "pasivo": return "bg-rose-100 text-rose-800";
+      case "capital": return "bg-purple-100 text-purple-800";
+      case "ingreso": return "bg-blue-100 text-blue-800";
+      case "gasto": return "bg-amber-100 text-amber-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
   };
   
   return (
@@ -140,11 +157,9 @@ export function TransactionsList({
                                 <span className="flex items-center">
                                   {entry.debit > 0 && <span className="mr-2 text-blue-600">→</span>}
                                   {entry.credit > 0 && <span className="mr-2 text-indigo-600">←</span>}
-                                  <AccountBadge
-                                    type={entry.accountType}
-                                    label={entry.accountName}
-                                    showIcon={false}
-                                  />
+                                  <span className={`px-1.5 py-0.5 rounded-sm ${getAccountTypeColor(entry.accountType)}`}>
+                                    {entry.accountName}
+                                  </span>
                                 </span>
                                 <span className="text-right ml-4">
                                   {entry.debit > 0 && formatCurrency(entry.debit)}
