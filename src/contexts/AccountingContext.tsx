@@ -628,6 +628,163 @@ const predefinedAccounts: Account[] = [
     nature: "acreedora",
     balance: 0,
     subcategory: "ganado"
+  },
+  
+  // ----- INGRESOS O VENTAS (INCOME) -----
+  {
+    id: uuidv4(),
+    name: "Ingresos netos o Ventas netas",
+    code: "4-01",
+    type: "ingreso",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "operativos"
+  },
+  {
+    id: uuidv4(),
+    name: "Ingresos o Ventas",
+    code: "4-02",
+    type: "ingreso",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "operativos"
+  },
+  
+  // ----- COSTOS Y GASTOS (EXPENSES) -----
+  // ----- COSTO DE VENTAS -----
+  {
+    id: uuidv4(),
+    name: "Costo de ventas (Cost of sales)",
+    code: "5-01",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "operativos_venta"
+  },
+  {
+    id: uuidv4(),
+    name: "Costo de ventas",
+    code: "5-02",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "operativos_venta"
+  },
+  
+  // ----- GASTOS GENERALES -----
+  {
+    id: uuidv4(),
+    name: "Gastos generales (General expenses)",
+    code: "5-03",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "operativos_admin"
+  },
+  {
+    id: uuidv4(),
+    name: "Gastos de administración",
+    code: "5-04",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "operativos_admin"
+  },
+  {
+    id: uuidv4(),
+    name: "Gastos de ventas",
+    code: "5-05",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "operativos_venta"
+  },
+  
+  // ----- RESULTADO INTEGRAL DE FINANCIAMIENTO -----
+  {
+    id: uuidv4(),
+    name: "Resultado Integral de Financiamiento",
+    code: "5-06",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "financieros"
+  },
+  {
+    id: uuidv4(),
+    name: "Productos financieros",
+    code: "5-07",
+    type: "ingreso",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "no_operativos"
+  },
+  {
+    id: uuidv4(),
+    name: "Intereses a cargo",
+    code: "5-08",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "financieros"
+  },
+  
+  // ----- IMPUESTOS A LA UTILIDAD -----
+  {
+    id: uuidv4(),
+    name: "Impuestos a la utilidad (Tax expenses)",
+    code: "5-09",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "otros"
+  },
+  {
+    id: uuidv4(),
+    name: "I.S.R. (Impuesto sobre la Renta)",
+    code: "5-10",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "otros"
+  },
+  {
+    id: uuidv4(),
+    name: "P.T.U.",
+    code: "5-11",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "otros"
+  },
+  
+  // ----- OTROS GASTOS E INGRESOS -----
+  {
+    id: uuidv4(),
+    name: "Otros gastos e ingresos (Other)",
+    code: "5-12",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "otros"
+  },
+  {
+    id: uuidv4(),
+    name: "Otros gastos",
+    code: "5-13",
+    type: "gasto",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "otros"
+  },
+  {
+    id: uuidv4(),
+    name: "Otros ingresos",
+    code: "5-14",
+    type: "ingreso",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "no_operativos"
   }
 ];
 
