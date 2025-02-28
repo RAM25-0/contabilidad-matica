@@ -26,6 +26,14 @@ import {
 import { useAccounting } from "@/contexts/AccountingContext";
 import { Account, AccountType } from "@/types/accounting";
 import { formatCurrency } from "@/lib/utils";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function AccountsList() {
   const { 
@@ -79,6 +87,23 @@ export default function AccountsList() {
     }
   };
 
+  const getTextColorForType = (type: AccountType): string => {
+    switch (type) {
+      case "activo":
+        return "text-green-700";
+      case "pasivo":
+        return "text-red-700";
+      case "capital":
+        return "text-blue-700";
+      case "ingreso":
+        return "text-orange-700";
+      case "gasto":
+        return "text-purple-700";
+      default:
+        return "text-slate-700";
+    }
+  };
+
   const handleTabChange = (value: string) => {
     filterAccounts(value as AccountType | "todos");
   };
@@ -127,80 +152,158 @@ export default function AccountsList() {
           ))}
         </TabsList>
 
-        <TabsContent value={state.selectedAccountType} className="mt-0">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredAccounts.length === 0 ? (
-              <p className="text-muted-foreground col-span-full text-center py-8">
-                No hay cuentas en esta categoría. Crea una nueva cuenta.
-              </p>
-            ) : (
-              filteredAccounts.map((account) => (
-                <Card 
-                  key={account.id} 
-                  className={`account-card overflow-hidden border hover-scale ${
-                    account.balance !== 0 ? "border-gray-300" : ""
-                  }`}
-                >
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <Badge 
-                        variant="secondary" 
-                        className={`${getColorForType(account.type)}`}
-                      >
-                        {getTypeLabel(account.type)}
-                      </Badge>
-                      <div className="flex gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7"
-                          onClick={() => setActiveAccount(account)}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7 text-destructive"
-                          onClick={() => deleteAccount(account.id)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </div>
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      {getIconForType(account.type)}
-                      <span className="truncate">{account.name}</span>
-                    </CardTitle>
-                    <CardDescription className="flex items-center justify-end">
-                      <span className="text-xs px-2 py-0.5 rounded bg-gray-100">
-                        {account.nature === "deudora" ? "Deudora" : "Acreedora"}
-                      </span>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {account.description && (
-                      <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-                        {account.description}
-                      </p>
+        <TabsContent value="todos" className="mt-0">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle>Listado Completo de Cuentas</CardTitle>
+              <CardDescription>Vista compacta de todas las cuentas del catálogo</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">Tipo</TableHead>
+                      <TableHead className="w-[200px]">Nombre</TableHead>
+                      <TableHead className="text-right">Saldo</TableHead>
+                      <TableHead className="w-[100px] text-right">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredAccounts.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
+                          No hay cuentas en esta categoría. Crea una nueva cuenta.
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredAccounts.map((account) => (
+                        <TableRow key={account.id}>
+                          <TableCell>
+                            <Badge 
+                              variant="secondary" 
+                              className={`${getColorForType(account.type)}`}
+                            >
+                              {getIconForType(account.type)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className={`font-medium ${getTextColorForType(account.type)}`}>
+                            {account.name}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <span className={`font-medium ${
+                              account.balance > 0 ? "text-green-700" : 
+                              account.balance < 0 ? "text-red-700" : "text-slate-500"
+                            }`}>
+                              {formatCurrency(account.balance)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={() => setActiveAccount(account)}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8 text-destructive"
+                                onClick={() => deleteAccount(account.id)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
                     )}
-                  </CardContent>
-                  <CardFooter className="bg-muted/50 py-2">
-                    <div className="w-full flex justify-between items-center">
-                      <span className="text-sm">Saldo:</span>
-                      <span className={`font-medium ${
-                        account.balance > 0 ? "text-green-700" : 
-                        account.balance < 0 ? "text-red-700" : ""
-                      }`}>
-                        {formatCurrency(account.balance)}
-                      </span>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))
-            )}
-          </div>
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
+
+        {accountTypes.filter(type => type.value !== "todos").map((type) => (
+          <TabsContent key={type.value} value={type.value} className="mt-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredAccounts.length === 0 ? (
+                <p className="text-muted-foreground col-span-full text-center py-8">
+                  No hay cuentas en esta categoría. Crea una nueva cuenta.
+                </p>
+              ) : (
+                filteredAccounts.map((account) => (
+                  <Card 
+                    key={account.id} 
+                    className={`account-card overflow-hidden border hover-scale ${
+                      account.balance !== 0 ? "border-gray-300" : ""
+                    }`}
+                  >
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <Badge 
+                          variant="secondary" 
+                          className={`${getColorForType(account.type)}`}
+                        >
+                          {getTypeLabel(account.type)}
+                        </Badge>
+                        <div className="flex gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-7 w-7"
+                            onClick={() => setActiveAccount(account)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-7 w-7 text-destructive"
+                            onClick={() => deleteAccount(account.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        {getIconForType(account.type)}
+                        <span className="truncate">{account.name}</span>
+                      </CardTitle>
+                      <CardDescription className="flex items-center justify-end">
+                        <span className="text-xs px-2 py-0.5 rounded bg-gray-100">
+                          {account.nature === "deudora" ? "Deudora" : "Acreedora"}
+                        </span>
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {account.description && (
+                        <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                          {account.description}
+                        </p>
+                      )}
+                    </CardContent>
+                    <CardFooter className="bg-muted/50 py-2">
+                      <div className="w-full flex justify-between items-center">
+                        <span className="text-sm">Saldo:</span>
+                        <span className={`font-medium ${
+                          account.balance > 0 ? "text-green-700" : 
+                          account.balance < 0 ? "text-red-700" : ""
+                        }`}>
+                          {formatCurrency(account.balance)}
+                        </span>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+        ))}
       </Tabs>
     </div>
   );
