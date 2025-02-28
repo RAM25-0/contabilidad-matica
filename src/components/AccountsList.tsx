@@ -19,7 +19,9 @@ import {
   Receipt, 
   Plus, 
   Pencil, 
-  Trash2 
+  Trash2,
+  DollarSign,
+  ShoppingBag
 } from "lucide-react";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { Account, AccountType } from "@/types/accounting";
@@ -40,7 +42,7 @@ export default function AccountsList() {
     { value: "pasivo", label: "Pasivos", icon: <Landmark className="h-4 w-4" /> },
     { value: "capital", label: "Capital", icon: <BarChart3 className="h-4 w-4" /> },
     { value: "ingreso", label: "Ingresos", icon: <Receipt className="h-4 w-4 rotate-180" /> },
-    { value: "gasto", label: "Gastos", icon: <Receipt className="h-4 w-4" /> },
+    { value: "gasto", label: "Egresos", icon: <Receipt className="h-4 w-4" /> },
   ];
 
   const getIconForType = (type: AccountType): React.ReactNode => {
@@ -50,13 +52,13 @@ export default function AccountsList() {
       case "pasivo":
         return <Landmark className="h-5 w-5 text-red-600" />;
       case "capital":
-        return <BarChart3 className="h-5 w-5 text-purple-600" />;
+        return <BarChart3 className="h-5 w-5 text-blue-600" />;
       case "ingreso":
-        return <Receipt className="h-5 w-5 text-blue-600 rotate-180" />;
+        return <DollarSign className="h-5 w-5 text-orange-600" />;
       case "gasto":
-        return <Receipt className="h-5 w-5 text-orange-600" />;
+        return <Receipt className="h-5 w-5 text-purple-600" />;
       default:
-        return <CreditCard className="h-5 w-5 text-gray-600" />;
+        return <ShoppingBag className="h-5 w-5 text-yellow-600" />;
     }
   };
 
@@ -67,13 +69,13 @@ export default function AccountsList() {
       case "pasivo":
         return "bg-red-50 text-red-700 border-red-200";
       case "capital":
-        return "bg-purple-50 text-purple-700 border-purple-200";
-      case "ingreso":
         return "bg-blue-50 text-blue-700 border-blue-200";
-      case "gasto":
+      case "ingreso":
         return "bg-orange-50 text-orange-700 border-orange-200";
+      case "gasto":
+        return "bg-purple-50 text-purple-700 border-purple-200";
       default:
-        return "bg-gray-50 text-gray-700 border-gray-200";
+        return "bg-yellow-50 text-yellow-700 border-yellow-200";
     }
   };
 

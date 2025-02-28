@@ -41,6 +41,23 @@ export function TransactionsList() {
   };
   
   const isOpen = (id: string) => !!openItems[id];
+
+  const getColorForType = (type: string): string => {
+    switch (type) {
+      case "activo":
+        return "bg-green-50 text-green-700 border-green-200";
+      case "pasivo":
+        return "bg-red-50 text-red-700 border-red-200";
+      case "capital":
+        return "bg-blue-50 text-blue-700 border-blue-200";
+      case "ingreso":
+        return "bg-orange-50 text-orange-700 border-orange-200";
+      case "gasto":
+        return "bg-purple-50 text-purple-700 border-purple-200";
+      default:
+        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+    }
+  };
   
   if (state.transactions.length === 0) {
     return (
@@ -122,14 +139,7 @@ export function TransactionsList() {
                           <TableCell>
                             <Badge 
                               variant="outline" 
-                              className={cn(
-                                "text-xs",
-                                entry.accountType === "activo" && "bg-green-50 text-green-700 border-green-200",
-                                entry.accountType === "pasivo" && "bg-red-50 text-red-700 border-red-200",
-                                entry.accountType === "capital" && "bg-purple-50 text-purple-700 border-purple-200",
-                                entry.accountType === "ingreso" && "bg-blue-50 text-blue-700 border-blue-200",
-                                entry.accountType === "gasto" && "bg-orange-50 text-orange-700 border-orange-200",
-                              )}
+                              className={getColorForType(entry.accountType)}
                             >
                               {getTypeLabel(entry.accountType)}
                             </Badge>

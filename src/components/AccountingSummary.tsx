@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, Landmark, Wallet, BarChart } from "lucide-react";
+import { DollarSign, Landmark, Wallet, BarChart, ShoppingBag } from "lucide-react";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { formatCurrency } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -45,7 +45,7 @@ export function AccountingSummary() {
       <Card className="hover-scale">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium">Capital Total</CardTitle>
-          <BarChart className="h-4 w-4 text-purple-600" />
+          <BarChart className="h-4 w-4 text-blue-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold balance-animation">
