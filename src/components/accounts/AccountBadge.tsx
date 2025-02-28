@@ -87,8 +87,8 @@ export const getSubcategoryLabel = (subcategory: AccountSubcategory) => {
     case "circulante": return "Activo Circulante (Current)";
     case "fijo": return "Activo No Circulante (Non Current)";
     case "diferido": return "Activos Intangibles";
-    case "corto_plazo": return "Pasivo a Corto Plazo";
-    case "largo_plazo": return "Pasivo a Largo Plazo";
+    case "corto_plazo": return "Pasivo a Corto Plazo (Short term)";
+    case "largo_plazo": return "Pasivo a Largo Plazo (Long term)";
     case "contribuido": return "Capital Contribuido";
     case "ganado": return "Capital Ganado";
     case "operativos": return "Ingresos Operativos";

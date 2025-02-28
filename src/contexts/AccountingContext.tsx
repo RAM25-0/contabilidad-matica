@@ -387,7 +387,7 @@ const predefinedAccounts: Account[] = [
     subcategory: "diferido"
   },
 
-  // ----- PASIVOS A CORTO PLAZO -----
+  // ----- PASIVOS A CORTO PLAZO (SHORT TERM) -----
   {
     id: uuidv4(),
     name: "Proveedores",
@@ -399,7 +399,7 @@ const predefinedAccounts: Account[] = [
   },
   {
     id: uuidv4(),
-    name: "Acreedores Diversos",
+    name: "Otras cuentas por pagar y pasivos acumulados",
     code: "2-02",
     type: "pasivo",
     nature: "acreedora",
@@ -408,7 +408,7 @@ const predefinedAccounts: Account[] = [
   },
   {
     id: uuidv4(),
-    name: "Documentos por Pagar (Corto Plazo)",
+    name: "Documentos por pagar",
     code: "2-03",
     type: "pasivo",
     nature: "acreedora",
@@ -417,7 +417,7 @@ const predefinedAccounts: Account[] = [
   },
   {
     id: uuidv4(),
-    name: "Intereses por Pagar",
+    name: "Acreedores Diversos",
     code: "2-04",
     type: "pasivo",
     nature: "acreedora",
@@ -426,7 +426,7 @@ const predefinedAccounts: Account[] = [
   },
   {
     id: uuidv4(),
-    name: "Impuestos y Derechos por Pagar",
+    name: "Impuestos por pagar",
     code: "2-05",
     type: "pasivo",
     nature: "acreedora",
@@ -435,7 +435,7 @@ const predefinedAccounts: Account[] = [
   },
   {
     id: uuidv4(),
-    name: "IVA por Pagar",
+    name: "IVA por pagar COBRADO",
     code: "2-06",
     type: "pasivo",
     nature: "acreedora",
@@ -444,7 +444,7 @@ const predefinedAccounts: Account[] = [
   },
   {
     id: uuidv4(),
-    name: "Anticipo a Clientes",
+    name: "IVA por pagar NO COBRADO",
     code: "2-07",
     type: "pasivo",
     nature: "acreedora",
@@ -453,19 +453,109 @@ const predefinedAccounts: Account[] = [
   },
   {
     id: uuidv4(),
-    name: "Intereses Cobrados por Anticipado",
+    name: "Anticipo de Clientes",
     code: "2-08",
     type: "pasivo",
     nature: "acreedora",
     balance: 0,
     subcategory: "corto_plazo"
   },
-
-  // ----- PASIVOS A LARGO PLAZO -----
   {
     id: uuidv4(),
-    name: "Documentos por Pagar (Largo Plazo)",
+    name: "Provisiones",
     code: "2-09",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Garantías sobre productos vendidos",
+    code: "2-10",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "I.S.R. por pagar",
+    code: "2-11",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "P.T.U. por pagar",
+    code: "2-12",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Pasivo financiero",
+    code: "2-13",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Intereses por pagar",
+    code: "2-14",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+
+  // ----- PASIVOS A LARGO PLAZO (LONG TERM) -----
+  {
+    id: uuidv4(),
+    name: "Deuda a largo plazo",
+    code: "2-15",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "largo_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Documentos por pagar a largo plazo",
+    code: "2-16",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "largo_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Préstamos Hipotecarios",
+    code: "2-17",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "largo_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Provisiones a largo plazo",
+    code: "2-18",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "largo_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Beneficios al retiro a empleados",
+    code: "2-19",
     type: "pasivo",
     nature: "acreedora",
     balance: 0,
