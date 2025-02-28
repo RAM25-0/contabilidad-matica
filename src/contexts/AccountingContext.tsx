@@ -19,61 +19,61 @@ type AccountingAction =
   | { type: "DELETE_TRANSACTION"; payload: string }
   | { type: "FILTER_ACCOUNTS"; payload: AccountType | "todos" };
 
-// Creamos un catálogo completo de cuentas predefinidas de activos pero con saldo cero
+// Creamos un catálogo completo de cuentas predefinidas basado en la imagen proporcionada
 const predefinedAccounts: Account[] = [
-  // ----- ACTIVOS CIRCULANTES -----
+  // ----- ACTIVOS CIRCULANTES (CURRENT) -----
   {
     id: uuidv4(),
-    name: "Fondo Fijo de Caja",
+    name: "Efectivo y equivalente de efectivo",
     code: "1-01",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Efectivo",
+    code: "1-02",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
     name: "Bancos",
-    code: "1-02",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "circulante"
-  },
-  {
-    id: uuidv4(),
-    name: "Inversiones en Valores",
     code: "1-03",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
-    name: "Almacén",
+    name: "Inversiones temporales",
     code: "1-04",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
-    name: "Inventario Inicial",
+    name: "Cuentas y documentos por cobrar",
     code: "1-05",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
-    name: "Estimación para Ajustes de Inventarios",
+    name: "Clientes neto",
     code: "1-06",
     type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
+    nature: "deudora",
+    balance: 0,
     subcategory: "circulante"
   },
   {
@@ -82,236 +82,308 @@ const predefinedAccounts: Account[] = [
     code: "1-07",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
-    name: "Estimación para Cuentas Incobrables",
+    name: "Documentos por cobrar",
     code: "1-08",
     type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
+    nature: "deudora",
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
-    name: "Documentos por Cobrar",
+    name: "IVA acreditable PAGADO",
     code: "1-09",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "circulante"
-  },
-  {
-    id: uuidv4(),
-    name: "Documentos Descontados",
-    code: "1-10",
-    type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
-    subcategory: "circulante"
-  },
-  {
-    id: uuidv4(),
-    name: "Intereses por Cobrar",
-    code: "1-11",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "circulante"
-  },
-  {
-    id: uuidv4(),
-    name: "IVA por Cobrar",
-    code: "1-12",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
     name: "Funcionarios y Empleados",
-    code: "1-13",
+    code: "1-10",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Anticipos a Proveedores",
+    code: "1-11",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "IVA Acreditable NO PAGADO",
+    code: "1-12",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
     name: "Deudores Diversos",
-    code: "1-14",
+    code: "1-13",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "circulante"
   },
   {
     id: uuidv4(),
-    name: "Anticipo a Proveedores",
+    name: "Inventarios",
+    code: "1-14",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Almacén",
     code: "1-15",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Pagos anticipados",
+    code: "1-16",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Rentas pagadas por anticipado",
+    code: "1-17",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Publicidad pagada por anticipado",
+    code: "1-18",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Seguros pagados por anticipado",
+    code: "1-19",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "circulante"
+  },
+  
+  // ----- ACTIVOS NO CIRCULANTES (NON CURRENT) -----
+  {
+    id: uuidv4(),
+    name: "Propiedades, planta y equipo neto",
+    code: "1-20",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Construcciones en proceso",
+    code: "1-21",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Terreno",
+    code: "1-22",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Edificio",
+    code: "1-23",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Depreciación acumulada de edificio",
+    code: "1-24",
+    type: "activo",
+    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Mobiliario y equipo",
+    code: "1-25",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Depreciación acumulada de mobiliario",
+    code: "1-26",
+    type: "activo",
+    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Equipo de transporte automóviles",
+    code: "1-27",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Depreciación acumulada de automóviles",
+    code: "1-28",
+    type: "activo",
+    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Maquinaria y equipo",
+    code: "1-29",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Depreciación acumulada de maquinaria",
+    code: "1-30",
+    type: "activo",
+    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Equipo de cómputo y equipo electrónico",
+    code: "1-31",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Depreciación acumulada de equipo electrónico",
+    code: "1-32",
+    type: "activo",
+    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Equipo de reparto",
+    code: "1-33",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Depreciación acumulada de reparto",
+    code: "1-34",
+    type: "activo",
+    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
+    balance: 0,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Otros Activos",
+    code: "1-35",
+    type: "activo",
+    nature: "deudora",
+    balance: 0,
+    subcategory: "fijo"
   },
   {
     id: uuidv4(),
     name: "Depósitos en Garantía",
-    code: "1-16",
+    code: "1-36",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "circulante"
-  },
-  
-  // ----- ACTIVOS FIJOS -----
-  {
-    id: uuidv4(),
-    name: "Terrenos",
-    code: "1-17",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Edificios",
-    code: "1-18",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Depreciación Acumulada de Edificio",
-    code: "1-19",
-    type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Maquinaria y Equipo",
-    code: "1-20",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Depreciación Acumulada de Maquinaria y Equipo",
-    code: "1-21",
-    type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Equipo de Transporte",
-    code: "1-22",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Depreciación Acumulada de Equipo de Transporte",
-    code: "1-23",
-    type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Mobiliario y Equipo",
-    code: "1-24",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Depreciación Acumulada de Mobiliario y Equipo",
-    code: "1-25",
-    type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
-    subcategory: "fijo"
-  },
-  {
-    id: uuidv4(),
-    name: "Construcciones en Proceso",
-    code: "1-26",
-    type: "activo",
-    nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "fijo"
   },
   
-  // ----- ACTIVOS NO CIRCULANTES (antes diferido) -----
+  // ----- ACTIVOS INTANGIBLES -----
   {
     id: uuidv4(),
-    name: "Gastos de Organización",
-    code: "1-27",
+    name: "Activos intangibles",
+    code: "1-37",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "diferido"
   },
   {
     id: uuidv4(),
-    name: "Amortización Gastos de Organización",
-    code: "1-28",
-    type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
-    subcategory: "diferido"
-  },
-  {
-    id: uuidv4(),
-    name: "Gastos de Instalación",
-    code: "1-29",
+    name: "Patentes",
+    code: "1-38",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "diferido"
   },
   {
     id: uuidv4(),
-    name: "Amortización Gastos de Instalación",
-    code: "1-30",
-    type: "activo",
-    nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: 0, // Saldo inicial cero
-    subcategory: "diferido"
-  },
-  {
-    id: uuidv4(),
-    name: "Intereses Pagados por Anticipado",
-    code: "1-31",
+    name: "Marcas registradas",
+    code: "1-39",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "diferido"
   },
   {
     id: uuidv4(),
-    name: "Seguros y Fianzas Pagados por Anticipado",
-    code: "1-32",
+    name: "Derechos de autor",
+    code: "1-40",
     type: "activo",
     nature: "deudora",
-    balance: 0, // Saldo inicial cero
+    balance: 0,
     subcategory: "diferido"
   },
 

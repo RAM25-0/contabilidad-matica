@@ -84,9 +84,9 @@ export const getBgColorForType = (
 
 export const getSubcategoryLabel = (subcategory: AccountSubcategory) => {
   switch (subcategory) {
-    case "circulante": return "Activo Circulante";
-    case "fijo": return "Activo Fijo";
-    case "diferido": return "Activo No Circulante";
+    case "circulante": return "Activo Circulante (Current)";
+    case "fijo": return "Activo No Circulante (Non Current)";
+    case "diferido": return "Activos Intangibles";
     case "corto_plazo": return "Pasivo a Corto Plazo";
     case "largo_plazo": return "Pasivo a Largo Plazo";
     case "contribuido": return "Capital Contribuido";
