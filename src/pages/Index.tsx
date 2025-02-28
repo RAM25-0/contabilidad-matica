@@ -9,7 +9,7 @@ import { AccountingSummary } from "@/components/AccountingSummary";
 import { AccountingProvider } from "@/contexts/AccountingContext";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { BookOpen, PieChart } from "lucide-react";
+import { BookOpen, PieChart, LayoutDashboard } from "lucide-react";
 
 const Index = () => {
   return (
@@ -34,7 +34,7 @@ const Index = () => {
               </Button>
             </Link>
             <Link to="/mayor">
-              <Button variant="outline" className="gap-2">
+              <Button variant="secondary" className="gap-2 bg-gradient-to-r from-blue-500/90 to-purple-500/90 text-white hover:from-blue-600 hover:to-purple-600">
                 <PieChart className="h-4 w-4" />
                 Ir al Libro Mayor
               </Button>

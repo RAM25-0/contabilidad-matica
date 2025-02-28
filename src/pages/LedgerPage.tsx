@@ -7,13 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { 
   Card, 
   CardContent, 
   CardHeader, 
@@ -24,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { AccountSubcategory, AccountType } from "@/types/accounting";
 import { formatCurrency } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, BookOpen, PieChart } from "lucide-react";
 
 // Tipo para agrupar cuentas por tipo y subcategoría
 type GroupedAccounts = {
@@ -37,6 +30,45 @@ type GroupedAccounts = {
       }>;
     };
   };
+};
+
+// Colores por tipo de cuenta
+const typeColors = {
+  activo: {
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
+    text: "text-emerald-700",
+    title: "text-emerald-800",
+    header: "bg-emerald-100"
+  },
+  pasivo: {
+    bg: "bg-rose-50",
+    border: "border-rose-200",
+    text: "text-rose-700",
+    title: "text-rose-800",
+    header: "bg-rose-100"
+  },
+  capital: {
+    bg: "bg-purple-50",
+    border: "border-purple-200",
+    text: "text-purple-700",
+    title: "text-purple-800",
+    header: "bg-purple-100"
+  },
+  ingreso: {
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    text: "text-blue-700",
+    title: "text-blue-800",
+    header: "bg-blue-100"
+  },
+  gasto: {
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-700",
+    title: "text-amber-800",
+    header: "bg-amber-100"
+  }
 };
 
 // Función para obtener la etiqueta de la subcategoría
@@ -137,6 +169,8 @@ export default function LedgerPage() {
       );
     }
     
+    const colors = typeColors[type];
+    
     return (
       <div className="space-y-8">
         {subcategoryOrder[type].map(subcategory => {
@@ -144,14 +178,15 @@ export default function LedgerPage() {
           if (!group || group.accounts.length === 0) return null;
           
           return (
-            <div key={subcategory}>
-              <h3 className="text-lg font-semibold mb-4">{group.label}</h3>
+            <div key={subcategory} className={`p-6 rounded-lg ${colors.bg} ${colors.border} border`}>
+              <h3 className={`text-lg font-semibold mb-4 ${colors.title}`}>{group.label}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {group.accounts.map(({ account, movements }) => (
                   <TAccount 
                     key={account.id} 
                     account={account} 
                     movements={movements} 
+                    colors={colors}
                   />
                 ))}
               </div>
@@ -171,45 +206,53 @@ export default function LedgerPage() {
             Visualización en formato de cuentas "T" para balance y resultados
           </p>
         </div>
-        <Link to="/">
-          <Button variant="outline" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Volver a Inicio
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link to="/diario">
+            <Button variant="outline" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              Ir al Libro Diario
+            </Button>
+          </Link>
+          <Link to="/">
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Volver a Inicio
+            </Button>
+          </Link>
+        </div>
       </div>
       
       <Card className="mb-6">
-        <CardHeader>
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-lg">
           <CardTitle>Ecuación Contable</CardTitle>
           <CardDescription>Activo = Pasivo + Capital</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
-            <div className="flex flex-col items-center">
-              <span className="text-lg font-medium">Activo</span>
-              <span className="text-2xl font-bold">{formatCurrency(activos)}</span>
+            <div className="flex flex-col items-center bg-emerald-50 rounded-lg p-4 w-full sm:w-auto">
+              <span className="text-lg font-medium text-emerald-800">Activo</span>
+              <span className="text-2xl font-bold text-emerald-700">{formatCurrency(activos)}</span>
             </div>
             <div className="text-2xl font-bold">=</div>
-            <div className="flex flex-col items-center">
-              <span className="text-lg font-medium">Pasivo</span>
-              <span className="text-2xl font-bold">{formatCurrency(pasivos)}</span>
+            <div className="flex flex-col items-center bg-rose-50 rounded-lg p-4 w-full sm:w-auto">
+              <span className="text-lg font-medium text-rose-800">Pasivo</span>
+              <span className="text-2xl font-bold text-rose-700">{formatCurrency(pasivos)}</span>
             </div>
             <div className="text-2xl font-bold">+</div>
-            <div className="flex flex-col items-center">
-              <span className="text-lg font-medium">Capital</span>
-              <span className="text-2xl font-bold">{formatCurrency(capital)}</span>
+            <div className="flex flex-col items-center bg-purple-50 rounded-lg p-4 w-full sm:w-auto">
+              <span className="text-lg font-medium text-purple-800">Capital</span>
+              <span className="text-2xl font-bold text-purple-700">{formatCurrency(capital)}</span>
             </div>
           </div>
           
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center pt-4">
             {equation ? (
-              <Badge variant="outline" className="gap-1 py-1 border-green-500 text-green-600">
+              <Badge variant="outline" className="gap-1 py-1 px-4 border-green-500 text-green-600 bg-green-50">
                 <CheckCircle className="h-4 w-4" />
                 La ecuación contable está balanceada
               </Badge>
             ) : (
-              <Badge variant="outline" className="gap-1 py-1 border-red-500 text-red-600">
+              <Badge variant="outline" className="gap-1 py-1 px-4 border-red-500 text-red-600 bg-red-50">
                 <XCircle className="h-4 w-4" />
                 La ecuación contable NO está balanceada
               </Badge>
@@ -225,24 +268,59 @@ export default function LedgerPage() {
       >
         <ScrollArea className="w-full">
           <div className="p-1">
-            <TabsList className="mb-4 grid grid-cols-3 md:flex md:w-auto">
-              <TabsTrigger value="activo">Activo</TabsTrigger>
-              <TabsTrigger value="pasivo">Pasivo</TabsTrigger>
-              <TabsTrigger value="capital">Capital</TabsTrigger>
+            <TabsList className="mb-4 grid grid-cols-5 md:flex md:w-auto">
+              <TabsTrigger 
+                value="activo" 
+                className="data-[state=active]:bg-emerald-100 data-[state=active]:text-emerald-800"
+              >
+                Activo
+              </TabsTrigger>
+              <TabsTrigger 
+                value="pasivo" 
+                className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-800"
+              >
+                Pasivo
+              </TabsTrigger>
+              <TabsTrigger 
+                value="capital" 
+                className="data-[state=active]:bg-purple-100 data-[state=active]:text-purple-800"
+              >
+                Capital
+              </TabsTrigger>
+              <TabsTrigger 
+                value="ingreso" 
+                className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800"
+              >
+                Ingresos
+              </TabsTrigger>
+              <TabsTrigger 
+                value="gasto" 
+                className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800"
+              >
+                Gastos
+              </TabsTrigger>
             </TabsList>
           </div>
         </ScrollArea>
         
-        <TabsContent value="activo" className="mt-4">
+        <TabsContent value="activo" className="mt-6">
           {renderAccountsBySubcategory("activo")}
         </TabsContent>
         
-        <TabsContent value="pasivo" className="mt-4">
+        <TabsContent value="pasivo" className="mt-6">
           {renderAccountsBySubcategory("pasivo")}
         </TabsContent>
         
-        <TabsContent value="capital" className="mt-4">
+        <TabsContent value="capital" className="mt-6">
           {renderAccountsBySubcategory("capital")}
+        </TabsContent>
+        
+        <TabsContent value="ingreso" className="mt-6">
+          {renderAccountsBySubcategory("ingreso")}
+        </TabsContent>
+        
+        <TabsContent value="gasto" className="mt-6">
+          {renderAccountsBySubcategory("gasto")}
         </TabsContent>
       </Tabs>
     </div>

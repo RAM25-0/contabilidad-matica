@@ -13,7 +13,6 @@ import {
 import { Account, TransactionEntry } from "@/types/accounting";
 import { cn, formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 
 interface MovementDetail {
@@ -24,12 +23,21 @@ interface MovementDetail {
   credit: number;
 }
 
+interface ColorScheme {
+  bg: string;
+  border: string;
+  text: string;
+  title: string;
+  header: string;
+}
+
 interface TAccountProps {
   account: Account;
   movements: MovementDetail[];
+  colors?: ColorScheme;
 }
 
-export function TAccount({ account, movements }: TAccountProps) {
+export function TAccount({ account, movements, colors }: TAccountProps) {
   const totalDebits = movements.reduce((sum, m) => sum + m.debit, 0);
   const totalCredits = movements.reduce((sum, m) => sum + m.credit, 0);
   
@@ -49,20 +57,35 @@ export function TAccount({ account, movements }: TAccountProps) {
       ? "Deudor"
       : "Acreedor";
 
+  // Determinar colores para el badge de saldo
+  let badgeVariant = "outline";
+  let badgeClasses = "";
+  
+  if (balanceNature === "Deudor") {
+    badgeVariant = "outline";
+    badgeClasses = "border-blue-500 text-blue-600 bg-blue-50";
+  } else if (balanceNature === "Acreedor") {
+    badgeVariant = "outline";
+    badgeClasses = "border-indigo-500 text-indigo-600 bg-indigo-50";
+  } else {
+    badgeVariant = "outline";
+    badgeClasses = "border-gray-300 text-gray-600 bg-gray-50";
+  }
+
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
+    <Card className={cn("h-full", colors?.border, colors?.bg)}>
+      <CardHeader className={cn("pb-2", colors?.header)}>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className={cn("flex items-center gap-2", colors?.title)}>
               <span>{account.code}</span>
-              <span>{account.name}</span>
+              <span className="truncate">{account.name}</span>
             </CardTitle>
             <div className="text-xs text-muted-foreground mt-1">
               Naturaleza: {account.nature === "deudora" ? "Deudora" : "Acreedora"}
             </div>
           </div>
-          <Badge variant={balanceNature === "Deudor" ? "default" : balanceNature === "Acreedor" ? "secondary" : "outline"}>
+          <Badge variant="outline" className={badgeClasses}>
             Saldo {balanceNature}
           </Badge>
         </div>
