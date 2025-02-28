@@ -49,58 +49,58 @@ export default function AccountsList() {
     { value: "activo", label: "Activos", icon: <Wallet className="h-4 w-4" /> },
     { value: "pasivo", label: "Pasivos", icon: <Landmark className="h-4 w-4" /> },
     { value: "capital", label: "Capital", icon: <BarChart3 className="h-4 w-4" /> },
-    { value: "ingreso", label: "Ingresos", icon: <Receipt className="h-4 w-4 rotate-180" /> },
+    { value: "ingreso", label: "Ingresos", icon: <DollarSign className="h-4 w-4" /> },
     { value: "gasto", label: "Egresos", icon: <Receipt className="h-4 w-4" /> },
   ];
 
   const getIconForType = (type: AccountType): React.ReactNode => {
     switch (type) {
       case "activo":
-        return <Wallet className="h-5 w-5 text-green-600" />;
+        return <Wallet className="h-5 w-5 text-emerald-600" />;
       case "pasivo":
-        return <Landmark className="h-5 w-5 text-red-600" />;
+        return <Landmark className="h-5 w-5 text-rose-600" />;
       case "capital":
-        return <BarChart3 className="h-5 w-5 text-blue-600" />;
+        return <BarChart3 className="h-5 w-5 text-indigo-600" />;
       case "ingreso":
-        return <DollarSign className="h-5 w-5 text-orange-600" />;
+        return <DollarSign className="h-5 w-5 text-amber-600" />;
       case "gasto":
-        return <Receipt className="h-5 w-5 text-purple-600" />;
+        return <Receipt className="h-5 w-5 text-violet-600" />;
       default:
-        return <ShoppingBag className="h-5 w-5 text-yellow-600" />;
+        return <ShoppingBag className="h-5 w-5 text-gray-600" />;
     }
   };
 
   const getColorForType = (type: AccountType): string => {
     switch (type) {
       case "activo":
-        return "bg-green-50 text-green-700 border-green-200";
+        return "bg-emerald-50 text-emerald-700 border-emerald-200";
       case "pasivo":
-        return "bg-red-50 text-red-700 border-red-200";
+        return "bg-rose-50 text-rose-700 border-rose-200";
       case "capital":
-        return "bg-blue-50 text-blue-700 border-blue-200";
+        return "bg-indigo-50 text-indigo-700 border-indigo-200";
       case "ingreso":
-        return "bg-orange-50 text-orange-700 border-orange-200";
+        return "bg-amber-50 text-amber-700 border-amber-200";
       case "gasto":
-        return "bg-purple-50 text-purple-700 border-purple-200";
+        return "bg-violet-50 text-violet-700 border-violet-200";
       default:
-        return "bg-yellow-50 text-yellow-700 border-yellow-200";
+        return "bg-gray-50 text-gray-700 border-gray-200";
     }
   };
 
   const getTextColorForType = (type: AccountType): string => {
     switch (type) {
       case "activo":
-        return "text-green-700";
+        return "text-emerald-700";
       case "pasivo":
-        return "text-red-700";
+        return "text-rose-700";
       case "capital":
-        return "text-blue-700";
+        return "text-indigo-700";
       case "ingreso":
-        return "text-orange-700";
+        return "text-amber-700";
       case "gasto":
-        return "text-purple-700";
+        return "text-violet-700";
       default:
-        return "text-slate-700";
+        return "text-gray-700";
     }
   };
 
@@ -192,8 +192,8 @@ export default function AccountsList() {
                           </TableCell>
                           <TableCell className="text-right">
                             <span className={`font-medium ${
-                              account.balance > 0 ? "text-green-700" : 
-                              account.balance < 0 ? "text-red-700" : "text-slate-500"
+                              account.balance > 0 ? "text-emerald-700" : 
+                              account.balance < 0 ? "text-rose-700" : "text-slate-500"
                             }`}>
                               {formatCurrency(account.balance)}
                             </span>
@@ -291,8 +291,8 @@ export default function AccountsList() {
                       <div className="w-full flex justify-between items-center">
                         <span className="text-sm">Saldo:</span>
                         <span className={`font-medium ${
-                          account.balance > 0 ? "text-green-700" : 
-                          account.balance < 0 ? "text-red-700" : ""
+                          account.balance > 0 ? "text-emerald-700" : 
+                          account.balance < 0 ? "text-rose-700" : ""
                         }`}>
                           {formatCurrency(account.balance)}
                         </span>
