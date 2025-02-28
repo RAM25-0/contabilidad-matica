@@ -1,117 +1,131 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Wallet, 
-  Landmark, 
-  BarChart3, 
-  Receipt, 
-  DollarSign,
-  ShoppingBag,
-  CircleDollarSign,
-  Building,
-  Clock 
-} from "lucide-react";
 import { AccountSubcategory, AccountType } from "@/types/accounting";
+import {
+  Banknote,
+  Building2,
+  Clock,
+  CreditCard,
+  DollarSign,
+  FileText,
+  PiggyBank,
+  Wallet,
+  WalletCards,
+} from "lucide-react";
+
+export const getIconForType = (
+  type: AccountType, 
+  subcategory?: AccountSubcategory
+) => {
+  switch (type) {
+    case "activo":
+      if (subcategory === "circulante") return <Wallet className="h-4 w-4" />;
+      if (subcategory === "fijo") return <Building2 className="h-4 w-4" />;
+      return <DollarSign className="h-4 w-4" />;
+    case "pasivo":
+      if (subcategory === "corto_plazo") return <Clock className="h-4 w-4" />;
+      if (subcategory === "largo_plazo") return <FileText className="h-4 w-4" />;
+      return <CreditCard className="h-4 w-4" />;
+    case "capital":
+      return <PiggyBank className="h-4 w-4" />;
+    case "ingreso":
+      return <Banknote className="h-4 w-4" />;
+    case "gasto":
+      return <WalletCards className="h-4 w-4" />;
+    default:
+      return <DollarSign className="h-4 w-4" />;
+  }
+};
+
+export const getTextColorForType = (
+  type: AccountType, 
+  subcategory?: AccountSubcategory
+) => {
+  switch (type) {
+    case "activo":
+      return "text-emerald-700";
+    case "pasivo":
+      if (subcategory === "corto_plazo") return "text-rose-500"; // Rojo claro
+      if (subcategory === "largo_plazo") return "text-rose-700"; // Rojo oscuro
+      return "text-rose-600"; // Por defecto para pasivos
+    case "capital":
+      return "text-purple-700";
+    case "ingreso":
+      return "text-blue-700";
+    case "gasto":
+      return "text-amber-700";
+    default:
+      return "text-slate-700";
+  }
+};
+
+export const getBgColorForType = (
+  type: AccountType, 
+  subcategory?: AccountSubcategory
+) => {
+  switch (type) {
+    case "activo":
+      return "bg-emerald-100";
+    case "pasivo":
+      if (subcategory === "corto_plazo") return "bg-rose-100"; // Rojo claro - Fondo más suave
+      if (subcategory === "largo_plazo") return "bg-rose-200"; // Rojo oscuro - Fondo más intenso
+      return "bg-rose-100"; // Por defecto para pasivos
+    case "capital":
+      return "bg-purple-100";
+    case "ingreso":
+      return "bg-blue-100";
+    case "gasto":
+      return "bg-amber-100";
+    default:
+      return "bg-slate-100";
+  }
+};
+
+export const getSubcategoryLabel = (subcategory: AccountSubcategory) => {
+  switch (subcategory) {
+    case "circulante": return "Activo Circulante";
+    case "fijo": return "Activo Fijo";
+    case "diferido": return "Activo No Circulante";
+    case "corto_plazo": return "Pasivo a Corto Plazo";
+    case "largo_plazo": return "Pasivo a Largo Plazo";
+    case "contribuido": return "Capital Contribuido";
+    case "ganado": return "Capital Ganado";
+    case "operativos": return "Ingresos Operativos";
+    case "no_operativos": return "Ingresos No Operativos";
+    case "operativos_admin": return "Gastos Operativos (Administración)";
+    case "operativos_venta": return "Gastos Operativos (Ventas)";
+    case "financieros": return "Gastos Financieros";
+    case "otros": return "Otros Gastos";
+    case "none": return "Sin Clasificar";
+    default: return "Desconocido";
+  }
+};
 
 interface AccountBadgeProps {
   type: AccountType;
   subcategory?: AccountSubcategory;
-  showIcon?: boolean;
   label?: string;
-  className?: string;
+  showIcon?: boolean;
 }
 
-export const AccountBadge = ({ type, subcategory, showIcon = true, label, className = "" }: AccountBadgeProps) => {
+export const AccountBadge = ({ 
+  type, 
+  subcategory, 
+  label, 
+  showIcon = true 
+}: AccountBadgeProps) => {
+  const icon = showIcon ? getIconForType(type, subcategory) : null;
+  const textColor = getTextColorForType(type, subcategory);
+  const bgColor = getBgColorForType(type, subcategory);
+  
   return (
     <Badge 
-      variant="secondary" 
-      className={`${getColorForType(type, subcategory)} ${className}`}
+      variant="outline" 
+      className={`font-medium border-0 ${bgColor} ${textColor}`}
     >
-      {showIcon && getIconForType(type, subcategory)}
-      {label || ""}
+      {icon && <span className="mr-1">{icon}</span>}
+      {label || type}
     </Badge>
   );
-};
-
-export const getIconForType = (type: AccountType, subcategory?: AccountSubcategory): React.ReactNode => {
-  if (type === "activo") {
-    if (subcategory === "circulante") return <CircleDollarSign className="h-5 w-5 text-emerald-600" />;
-    if (subcategory === "fijo") return <Building className="h-5 w-5 text-emerald-700" />;
-    if (subcategory === "diferido") return <Clock className="h-5 w-5 text-cyan-600" />;
-    return <Wallet className="h-5 w-5 text-emerald-600" />;
-  } else if (type === "pasivo") {
-    return <Landmark className="h-5 w-5 text-rose-600" />;
-  } else if (type === "capital") {
-    return <BarChart3 className="h-5 w-5 text-indigo-600" />;
-  } else if (type === "ingreso") {
-    return <DollarSign className="h-5 w-5 text-amber-600" />;
-  } else if (type === "gasto") {
-    return <Receipt className="h-5 w-5 text-violet-600" />;
-  } else {
-    return <ShoppingBag className="h-5 w-5 text-gray-600" />;
-  }
-};
-
-export const getColorForType = (type: AccountType, subcategory?: AccountSubcategory): string => {
-  switch (type) {
-    case "activo":
-      if (subcategory === "circulante") return "bg-emerald-50 text-emerald-700 border-emerald-200";
-      if (subcategory === "fijo") return "bg-teal-50 text-teal-700 border-teal-200";
-      if (subcategory === "diferido") return "bg-cyan-50 text-cyan-700 border-cyan-200";
-      return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "pasivo":
-      return "bg-rose-50 text-rose-700 border-rose-200";
-    case "capital":
-      return "bg-indigo-50 text-indigo-700 border-indigo-200";
-    case "ingreso":
-      return "bg-amber-50 text-amber-700 border-amber-200";
-    case "gasto":
-      return "bg-violet-50 text-violet-700 border-violet-200";
-    default:
-      return "bg-gray-50 text-gray-700 border-gray-200";
-  }
-};
-
-export const getTextColorForType = (type: AccountType, subcategory?: AccountSubcategory): string => {
-  switch (type) {
-    case "activo":
-      if (subcategory === "circulante") return "text-emerald-700";
-      if (subcategory === "fijo") return "text-teal-700";
-      if (subcategory === "diferido") return "text-cyan-700";
-      return "text-emerald-700";
-    case "pasivo":
-      return "text-rose-700";
-    case "capital":
-      return "text-indigo-700";
-    case "ingreso":
-      return "text-amber-700";
-    case "gasto":
-      return "text-violet-700";
-    default:
-      return "text-gray-700";
-  }
-};
-
-export const getSubcategoryLabel = (subcategory?: AccountSubcategory): string => {
-  if (!subcategory || subcategory === "none") return "";
-  
-  const labels: Record<AccountSubcategory, string> = {
-    circulante: "Circulante",
-    fijo: "Fijo",
-    diferido: "No Circulante",
-    corto_plazo: "Corto Plazo",
-    largo_plazo: "Largo Plazo",
-    contribuido: "Contribuido",
-    ganado: "Ganado",
-    operativos: "Operativos",
-    no_operativos: "No Operativos",
-    operativos_admin: "Operativos (Admin)",
-    operativos_venta: "Operativos (Ventas)",
-    financieros: "Financieros",
-    otros: "Otros",
-    none: ""
-  };
-  
-  return labels[subcategory];
 };

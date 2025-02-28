@@ -313,6 +313,91 @@ const predefinedAccounts: Account[] = [
     nature: "deudora",
     balance: 0, // Saldo inicial cero
     subcategory: "diferido"
+  },
+
+  // ----- PASIVOS A CORTO PLAZO -----
+  {
+    id: uuidv4(),
+    name: "Proveedores",
+    code: "2-01",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Acreedores Diversos",
+    code: "2-02",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Documentos por Pagar (Corto Plazo)",
+    code: "2-03",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Intereses por Pagar",
+    code: "2-04",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Impuestos y Derechos por Pagar",
+    code: "2-05",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "IVA por Pagar",
+    code: "2-06",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Anticipo a Clientes",
+    code: "2-07",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+  {
+    id: uuidv4(),
+    name: "Intereses Cobrados por Anticipado",
+    code: "2-08",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "corto_plazo"
+  },
+
+  // ----- PASIVOS A LARGO PLAZO -----
+  {
+    id: uuidv4(),
+    name: "Documentos por Pagar (Largo Plazo)",
+    code: "2-09",
+    type: "pasivo",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "largo_plazo"
   }
 ];
 
