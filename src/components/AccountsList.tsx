@@ -70,12 +70,7 @@ export default function AccountsList() {
     }
   };
 
-  const getColorForType = (type: AccountType, accountName?: string): string => {
-    // Caso especial para la cuenta de Inventario Final
-    if (accountName === "Inventario Final") {
-      return "bg-purple-100 text-purple-700 border-purple-200";
-    }
-    
+  const getColorForType = (type: AccountType): string => {
     switch (type) {
       case "activo":
         return "bg-green-50 text-green-700 border-green-200";
@@ -92,12 +87,7 @@ export default function AccountsList() {
     }
   };
 
-  const getTextColorForType = (type: AccountType, accountName?: string): string => {
-    // Caso especial para la cuenta de Inventario Final
-    if (accountName === "Inventario Final") {
-      return "text-purple-700";
-    }
-    
+  const getTextColorForType = (type: AccountType): string => {
     switch (type) {
       case "activo":
         return "text-green-700";
@@ -191,18 +181,17 @@ export default function AccountsList() {
                         <TableRow key={account.id}>
                           <TableCell>
                             <Badge 
-                              variant={account.name === "Inventario Final" ? "purple" : "secondary"} 
-                              className={account.name !== "Inventario Final" ? getColorForType(account.type, account.name) : ""}
+                              variant="secondary" 
+                              className={`${getColorForType(account.type)}`}
                             >
                               {getIconForType(account.type)}
                             </Badge>
                           </TableCell>
-                          <TableCell className={`font-medium ${getTextColorForType(account.type, account.name)}`}>
+                          <TableCell className={`font-medium ${getTextColorForType(account.type)}`}>
                             {account.name}
                           </TableCell>
                           <TableCell className="text-right">
                             <span className={`font-medium ${
-                              account.name === "Inventario Final" ? "text-purple-700" :
                               account.balance > 0 ? "text-green-700" : 
                               account.balance < 0 ? "text-red-700" : "text-slate-500"
                             }`}>
@@ -252,13 +241,13 @@ export default function AccountsList() {
                     key={account.id} 
                     className={`account-card overflow-hidden border hover-scale ${
                       account.balance !== 0 ? "border-gray-300" : ""
-                    } ${account.name === "Inventario Final" ? "border-purple-300" : ""}`}
+                    }`}
                   >
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start">
                         <Badge 
-                          variant={account.name === "Inventario Final" ? "purple" : "secondary"} 
-                          className={account.name !== "Inventario Final" ? getColorForType(account.type, account.name) : ""}
+                          variant="secondary" 
+                          className={`${getColorForType(account.type)}`}
                         >
                           {getTypeLabel(account.type)}
                         </Badge>
@@ -281,7 +270,7 @@ export default function AccountsList() {
                           </Button>
                         </div>
                       </div>
-                      <CardTitle className={`text-lg flex items-center gap-2 ${account.name === "Inventario Final" ? "text-purple-700" : ""}`}>
+                      <CardTitle className="text-lg flex items-center gap-2">
                         {getIconForType(account.type)}
                         <span className="truncate">{account.name}</span>
                       </CardTitle>
@@ -298,11 +287,10 @@ export default function AccountsList() {
                         </p>
                       )}
                     </CardContent>
-                    <CardFooter className={`py-2 ${account.name === "Inventario Final" ? "bg-purple-50" : "bg-muted/50"}`}>
+                    <CardFooter className="bg-muted/50 py-2">
                       <div className="w-full flex justify-between items-center">
                         <span className="text-sm">Saldo:</span>
                         <span className={`font-medium ${
-                          account.name === "Inventario Final" ? "text-purple-700" :
                           account.balance > 0 ? "text-green-700" : 
                           account.balance < 0 ? "text-red-700" : ""
                         }`}>
