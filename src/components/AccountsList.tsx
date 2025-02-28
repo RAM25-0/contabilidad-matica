@@ -180,6 +180,7 @@ export default function AccountsList() {
           onClick={() => setActiveAccount({ 
             id: "", 
             name: "", 
+            code: "", // Añadimos el código vacío para cumplir con el tipo Account
             type: "activo", 
             nature: "deudora", 
             balance: 0 
