@@ -36,6 +36,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { AccountBadge, getTextColorForType, getBgColorForType } from "@/components/accounts/AccountBadge";
 
 const formSchema = z.object({
   date: z.date({
@@ -152,93 +153,104 @@ export function TransactionForm() {
   
   return (
     <Card className="animate-fade-in">
-      <CardHeader>
-        <CardTitle className="text-2xl">Nueva Transacción</CardTitle>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl">Nueva Transacción</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-2">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Fecha</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className="w-full pl-3 text-left font-normal"
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP", { locale: es })
-                          ) : (
-                            <span>Seleccionar fecha</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Fecha</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className="w-full pl-3 text-left font-normal h-9"
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP", { locale: es })
+                            ) : (
+                              <span>Seleccionar fecha</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descripción</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Describe la transacción" 
+                        className="resize-none h-9 py-2" 
+                        {...field} 
                       />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg">Descripción</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Describe la transacción" 
-                      className="resize-none" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="space-y-4">
+            <div className="space-y-2">
               {entries.map((entry, index) => (
-                <div key={index} className="grid grid-cols-[1fr,1fr,1fr,auto] gap-4 items-end">
+                <div key={index} className="grid grid-cols-[1fr,auto,1fr,auto] gap-2 items-center">
                   <FormField
                     control={form.control}
                     name={`entries.${index}.accountId`}
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cuenta</FormLabel>
+                      <FormItem className="space-y-1">
+                        <FormLabel className="sr-only">Cuenta</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona una..." />
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Selecciona cuenta" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {state.accounts.map((account) => (
-                              <SelectItem key={account.id} value={account.id}>
-                                {account.code} - {account.name}
-                              </SelectItem>
-                            ))}
+                            {state.accounts.map((account) => {
+                              const textColor = getTextColorForType(account.type, account.subcategory);
+                              const bgColor = getBgColorForType(account.type, account.subcategory);
+                              
+                              return (
+                                <SelectItem 
+                                  key={account.id} 
+                                  value={account.id}
+                                  className={`${textColor} ${bgColor} rounded my-1`}
+                                >
+                                  {account.name}
+                                </SelectItem>
+                              );
+                            })}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -250,20 +262,20 @@ export function TransactionForm() {
                     control={form.control}
                     name={`entries.${index}.type`}
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tipo</FormLabel>
+                      <FormItem className="space-y-1">
+                        <FormLabel className="sr-only">Tipo</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecciona un tipo" />
+                            <SelectTrigger className="w-24 h-9">
+                              <SelectValue placeholder="Tipo" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="cargo">Cargo</SelectItem>
-                            <SelectItem value="abono">Abono</SelectItem>
+                            <SelectItem value="cargo" className="text-blue-600 bg-blue-50 rounded my-1">Cargo</SelectItem>
+                            <SelectItem value="abono" className="text-indigo-600 bg-indigo-50 rounded my-1">Abono</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -275,14 +287,15 @@ export function TransactionForm() {
                     control={form.control}
                     name={`entries.${index}.amount`}
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Monto</FormLabel>
+                      <FormItem className="space-y-1">
+                        <FormLabel className="sr-only">Monto</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             min="0.01"
                             step="0.01"
-                            placeholder="0"
+                            placeholder="Monto"
+                            className="h-9"
                             {...field}
                             onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                             value={field.value === 0 ? "" : field.value}
@@ -297,10 +310,10 @@ export function TransactionForm() {
                     type="button"
                     variant="outline"
                     size="icon"
-                    className="rounded-full"
+                    className="rounded-full h-8 w-8"
                     onClick={() => removeEntry(index)}
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-3 w-3" />
                   </Button>
                 </div>
               ))}
@@ -311,21 +324,21 @@ export function TransactionForm() {
                 type="button"
                 variant="outline"
                 onClick={addEntry}
-                className="gap-2"
+                className="gap-1 h-8 text-sm"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3 w-3" />
                 Agregar entrada
               </Button>
               
               <div className="text-sm text-muted-foreground">
                 <div className="flex justify-between gap-4">
-                  <span>Total Cargo:</span>
+                  <span>Cargo:</span>
                   <span className={isBalanced ? "text-green-600" : "text-red-600"}>
                     {formatCurrency(totalCargo)}
                   </span>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span>Total Abono:</span>
+                  <span>Abono:</span>
                   <span className={isBalanced ? "text-green-600" : "text-red-600"}>
                     {formatCurrency(totalAbono)}
                   </span>
@@ -345,7 +358,7 @@ export function TransactionForm() {
               <Button 
                 type="submit" 
                 disabled={!isBalanced} 
-                className="px-6 py-5 text-lg"
+                className="px-4 py-2"
               >
                 Registrar transacción
               </Button>
