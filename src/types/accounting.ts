@@ -3,6 +3,8 @@ export type AccountType = "activo" | "pasivo" | "capital" | "ingreso" | "gasto";
 
 export type AccountNature = "deudora" | "acreedora";
 
+export type AccountSubcategory = "circulante" | "fijo" | "diferido" | "corto_plazo" | "largo_plazo" | "contribuido" | "ganado" | "operativos" | "no_operativos" | "operativos_admin" | "operativos_venta" | "financieros" | "otros" | "none";
+
 export interface Account {
   id: string;
   name: string;
@@ -11,6 +13,7 @@ export interface Account {
   nature: AccountNature;
   balance: number;
   description?: string;
+  subcategory?: AccountSubcategory;
 }
 
 export interface Transaction {

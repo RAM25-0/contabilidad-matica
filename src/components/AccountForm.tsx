@@ -34,6 +34,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { toast } from "@/components/ui/use-toast";
+import { AccountSubcategory } from "@/types/accounting";
 
 const formSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -41,6 +42,14 @@ const formSchema = z.object({
   type: z.enum(["activo", "pasivo", "capital", "ingreso", "gasto"]),
   nature: z.enum(["deudora", "acreedora"]),
   description: z.string().optional(),
+  subcategory: z.enum([
+    "circulante", "fijo", "diferido", 
+    "corto_plazo", "largo_plazo", 
+    "contribuido", "ganado", 
+    "operativos", "no_operativos", 
+    "operativos_admin", "operativos_venta", 
+    "financieros", "otros", "none"
+  ]).default("none"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -57,6 +66,7 @@ export function AccountForm() {
     type: activeAccount?.type || "activo",
     nature: activeAccount?.nature || "deudora",
     description: activeAccount?.description || "",
+    subcategory: activeAccount?.subcategory || "none",
   };
   
   const form = useForm<FormData>({
@@ -72,6 +82,7 @@ export function AccountForm() {
       type: activeAccount?.type || "activo",
       nature: activeAccount?.nature || "deudora",
       description: activeAccount?.description || "",
+      subcategory: activeAccount?.subcategory || "none",
     });
   }, [activeAccount, form]);
   
@@ -106,7 +117,8 @@ export function AccountForm() {
         code: data.code,
         type: data.type,
         nature: data.nature,
-        description: data.description
+        description: data.description,
+        subcategory: data.subcategory
       };
       
       addAccount(newAccount);
@@ -122,6 +134,46 @@ export function AccountForm() {
     return nature === "deudora" 
       ? "Aumenta con cargos (Debe) y disminuye con abonos (Haber)" 
       : "Aumenta con abonos (Haber) y disminuye con cargos (Debe)";
+  };
+
+  const getSubcategoryOptions = (accountType: string) => {
+    switch (accountType) {
+      case "activo":
+        return [
+          { value: "circulante", label: "Circulante" },
+          { value: "fijo", label: "Fijo" },
+          { value: "diferido", label: "Diferido" },
+          { value: "none", label: "Sin clasificar" }
+        ];
+      case "pasivo":
+        return [
+          { value: "corto_plazo", label: "Corto Plazo" },
+          { value: "largo_plazo", label: "Largo Plazo" },
+          { value: "none", label: "Sin clasificar" }
+        ];
+      case "capital":
+        return [
+          { value: "contribuido", label: "Contribuido" },
+          { value: "ganado", label: "Ganado" },
+          { value: "none", label: "Sin clasificar" }
+        ];
+      case "ingreso":
+        return [
+          { value: "operativos", label: "Operativos" },
+          { value: "no_operativos", label: "No Operativos" },
+          { value: "none", label: "Sin clasificar" }
+        ];
+      case "gasto":
+        return [
+          { value: "operativos_admin", label: "Operativos (Administración)" },
+          { value: "operativos_venta", label: "Operativos (Ventas)" },
+          { value: "financieros", label: "Financieros" },
+          { value: "otros", label: "Otros" },
+          { value: "none", label: "Sin clasificar" }
+        ];
+      default:
+        return [{ value: "none", label: "Sin clasificar" }];
+    }
   };
   
   return (
@@ -178,7 +230,11 @@ export function AccountForm() {
                 <FormItem>
                   <FormLabel>Tipo de cuenta</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      // Reset subcategory when type changes
+                      form.setValue("subcategory", "none");
+                    }}
                     defaultValue={field.value}
                     value={field.value}
                   >
@@ -193,6 +249,35 @@ export function AccountForm() {
                       <SelectItem value="capital">Capital</SelectItem>
                       <SelectItem value="ingreso">Ingreso</SelectItem>
                       <SelectItem value="gasto">Gasto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="subcategory"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Subcategoría</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccione la subcategoría" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {getSubcategoryOptions(form.watch("type")).map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
