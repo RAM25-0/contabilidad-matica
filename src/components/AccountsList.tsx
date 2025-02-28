@@ -44,8 +44,10 @@ export default function AccountsList() {
     return grouped;
   };
 
+  // Modificamos esta parte para que cuando se seleccione "todos", 
+  // solo muestre las cuentas de tipo "activo"
   const filteredAccounts = state.selectedAccountType === "todos"
-    ? state.accounts
+    ? state.accounts.filter(account => account.type === "activo")
     : state.accounts.filter(account => account.type === state.selectedAccountType);
 
   const groupedAccounts = groupAccountsBySubcategory(filteredAccounts);
@@ -60,12 +62,12 @@ export default function AccountsList() {
     "financieros", "otros", "none"
   ];
 
-  // Renderiza el contenido para la pestaña "todos"
+  // Actualizamos el título para reflejar que estamos mostrando cuentas de activos
   const renderAllAccountsContent = () => (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Listado Completo de Cuentas</CardTitle>
-        <CardDescription>Vista compacta de todas las cuentas del catálogo</CardDescription>
+        <CardTitle>Catálogo de Cuentas de Activos</CardTitle>
+        <CardDescription>Vista compacta de todas las cuentas de activos</CardDescription>
       </CardHeader>
       <CardContent>
         <AccountsCompactList 
