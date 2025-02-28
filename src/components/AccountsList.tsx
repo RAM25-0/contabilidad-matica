@@ -17,6 +17,7 @@ import { AccountsSubcategoryGroup } from "./accounts/AccountsSubcategoryGroup";
 import { AccountsCompactList } from "./accounts/AccountsCompactList";
 import { getSubcategoryLabel } from "./accounts/AccountBadge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/utils";
 
 export default function AccountsList() {
   const { 
@@ -98,7 +99,7 @@ export default function AccountsList() {
               <TableRow>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Total Cuentas</TableHead>
-                <TableHead>Ejemplos</TableHead>
+                <TableHead className="text-right">Saldo Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -106,15 +107,20 @@ export default function AccountsList() {
                 const accounts = groupedAccounts[type] || [];
                 if (accounts.length === 0) return null;
                 
+                // Calcular el saldo total de todas las cuentas de este tipo
+                const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
+                
                 return (
                   <TableRow key={type} className="hover:bg-gray-50">
                     <TableCell className="font-medium">
                       {getTypeLabel(type)}
                     </TableCell>
                     <TableCell>{accounts.length}</TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {accounts.slice(0, 3).map(acc => acc.name).join(", ")}
-                      {accounts.length > 3 && "..."}
+                    <TableCell className={`text-right font-medium ${
+                      totalBalance > 0 ? "text-emerald-700" : 
+                      totalBalance < 0 ? "text-rose-700" : "text-slate-500"
+                    }`}>
+                      {formatCurrency(totalBalance)}
                     </TableCell>
                   </TableRow>
                 );
