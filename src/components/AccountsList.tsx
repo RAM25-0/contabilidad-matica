@@ -180,7 +180,6 @@ export default function AccountsList() {
           onClick={() => setActiveAccount({ 
             id: "", 
             name: "", 
-            code: "", 
             type: "activo", 
             nature: "deudora", 
             balance: 0 

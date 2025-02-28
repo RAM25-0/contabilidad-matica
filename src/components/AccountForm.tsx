@@ -38,7 +38,6 @@ import { AccountSubcategory } from "@/types/accounting";
 
 const formSchema = z.object({
   name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  code: z.string().min(1, "El código es requerido"),
   type: z.enum(["activo", "pasivo", "capital", "ingreso", "gasto"]),
   nature: z.enum(["deudora", "acreedora"]),
   description: z.string().optional(),
@@ -62,7 +61,6 @@ export function AccountForm() {
   
   const defaultValues: FormData = {
     name: activeAccount?.name || "",
-    code: activeAccount?.code || "",
     type: activeAccount?.type || "activo",
     nature: activeAccount?.nature || "deudora",
     description: activeAccount?.description || "",
@@ -78,7 +76,6 @@ export function AccountForm() {
   React.useEffect(() => {
     form.reset({
       name: activeAccount?.name || "",
-      code: activeAccount?.code || "",
       type: activeAccount?.type || "activo",
       nature: activeAccount?.nature || "deudora",
       description: activeAccount?.description || "",
@@ -111,10 +108,19 @@ export function AccountForm() {
         description: `La cuenta "${data.name}" ha sido actualizada exitosamente.`,
       });
     } else {
+      // Generamos automáticamente un código basado en el tipo de cuenta
+      const accountTypePrefix = {
+        activo: "1",
+        pasivo: "2",
+        capital: "3",
+        ingreso: "4",
+        gasto: "5"
+      }[data.type];
+      
       // Al añadir una nueva cuenta, nos aseguramos de que todos los campos requeridos estén presentes
       const newAccount = {
         name: data.name,
-        code: data.code,
+        code: `${accountTypePrefix}-${Math.floor(Math.random() * 1000).toString().padStart(2, '0')}`, // Código generado automáticamente
         type: data.type,
         nature: data.nature,
         description: data.description,
@@ -193,35 +199,19 @@ export function AccountForm() {
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: Caja" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Código</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: 1-01" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ej: Caja" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
             <FormField
               control={form.control}
