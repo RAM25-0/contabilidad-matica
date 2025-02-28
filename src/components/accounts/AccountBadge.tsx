@@ -12,6 +12,8 @@ import {
   PiggyBank,
   Wallet,
   WalletCards,
+  Landmark,
+  TrendingUp,
 } from "lucide-react";
 
 export const getIconForType = (
@@ -28,6 +30,8 @@ export const getIconForType = (
       if (subcategory === "largo_plazo") return <FileText className="h-4 w-4" />;
       return <CreditCard className="h-4 w-4" />;
     case "capital":
+      if (subcategory === "contribuido") return <Landmark className="h-4 w-4" />;
+      if (subcategory === "ganado") return <TrendingUp className="h-4 w-4" />;
       return <PiggyBank className="h-4 w-4" />;
     case "ingreso":
       return <Banknote className="h-4 w-4" />;
@@ -50,7 +54,9 @@ export const getTextColorForType = (
       if (subcategory === "largo_plazo") return "text-rose-700"; // Rojo oscuro
       return "text-rose-600"; // Por defecto para pasivos
     case "capital":
-      return "text-purple-700";
+      if (subcategory === "contribuido") return "text-purple-600"; // Contribuido
+      if (subcategory === "ganado") return "text-purple-800"; // Ganado
+      return "text-purple-700"; // Por defecto para capital
     case "ingreso":
       return "text-blue-700";
     case "gasto":
@@ -72,7 +78,9 @@ export const getBgColorForType = (
       if (subcategory === "largo_plazo") return "bg-rose-200"; // Rojo oscuro - Fondo más intenso
       return "bg-rose-100"; // Por defecto para pasivos
     case "capital":
-      return "bg-purple-100";
+      if (subcategory === "contribuido") return "bg-purple-100"; // Contribuido
+      if (subcategory === "ganado") return "bg-purple-200"; // Ganado
+      return "bg-purple-100"; // Por defecto para capital
     case "ingreso":
       return "bg-blue-100";
     case "gasto":
@@ -89,8 +97,8 @@ export const getSubcategoryLabel = (subcategory: AccountSubcategory) => {
     case "diferido": return "Activos Intangibles";
     case "corto_plazo": return "Pasivo a Corto Plazo (Short term)";
     case "largo_plazo": return "Pasivo a Largo Plazo (Long term)";
-    case "contribuido": return "Capital Contribuido";
-    case "ganado": return "Capital Ganado";
+    case "contribuido": return "Capital Contribuido (Contributed)";
+    case "ganado": return "Capital Ganado (Earned)";
     case "operativos": return "Ingresos Operativos";
     case "no_operativos": return "Ingresos No Operativos";
     case "operativos_admin": return "Gastos Operativos (Administración)";

@@ -560,6 +560,74 @@ const predefinedAccounts: Account[] = [
     nature: "acreedora",
     balance: 0,
     subcategory: "largo_plazo"
+  },
+
+  // ----- CAPITAL CONTABLE (OWNERS' EQUITY) -----
+  // ----- CAPITAL CONTRIBUIDO (CONTRIBUTED) -----
+  {
+    id: uuidv4(),
+    name: "Capital social",
+    code: "3-01",
+    type: "capital",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "contribuido"
+  },
+  {
+    id: uuidv4(),
+    name: "Capital social común",
+    code: "3-02",
+    type: "capital",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "contribuido"
+  },
+  {
+    id: uuidv4(),
+    name: "Prima en venta de acciones",
+    code: "3-03",
+    type: "capital",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "contribuido"
+  },
+
+  // ----- CAPITAL GANADO (EARNED) -----
+  {
+    id: uuidv4(),
+    name: "Utilidades retenidas",
+    code: "3-04",
+    type: "capital",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "ganado"
+  },
+  {
+    id: uuidv4(),
+    name: "Utilidades acumuladas",
+    code: "3-05",
+    type: "capital",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "ganado"
+  },
+  {
+    id: uuidv4(),
+    name: "Utilidad neta del ejercicio",
+    code: "3-06",
+    type: "capital",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "ganado"
+  },
+  {
+    id: uuidv4(),
+    name: "Reservas de capital",
+    code: "3-07",
+    type: "capital",
+    nature: "acreedora",
+    balance: 0,
+    subcategory: "ganado"
   }
 ];
 
