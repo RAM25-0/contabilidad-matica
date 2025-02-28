@@ -29,14 +29,16 @@ const Index = () => {
           Gestiona tus cuentas contables y registra transacciones
         </p>
         
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] gap-8">
+        {/* Nueva posición del formulario de transacción */}
+        <TransactionForm />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] gap-8 mt-8">
           <div>
             <AccountsList />
             <AccountForm />
           </div>
           
           <div>
-            <TransactionForm />
             <TransactionsList />
           </div>
         </div>
