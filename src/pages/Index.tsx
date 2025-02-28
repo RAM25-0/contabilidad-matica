@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Link } from "react-router-dom";
 import AccountsList from "@/components/AccountsList";
 import { AccountForm } from "@/components/AccountForm";
 import { TransactionForm } from "@/components/TransactionForm";
@@ -7,6 +8,8 @@ import { TransactionsList } from "@/components/TransactionsList";
 import { AccountingSummary } from "@/components/AccountingSummary";
 import { AccountingProvider } from "@/contexts/AccountingContext";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { BookOpen } from "lucide-react";
 
 const Index = () => {
   return (
@@ -21,8 +24,14 @@ const Index = () => {
         
         <AccountingSummary />
         
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold tracking-tight">Sistema Contable</h2>
+          <Link to="/diario">
+            <Button className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              Ir al Libro Diario
+            </Button>
+          </Link>
         </div>
         
         <p className="text-muted-foreground mt-1 mb-6">

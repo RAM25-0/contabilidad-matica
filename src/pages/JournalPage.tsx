@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionsList } from "@/components/TransactionsList";
@@ -19,7 +20,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon, Filter, X } from "lucide-react";
+import { CalendarIcon, Filter, X, ArrowLeft } from "lucide-react";
 
 export default function JournalPage() {
   const { state } = useAccounting();
@@ -38,11 +39,19 @@ export default function JournalPage() {
       <Sidebar />
       
       <div className="flex-1 ml-64 p-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Libro Diario</h1>
-          <p className="text-muted-foreground mt-2">
-            Registra y consulta las transacciones en el libro diario contable.
-          </p>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Libro Diario</h1>
+            <p className="text-muted-foreground mt-2">
+              Registra y consulta las transacciones en el libro diario contable.
+            </p>
+          </div>
+          <Link to="/">
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Volver a Inicio
+            </Button>
+          </Link>
         </div>
 
         <Tabs defaultValue="register" className="w-full">
