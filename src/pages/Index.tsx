@@ -1,13 +1,47 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from "react";
+import { AccountsList } from "@/components/AccountsList";
+import { AccountForm } from "@/components/AccountForm";
+import { TransactionForm } from "@/components/TransactionForm";
+import { TransactionsList } from "@/components/TransactionsList";
+import { AccountingSummary } from "@/components/AccountingSummary";
+import { AccountingProvider } from "@/contexts/AccountingContext";
+import { Separator } from "@/components/ui/separator";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <AccountingProvider>
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold tracking-tight">Contabilidad Mática</h1>
+          <p className="text-lg text-muted-foreground mt-2">
+            Sistema de contabilidad que sigue la ecuación A = P + C
+          </p>
+        </header>
+        
+        <AccountingSummary />
+        
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold tracking-tight">Sistema Contable</h2>
+          <TransactionForm />
+        </div>
+        
+        <p className="text-muted-foreground mt-1 mb-6">
+          Gestiona tus cuentas contables y registra transacciones
+        </p>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] gap-8">
+          <div>
+            <AccountsList />
+            <AccountForm />
+          </div>
+          
+          <div>
+            <TransactionsList />
+          </div>
+        </div>
       </div>
-    </div>
+    </AccountingProvider>
   );
 };
 
