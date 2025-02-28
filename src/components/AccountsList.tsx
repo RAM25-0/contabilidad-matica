@@ -16,6 +16,7 @@ import { AccountsTabs } from "./accounts/AccountsTabs";
 import { AccountsSubcategoryGroup } from "./accounts/AccountsSubcategoryGroup";
 import { AccountsCompactList } from "./accounts/AccountsCompactList";
 import { getSubcategoryLabel } from "./accounts/AccountBadge";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 
 export default function AccountsList() {
   const { 
@@ -44,13 +45,29 @@ export default function AccountsList() {
     return grouped;
   };
 
-  // Modificamos esta parte para que cuando se seleccione "todos", 
-  // solo muestre las cuentas de tipo "activo"
+  // Agrupamos cuentas por tipo para la vista compacta
+  const groupAccountsByType = (accounts: Account[]) => {
+    const grouped: Record<string, Account[]> = {};
+    
+    accounts.forEach(account => {
+      const key = account.type;
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(account);
+    });
+    
+    return grouped;
+  };
+
+  // Filtramos las cuentas según el tipo seleccionado
   const filteredAccounts = state.selectedAccountType === "todos"
-    ? state.accounts.filter(account => account.type === "activo")
+    ? state.accounts
     : state.accounts.filter(account => account.type === state.selectedAccountType);
 
-  const groupedAccounts = groupAccountsBySubcategory(filteredAccounts);
+  const groupedAccounts = state.selectedAccountType === "todos" 
+    ? groupAccountsByType(filteredAccounts)
+    : groupAccountsBySubcategory(filteredAccounts);
 
   // Define el orden para mostrar las subcategorías
   const subcategoryOrder: AccountSubcategory[] = [
@@ -62,19 +79,49 @@ export default function AccountsList() {
     "financieros", "otros", "none"
   ];
 
-  // Actualizamos el título para reflejar que estamos mostrando cuentas de activos
+  // Define el orden para mostrar los tipos de cuenta
+  const typeOrder: AccountType[] = [
+    "activo", "pasivo", "capital", "ingreso", "gasto"
+  ];
+
+  // Renderiza una versión compacta que muestra todas las cuentas agrupadas por tipo
   const renderAllAccountsContent = () => (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle>Catálogo de Cuentas de Activos</CardTitle>
-        <CardDescription>Vista compacta de todas las cuentas de activos</CardDescription>
+        <CardTitle>Catálogo de Cuentas</CardTitle>
+        <CardDescription>Resumen por tipo de cuenta</CardDescription>
       </CardHeader>
       <CardContent>
-        <AccountsCompactList 
-          accounts={filteredAccounts} 
-          onEdit={setActiveAccount} 
-          onDelete={deleteAccount} 
-        />
+        <div className="overflow-x-auto">
+          <Table className="text-sm">
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Total Cuentas</TableHead>
+                <TableHead>Ejemplos</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {typeOrder.map(type => {
+                const accounts = groupedAccounts[type] || [];
+                if (accounts.length === 0) return null;
+                
+                return (
+                  <TableRow key={type} className="hover:bg-gray-50">
+                    <TableCell className="font-medium">
+                      {getTypeLabel(type)}
+                    </TableCell>
+                    <TableCell>{accounts.length}</TableCell>
+                    <TableCell className="max-w-xs truncate">
+                      {accounts.slice(0, 3).map(acc => acc.name).join(", ")}
+                      {accounts.length > 3 && "..."}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
