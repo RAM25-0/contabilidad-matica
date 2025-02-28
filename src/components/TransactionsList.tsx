@@ -1,202 +1,205 @@
 
-import React from "react";
-import { Button } from "@/components/ui/button";
+import React, { useMemo } from "react";
+import { useAccounting } from "@/contexts/AccountingContext";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
+  TableHead,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
-import { useAccounting } from "@/contexts/AccountingContext";
-import { format, isEqual, isSameDay } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Trash2, AlertTriangle } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import { formatCurrency } from "@/lib/utils";
+import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { cn, formatCurrency } from "@/lib/utils";
-import { Transaction } from "@/types/accounting";
+import { AccountBadge } from "@/components/accounts/AccountBadge";
 
-interface TransactionsListProps {
+type TransactionsListProps = {
   dateFilter?: Date;
   accountFilter?: string;
-}
+  showHeader?: boolean;
+  limit?: number;
+};
 
-export function TransactionsList({ dateFilter, accountFilter }: TransactionsListProps) {
-  const { state, deleteTransaction, getTypeLabel } = useAccounting();
-  const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({});
+export function TransactionsList({ 
+  dateFilter, 
+  accountFilter,
+  showHeader = true,
+  limit 
+}: TransactionsListProps) {
+  const { state, deleteTransaction } = useAccounting();
+  const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null);
   
-  const toggleItem = (id: string) => {
-    setOpenItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
-  
-  const isOpen = (id: string) => !!openItems[id];
-
-  const getColorForType = (type: string): string => {
-    switch (type) {
-      case "activo":
-        return "bg-green-50 text-green-700 border-green-200";
-      case "pasivo":
-        return "bg-red-50 text-red-700 border-red-200";
-      case "capital":
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case "ingreso":
-        return "bg-orange-50 text-orange-700 border-orange-200";
-      case "gasto":
-        return "bg-purple-50 text-purple-700 border-purple-200";
-      default:
-        return "bg-yellow-50 text-yellow-700 border-yellow-200";
-    }
-  };
-  
-  // Aplicar filtros a las transacciones
-  const filteredTransactions = state.transactions.filter(transaction => {
-    // Filtro por fecha
-    if (dateFilter && !isSameDay(new Date(transaction.date), dateFilter)) {
-      return false;
+  const filteredTransactions = useMemo(() => {
+    let transactions = [...state.transactions];
+    
+    // Ordenar por fecha (más reciente primero)
+    transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    // Filtrar por fecha
+    if (dateFilter) {
+      const filterDateString = format(dateFilter, 'yyyy-MM-dd');
+      transactions = transactions.filter(t => {
+        const transactionDateString = format(new Date(t.date), 'yyyy-MM-dd');
+        return transactionDateString === filterDateString;
+      });
     }
     
-    // Filtro por cuenta
+    // Filtrar por cuenta
     if (accountFilter) {
-      return transaction.entries.some(entry => entry.accountId === accountFilter);
+      transactions = transactions.filter(t => 
+        t.entries.some(entry => entry.accountId === accountFilter)
+      );
     }
     
-    return true;
-  });
+    // Limitar la cantidad de transacciones si se especifica
+    if (limit && transactions.length > limit) {
+      transactions = transactions.slice(0, limit);
+    }
+    
+    return transactions;
+  }, [state.transactions, dateFilter, accountFilter, limit]);
   
-  if (filteredTransactions.length === 0) {
-    return (
-      <Card className="mt-6 animate-fade-in">
-        <CardHeader>
-          <CardTitle>Transacciones</CardTitle>
-          <CardDescription>
-            {state.transactions.length === 0 
-              ? "No hay transacciones registradas. Utiliza el botón 'Registrar Transacción' para crear una."
-              : "No hay transacciones que coincidan con los filtros aplicados."
-            }
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
+  const getTotalDebitsAndCredits = (transactionId: string) => {
+    const transaction = state.transactions.find(t => t.id === transactionId);
+    if (!transaction) return { totalDebits: 0, totalCredits: 0 };
+    
+    const totalDebits = transaction.entries.reduce((sum, entry) => sum + entry.debit, 0);
+    const totalCredits = transaction.entries.reduce((sum, entry) => sum + entry.credit, 0);
+    
+    return { totalDebits, totalCredits };
+  };
+  
+  const handleDeleteTransaction = (id: string) => {
+    deleteTransaction(id);
+    setConfirmDeleteId(null);
+    toast({
+      title: "Transacción eliminada",
+      description: "La transacción ha sido eliminada exitosamente.",
+    });
+  };
   
   return (
-    <div className="space-y-4 animate-fade-in">
-      <ScrollArea className="h-[600px] rounded-md border">
-        <div className="p-4">
-          {filteredTransactions.slice().reverse().map((transaction) => (
-            <Collapsible
-              key={transaction.id}
-              open={isOpen(transaction.id)}
-              onOpenChange={() => toggleItem(transaction.id)}
-              className="mb-4 bg-card rounded-lg border overflow-hidden"
+    <>
+      <Card className="shadow-sm">
+        {showHeader && (
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">
+              Historial de Transacciones
+              {filteredTransactions.length > 0 && (
+                <span className="ml-2 text-sm font-normal text-muted-foreground">
+                  ({filteredTransactions.length} {filteredTransactions.length === 1 ? 'transacción' : 'transacciones'})
+                </span>
+              )}
+            </CardTitle>
+          </CardHeader>
+        )}
+        <CardContent className="p-0">
+          {filteredTransactions.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">
+              No hay transacciones registradas
+              {dateFilter && " para la fecha seleccionada"}
+              {accountFilter && " para la cuenta seleccionada"}
+            </div>
+          ) : (
+            <ScrollArea className="max-h-[500px]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[120px]">Fecha</TableHead>
+                    <TableHead>Descripción</TableHead>
+                    <TableHead className="text-right">Monto</TableHead>
+                    <TableHead className="w-[80px] text-center">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredTransactions.map((transaction) => {
+                    const { totalDebits, totalCredits } = getTotalDebitsAndCredits(transaction.id);
+                    
+                    return (
+                      <TableRow key={transaction.id} className="group">
+                        <TableCell className="font-medium align-top">
+                          {format(new Date(transaction.date), "dd/MM/yyyy", { locale: es })}
+                        </TableCell>
+                        <TableCell className="align-top">
+                          <div className="font-medium mb-1">{transaction.description}</div>
+                          <div className="space-y-1">
+                            {transaction.entries.map(entry => (
+                              <div key={entry.id} className="flex justify-between text-sm">
+                                <span className="flex items-center">
+                                  {entry.debit > 0 && <span className="mr-2 text-blue-600">→</span>}
+                                  {entry.credit > 0 && <span className="mr-2 text-indigo-600">←</span>}
+                                  <AccountBadge
+                                    type={entry.accountType}
+                                    label={entry.accountName}
+                                    showIcon={false}
+                                  />
+                                </span>
+                                <span className="text-right ml-4">
+                                  {entry.debit > 0 && formatCurrency(entry.debit)}
+                                  {entry.credit > 0 && formatCurrency(entry.credit)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-medium align-top">
+                          {formatCurrency(totalDebits)}
+                        </TableCell>
+                        <TableCell className="text-center align-top">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setConfirmDeleteId(transaction.id)}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          )}
+        </CardContent>
+      </Card>
+      
+      <AlertDialog open={!!confirmDeleteId} onOpenChange={() => setConfirmDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Confirmar eliminación
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción es irreversible. Se eliminará la transacción y se revertirán todos sus efectos
+              en los saldos de las cuentas asociadas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => confirmDeleteId && handleDeleteTransaction(confirmDeleteId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              <div className="flex items-center justify-between p-4">
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">
-                      {format(new Date(transaction.date), "PP", { locale: es })}
-                    </span>
-                    <Badge variant="outline" className="h-5 rounded-sm">
-                      #{state.transactions.length - state.transactions.indexOf(transaction)}
-                    </Badge>
-                  </div>
-                  <p className="text-base font-medium">{transaction.description}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-destructive"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteTransaction(transaction.id);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      {isOpen(transaction.id) ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </CollapsibleTrigger>
-                </div>
-              </div>
-              
-              <CollapsibleContent>
-                <div className="px-4 pb-4">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Cuenta</TableHead>
-                        <TableHead>Tipo</TableHead>
-                        <TableHead className="text-right">Debe</TableHead>
-                        <TableHead className="text-right">Haber</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {transaction.entries.map((entry) => (
-                        <TableRow key={entry.id} className="transaction-row">
-                          <TableCell className="font-medium">{entry.accountName}</TableCell>
-                          <TableCell>
-                            <Badge 
-                              variant="outline" 
-                              className={getColorForType(entry.accountType)}
-                            >
-                              {getTypeLabel(entry.accountType)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {entry.debit > 0 && formatCurrency(entry.debit)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {entry.credit > 0 && formatCurrency(entry.credit)}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      <TableRow className="bg-muted/50">
-                        <TableCell colSpan={2} className="font-medium">
-                          Total
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          {formatCurrency(
-                            transaction.entries.reduce((sum, entry) => sum + entry.debit, 0)
-                          )}
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          {formatCurrency(
-                            transaction.entries.reduce((sum, entry) => sum + entry.credit, 0)
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-          ))}
-        </div>
-      </ScrollArea>
-    </div>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

@@ -99,33 +99,53 @@ export function TransactionForm() {
   const isBalanced = Math.abs(difference) < 0.001;
   
   const onSubmit = (data: FormData) => {
-    // Transformar las entradas al formato esperado por la función addTransaction
-    const transactionEntries = data.entries.map(entry => {
-      const account = state.accounts.find(a => a.id === entry.accountId);
-      if (!account) throw new Error("Cuenta no encontrada");
+    try {
+      // Transformar las entradas al formato esperado por la función addTransaction
+      const transactionEntries = data.entries.map(entry => {
+        const account = state.accounts.find(a => a.id === entry.accountId);
+        if (!account) throw new Error("Cuenta no encontrada");
+        
+        return {
+          id: uuidv4(),
+          accountId: entry.accountId,
+          accountName: account.name,
+          accountType: account.type,
+          debit: entry.type === "cargo" ? entry.amount : 0,
+          credit: entry.type === "abono" ? entry.amount : 0,
+        };
+      });
       
-      return {
-        id: uuidv4(),
-        accountId: entry.accountId,
-        accountName: account.name,
-        accountType: account.type,
-        debit: entry.type === "cargo" ? entry.amount : 0,
-        credit: entry.type === "abono" ? entry.amount : 0,
-      };
-    });
-    
-    addTransaction({
-      date: data.date,
-      description: data.description,
-      entries: transactionEntries,
-    });
-    
-    toast({
-      title: "Transacción registrada",
-      description: "La transacción ha sido registrada exitosamente.",
-    });
-    
-    form.reset(defaultValues);
+      // Añadir la transacción al contexto (esto actualizará el estado global)
+      addTransaction({
+        date: data.date,
+        description: data.description,
+        entries: transactionEntries,
+      });
+      
+      // Notificar al usuario
+      toast({
+        title: "Transacción registrada",
+        description: "La transacción ha sido registrada exitosamente y está disponible en todos los módulos.",
+        variant: "success",
+      });
+      
+      // Limpiar el formulario
+      form.reset(defaultValues);
+      
+      // Registrar en consola para depuración
+      console.log("Transacción guardada exitosamente:", {
+        date: data.date,
+        description: data.description,
+        entries: transactionEntries,
+      });
+    } catch (error) {
+      console.error("Error al guardar la transacción:", error);
+      toast({
+        title: "Error",
+        description: "Ocurrió un error al registrar la transacción. Por favor intenta nuevamente.",
+        variant: "destructive",
+      });
+    }
   };
   
   const addEntry = () => {
@@ -152,14 +172,14 @@ export function TransactionForm() {
   };
   
   return (
-    <Card className="animate-fade-in">
+    <Card className="animate-fade-in shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl">Nueva Transacción</CardTitle>
+        <CardTitle className="text-lg">Nueva Transacción</CardTitle>
       </CardHeader>
       <CardContent className="pt-2">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <FormField
                 control={form.control}
                 name="date"
@@ -218,7 +238,7 @@ export function TransactionForm() {
               />
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
               {entries.map((entry, index) => (
                 <div key={index} className="grid grid-cols-[1fr,auto,1fr,auto] gap-2 items-center">
                   <FormField

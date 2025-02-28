@@ -15,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
@@ -143,7 +142,7 @@ export default function JournalPage() {
                             <SelectItem value="">Todas</SelectItem>
                             {state.accounts.map(account => (
                               <SelectItem key={account.id} value={account.id}>
-                                {account.code} - {account.name}
+                                {account.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
