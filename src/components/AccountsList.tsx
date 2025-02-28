@@ -172,8 +172,7 @@ export default function AccountsList() {
                       {getIconForType(account.type)}
                       <span className="truncate">{account.name}</span>
                     </CardTitle>
-                    <CardDescription className="flex items-center justify-between">
-                      <span>Código: {account.code}</span>
+                    <CardDescription className="flex items-center justify-end">
                       <span className="text-xs px-2 py-0.5 rounded bg-gray-100">
                         {account.nature === "deudora" ? "Deudora" : "Acreedora"}
                       </span>
