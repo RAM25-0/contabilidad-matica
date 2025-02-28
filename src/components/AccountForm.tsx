@@ -86,7 +86,7 @@ export function AccountForm() {
   }, [form.watch("type")]);
   
   const onSubmit = (data: FormData) => {
-    if (isEditing) {
+    if (isEditing && activeAccount) {
       updateAccount({
         ...activeAccount,
         ...data,
@@ -96,7 +96,16 @@ export function AccountForm() {
         description: `La cuenta "${data.name}" ha sido actualizada exitosamente.`,
       });
     } else {
-      addAccount(data);
+      // Al añadir una nueva cuenta, nos aseguramos de que todos los campos requeridos estén presentes
+      const newAccount = {
+        name: data.name,
+        code: data.code,
+        type: data.type,
+        nature: data.nature,
+        description: data.description
+      };
+      
+      addAccount(newAccount);
       toast({
         title: "Cuenta creada",
         description: `La cuenta "${data.name}" ha sido creada exitosamente.`,

@@ -43,6 +43,7 @@ import { useAccounting } from "@/contexts/AccountingContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/components/ui/use-toast";
+import { v4 as uuidv4 } from "uuid";
 
 const formSchema = z.object({
   date: z.date({
@@ -95,14 +96,18 @@ export function TransactionForm() {
   const isBalanced = Math.abs(difference) < 0.001;
   
   const onSubmit = (data: FormData) => {
+    // Aquí está la corrección - asegurarse de que cada entrada tenga un id
     const formattedEntries = data.entries.map(entry => {
       const account = state.accounts.find(a => a.id === entry.accountId);
       if (!account) throw new Error("Cuenta no encontrada");
       
       return {
-        ...entry,
+        id: uuidv4(), // Generamos un id único para cada entrada
+        accountId: entry.accountId,
         accountName: account.name,
         accountType: account.type,
+        debit: entry.debit,
+        credit: entry.credit,
       };
     });
     

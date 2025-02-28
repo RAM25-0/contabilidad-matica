@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AccountsList } from "@/components/AccountsList";
+import AccountsList from "@/components/AccountsList";
 import { AccountForm } from "@/components/AccountForm";
 import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionsList } from "@/components/TransactionsList";
