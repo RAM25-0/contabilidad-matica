@@ -25,11 +25,17 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useAccounting } from "@/contexts/AccountingContext";
-import { format } from "date-fns";
+import { format, isEqual, isSameDay } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn, formatCurrency } from "@/lib/utils";
+import { Transaction } from "@/types/accounting";
 
-export function TransactionsList() {
+interface TransactionsListProps {
+  dateFilter?: Date;
+  accountFilter?: string;
+}
+
+export function TransactionsList({ dateFilter, accountFilter }: TransactionsListProps) {
   const { state, deleteTransaction, getTypeLabel } = useAccounting();
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({});
   
@@ -59,13 +65,31 @@ export function TransactionsList() {
     }
   };
   
-  if (state.transactions.length === 0) {
+  // Aplicar filtros a las transacciones
+  const filteredTransactions = state.transactions.filter(transaction => {
+    // Filtro por fecha
+    if (dateFilter && !isSameDay(new Date(transaction.date), dateFilter)) {
+      return false;
+    }
+    
+    // Filtro por cuenta
+    if (accountFilter) {
+      return transaction.entries.some(entry => entry.accountId === accountFilter);
+    }
+    
+    return true;
+  });
+  
+  if (filteredTransactions.length === 0) {
     return (
       <Card className="mt-6 animate-fade-in">
         <CardHeader>
           <CardTitle>Transacciones</CardTitle>
           <CardDescription>
-            No hay transacciones registradas. Utiliza el botón "Nueva Transacción" para crear una.
+            {state.transactions.length === 0 
+              ? "No hay transacciones registradas. Utiliza el botón 'Registrar Transacción' para crear una."
+              : "No hay transacciones que coincidan con los filtros aplicados."
+            }
           </CardDescription>
         </CardHeader>
       </Card>
@@ -73,12 +97,10 @@ export function TransactionsList() {
   }
   
   return (
-    <div className="space-y-4 mt-6 animate-fade-in">
-      <h2 className="text-2xl font-semibold tracking-tight">Transacciones Recientes</h2>
-      
+    <div className="space-y-4 animate-fade-in">
       <ScrollArea className="h-[600px] rounded-md border">
         <div className="p-4">
-          {state.transactions.slice().reverse().map((transaction) => (
+          {filteredTransactions.slice().reverse().map((transaction) => (
             <Collapsible
               key={transaction.id}
               open={isOpen(transaction.id)}

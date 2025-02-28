@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Plus } from "lucide-react";
+import { X, Plus, CalendarIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -32,8 +32,15 @@ import { useAccounting } from "@/contexts/AccountingContext";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import { formatCurrency } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 const formSchema = z.object({
+  date: z.date({
+    required_error: "La fecha es requerida.",
+  }),
   description: z.string().min(3, "La descripción debe tener al menos 3 caracteres."),
   entries: z.array(
     z.object({
@@ -64,6 +71,7 @@ export function TransactionForm() {
   const { state, addTransaction } = useAccounting();
   
   const defaultValues: FormData = {
+    date: new Date(),
     description: "",
     entries: [
       { accountId: "", type: "cargo", amount: 0 },
@@ -106,7 +114,7 @@ export function TransactionForm() {
     });
     
     addTransaction({
-      date: new Date(),
+      date: data.date,
       description: data.description,
       entries: transactionEntries,
     });
@@ -143,13 +151,52 @@ export function TransactionForm() {
   };
   
   return (
-    <Card className="mt-6">
+    <Card className="animate-fade-in">
       <CardHeader>
         <CardTitle className="text-2xl">Nueva Transacción</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Fecha</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className="w-full pl-3 text-left font-normal"
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP", { locale: es })
+                          ) : (
+                            <span>Seleccionar fecha</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
             <FormField
               control={form.control}
               name="description"
@@ -189,7 +236,7 @@ export function TransactionForm() {
                           <SelectContent>
                             {state.accounts.map((account) => (
                               <SelectItem key={account.id} value={account.id}>
-                                {account.name}
+                                {account.code} - {account.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
