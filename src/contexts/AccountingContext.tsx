@@ -19,7 +19,7 @@ type AccountingAction =
   | { type: "DELETE_TRANSACTION"; payload: string }
   | { type: "FILTER_ACCOUNTS"; payload: AccountType | "todos" };
 
-// Creamos un catálogo completo de cuentas predefinidas de activos
+// Creamos un catálogo completo de cuentas predefinidas de activos pero con saldo cero
 const predefinedAccounts: Account[] = [
   // ----- ACTIVOS CIRCULANTES -----
   {
@@ -28,7 +28,7 @@ const predefinedAccounts: Account[] = [
     code: "1-01",
     type: "activo",
     nature: "deudora",
-    balance: 5000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -37,7 +37,7 @@ const predefinedAccounts: Account[] = [
     code: "1-02",
     type: "activo",
     nature: "deudora",
-    balance: 25000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -46,7 +46,7 @@ const predefinedAccounts: Account[] = [
     code: "1-03",
     type: "activo",
     nature: "deudora",
-    balance: 75000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -55,7 +55,7 @@ const predefinedAccounts: Account[] = [
     code: "1-04",
     type: "activo",
     nature: "deudora",
-    balance: 15000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -64,7 +64,7 @@ const predefinedAccounts: Account[] = [
     code: "1-05",
     type: "activo",
     nature: "deudora",
-    balance: 20000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -73,7 +73,7 @@ const predefinedAccounts: Account[] = [
     code: "1-06",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -1000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -82,7 +82,7 @@ const predefinedAccounts: Account[] = [
     code: "1-07",
     type: "activo",
     nature: "deudora",
-    balance: 45000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -91,7 +91,7 @@ const predefinedAccounts: Account[] = [
     code: "1-08",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -2500,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -100,7 +100,7 @@ const predefinedAccounts: Account[] = [
     code: "1-09",
     type: "activo",
     nature: "deudora",
-    balance: 30000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -109,7 +109,7 @@ const predefinedAccounts: Account[] = [
     code: "1-10",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -5000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -118,7 +118,7 @@ const predefinedAccounts: Account[] = [
     code: "1-11",
     type: "activo",
     nature: "deudora",
-    balance: 2000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -127,7 +127,7 @@ const predefinedAccounts: Account[] = [
     code: "1-12",
     type: "activo",
     nature: "deudora",
-    balance: 8000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -136,7 +136,7 @@ const predefinedAccounts: Account[] = [
     code: "1-13",
     type: "activo",
     nature: "deudora",
-    balance: 7500,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -145,7 +145,7 @@ const predefinedAccounts: Account[] = [
     code: "1-14",
     type: "activo",
     nature: "deudora",
-    balance: 12000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -154,7 +154,7 @@ const predefinedAccounts: Account[] = [
     code: "1-15",
     type: "activo",
     nature: "deudora",
-    balance: 18000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   {
@@ -163,7 +163,7 @@ const predefinedAccounts: Account[] = [
     code: "1-16",
     type: "activo",
     nature: "deudora",
-    balance: 10000,
+    balance: 0, // Saldo inicial cero
     subcategory: "circulante"
   },
   
@@ -174,7 +174,7 @@ const predefinedAccounts: Account[] = [
     code: "1-17",
     type: "activo",
     nature: "deudora",
-    balance: 250000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -183,7 +183,7 @@ const predefinedAccounts: Account[] = [
     code: "1-18",
     type: "activo",
     nature: "deudora",
-    balance: 500000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -192,7 +192,7 @@ const predefinedAccounts: Account[] = [
     code: "1-19",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -75000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -201,7 +201,7 @@ const predefinedAccounts: Account[] = [
     code: "1-20",
     type: "activo",
     nature: "deudora",
-    balance: 320000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -210,7 +210,7 @@ const predefinedAccounts: Account[] = [
     code: "1-21",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -64000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -219,7 +219,7 @@ const predefinedAccounts: Account[] = [
     code: "1-22",
     type: "activo",
     nature: "deudora",
-    balance: 180000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -228,7 +228,7 @@ const predefinedAccounts: Account[] = [
     code: "1-23",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -45000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -237,7 +237,7 @@ const predefinedAccounts: Account[] = [
     code: "1-24",
     type: "activo",
     nature: "deudora",
-    balance: 85000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -246,7 +246,7 @@ const predefinedAccounts: Account[] = [
     code: "1-25",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -17000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   {
@@ -255,7 +255,7 @@ const predefinedAccounts: Account[] = [
     code: "1-26",
     type: "activo",
     nature: "deudora",
-    balance: 120000,
+    balance: 0, // Saldo inicial cero
     subcategory: "fijo"
   },
   
@@ -266,7 +266,7 @@ const predefinedAccounts: Account[] = [
     code: "1-27",
     type: "activo",
     nature: "deudora",
-    balance: 25000,
+    balance: 0, // Saldo inicial cero
     subcategory: "diferido"
   },
   {
@@ -275,7 +275,7 @@ const predefinedAccounts: Account[] = [
     code: "1-28",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -5000,
+    balance: 0, // Saldo inicial cero
     subcategory: "diferido"
   },
   {
@@ -284,7 +284,7 @@ const predefinedAccounts: Account[] = [
     code: "1-29",
     type: "activo",
     nature: "deudora",
-    balance: 35000,
+    balance: 0, // Saldo inicial cero
     subcategory: "diferido"
   },
   {
@@ -293,7 +293,7 @@ const predefinedAccounts: Account[] = [
     code: "1-30",
     type: "activo",
     nature: "acreedora",  // Cuenta correctora, naturaleza contraria
-    balance: -7000,
+    balance: 0, // Saldo inicial cero
     subcategory: "diferido"
   },
   {
@@ -302,7 +302,7 @@ const predefinedAccounts: Account[] = [
     code: "1-31",
     type: "activo",
     nature: "deudora",
-    balance: 8000,
+    balance: 0, // Saldo inicial cero
     subcategory: "diferido"
   },
   {
@@ -311,7 +311,7 @@ const predefinedAccounts: Account[] = [
     code: "1-32",
     type: "activo",
     nature: "deudora",
-    balance: 12000,
+    balance: 0, // Saldo inicial cero
     subcategory: "diferido"
   }
 ];
