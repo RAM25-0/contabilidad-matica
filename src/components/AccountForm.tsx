@@ -25,6 +25,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -113,6 +117,12 @@ export function AccountForm() {
     }
     setActiveAccount(null);
   };
+
+  const getNatureDescription = (nature: string) => {
+    return nature === "deudora" 
+      ? "Aumenta con cargos (Debe) y disminuye con abonos (Haber)" 
+      : "Aumenta con abonos (Haber) y disminuye con cargos (Debe)";
+  };
   
   return (
     <Dialog 
@@ -161,62 +171,72 @@ export function AccountForm() {
               />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo de cuenta</FormLabel>
-                    <Select
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo de cuenta</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccione el tipo" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="activo">Activo</SelectItem>
+                      <SelectItem value="pasivo">Pasivo</SelectItem>
+                      <SelectItem value="capital">Capital</SelectItem>
+                      <SelectItem value="ingreso">Ingreso</SelectItem>
+                      <SelectItem value="gasto">Gasto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="nature"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Naturaleza</FormLabel>
+                  <FormControl>
+                    <RadioGroup
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
                       value={field.value}
+                      className="flex flex-col space-y-1"
                     >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione el tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="activo">Activo</SelectItem>
-                        <SelectItem value="pasivo">Pasivo</SelectItem>
-                        <SelectItem value="capital">Capital</SelectItem>
-                        <SelectItem value="ingreso">Ingreso</SelectItem>
-                        <SelectItem value="gasto">Gasto</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="nature"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Naturaleza</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione naturaleza" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="deudora">Deudora</SelectItem>
-                        <SelectItem value="acreedora">Acreedora</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="deudora" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">
+                          Deudora (Cargo)
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="acreedora" />
+                        </FormControl>
+                        <FormLabel className="font-normal cursor-pointer">
+                          Acreedora (Abono)
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <p className="text-xs text-muted-foreground">
+                    {getNatureDescription(field.value)}
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
             <FormField
               control={form.control}

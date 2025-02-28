@@ -3,6 +3,7 @@ import React from "react";
 import AccountsList from "@/components/AccountsList";
 import { AccountForm } from "@/components/AccountForm";
 import { TransactionForm } from "@/components/TransactionForm";
+import { SimpleTransactionForm } from "@/components/SimpleTransactionForm";
 import { TransactionsList } from "@/components/TransactionsList";
 import { AccountingSummary } from "@/components/AccountingSummary";
 import { AccountingProvider } from "@/contexts/AccountingContext";
@@ -23,7 +24,10 @@ const Index = () => {
         
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold tracking-tight">Sistema Contable</h2>
-          <TransactionForm />
+          <div className="flex gap-2">
+            <SimpleTransactionForm />
+            <TransactionForm />
+          </div>
         </div>
         
         <p className="text-muted-foreground mt-1 mb-6">
