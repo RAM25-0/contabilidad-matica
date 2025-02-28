@@ -142,7 +142,7 @@ export function AccountForm() {
         return [
           { value: "circulante", label: "Circulante" },
           { value: "fijo", label: "Fijo" },
-          { value: "diferido", label: "Diferido" },
+          { value: "diferido", label: "No Circulante" },
           { value: "none", label: "Sin clasificar" }
         ];
       case "pasivo":

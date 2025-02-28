@@ -24,6 +24,7 @@ import {
   ShoppingBag,
   CircleDollarSign,
   Building,
+  Clock,
   Banknote
 } from "lucide-react";
 import { useAccounting } from "@/contexts/AccountingContext";
@@ -60,6 +61,7 @@ export default function AccountsList() {
     if (type === "activo") {
       if (subcategory === "circulante") return <CircleDollarSign className="h-5 w-5 text-emerald-600" />;
       if (subcategory === "fijo") return <Building className="h-5 w-5 text-emerald-700" />;
+      if (subcategory === "diferido") return <Clock className="h-5 w-5 text-cyan-600" />;
       return <Wallet className="h-5 w-5 text-emerald-600" />;
     } else if (type === "pasivo") {
       return <Landmark className="h-5 w-5 text-rose-600" />;
@@ -120,7 +122,7 @@ export default function AccountsList() {
     const labels: Record<AccountSubcategory, string> = {
       circulante: "Circulante",
       fijo: "Fijo",
-      diferido: "Diferido",
+      diferido: "No Circulante",
       corto_plazo: "Corto Plazo",
       largo_plazo: "Largo Plazo",
       contribuido: "Contribuido",
