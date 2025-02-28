@@ -20,11 +20,8 @@ const Index = () => {
         </header>
         
         <AccountingSummary />
-
-        {/* Nueva posición del formulario de transacción */}
-        <TransactionForm />
         
-        <div className="flex justify-between items-center mt-8">
+        <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold tracking-tight">Sistema Contable</h2>
         </div>
         
@@ -39,6 +36,7 @@ const Index = () => {
           </div>
           
           <div>
+            <TransactionForm />
             <TransactionsList />
           </div>
         </div>
