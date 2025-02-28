@@ -19,8 +19,84 @@ type AccountingAction =
   | { type: "DELETE_TRANSACTION"; payload: string }
   | { type: "FILTER_ACCOUNTS"; payload: AccountType | "todos" };
 
+// Creamos algunas cuentas predefinidas para mostrar en el catálogo
+const predefinedAccounts: Account[] = [
+  {
+    id: uuidv4(),
+    name: "Caja",
+    code: "1-01",
+    type: "activo",
+    nature: "deudora",
+    balance: 5000,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Bancos",
+    code: "1-02",
+    type: "activo",
+    nature: "deudora",
+    balance: 25000,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Clientes",
+    code: "1-03",
+    type: "activo",
+    nature: "deudora",
+    balance: 15000,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Inventario",
+    code: "1-04",
+    type: "activo",
+    nature: "deudora",
+    balance: 20000,
+    subcategory: "circulante"
+  },
+  {
+    id: uuidv4(),
+    name: "Edificios",
+    code: "1-05",
+    type: "activo",
+    nature: "deudora",
+    balance: 100000,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Equipos de Transporte",
+    code: "1-06",
+    type: "activo",
+    nature: "deudora",
+    balance: 50000,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Mobiliario y Equipo",
+    code: "1-07",
+    type: "activo",
+    nature: "deudora",
+    balance: 30000,
+    subcategory: "fijo"
+  },
+  {
+    id: uuidv4(),
+    name: "Gastos de Instalación",
+    code: "1-08",
+    type: "activo",
+    nature: "deudora",
+    balance: 8000,
+    subcategory: "diferido"
+  }
+];
+
 const initialState: AccountingState = {
-  accounts: [], // Se eliminaron todas las cuentas
+  accounts: predefinedAccounts, // Ahora comenzamos con cuentas predefinidas
   transactions: [],
   activeAccount: null,
   selectedAccountType: "todos",
