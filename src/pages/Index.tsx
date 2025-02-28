@@ -9,7 +9,7 @@ import { AccountingSummary } from "@/components/AccountingSummary";
 import { AccountingProvider } from "@/contexts/AccountingContext";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { BookOpen } from "lucide-react";
+import { BookOpen, PieChart } from "lucide-react";
 
 const Index = () => {
   return (
@@ -26,12 +26,20 @@ const Index = () => {
         
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold tracking-tight">Sistema Contable</h2>
-          <Link to="/diario">
-            <Button className="gap-2">
-              <BookOpen className="h-4 w-4" />
-              Ir al Libro Diario
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link to="/diario">
+              <Button className="gap-2">
+                <BookOpen className="h-4 w-4" />
+                Ir al Libro Diario
+              </Button>
+            </Link>
+            <Link to="/mayor">
+              <Button variant="outline" className="gap-2">
+                <PieChart className="h-4 w-4" />
+                Ir al Libro Mayor
+              </Button>
+            </Link>
+          </div>
         </div>
         
         <p className="text-muted-foreground mt-1 mb-6">

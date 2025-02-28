@@ -20,7 +20,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon, Filter, X, ArrowLeft } from "lucide-react";
+import { CalendarIcon, Filter, X, ArrowLeft, PieChart } from "lucide-react";
 
 export default function JournalPage() {
   const { state } = useAccounting();
@@ -46,12 +46,20 @@ export default function JournalPage() {
               Registra y consulta las transacciones en el libro diario contable.
             </p>
           </div>
-          <Link to="/">
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Volver a Inicio
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link to="/">
+              <Button variant="outline" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Volver a Inicio
+              </Button>
+            </Link>
+            <Link to="/mayor">
+              <Button variant="outline" className="gap-2">
+                <PieChart className="h-4 w-4" />
+                Ir al Libro Mayor
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <Tabs defaultValue="register" className="w-full">
