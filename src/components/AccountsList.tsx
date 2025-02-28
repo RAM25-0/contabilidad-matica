@@ -14,6 +14,7 @@ import { Account, AccountSubcategory, AccountType } from "@/types/accounting";
 import { AccountsTable } from "./accounts/AccountsTable";
 import { AccountsTabs } from "./accounts/AccountsTabs";
 import { AccountsSubcategoryGroup } from "./accounts/AccountsSubcategoryGroup";
+import { AccountsCompactList } from "./accounts/AccountsCompactList";
 
 export default function AccountsList() {
   const { 
@@ -66,7 +67,7 @@ export default function AccountsList() {
         <CardDescription>Vista compacta de todas las cuentas del catálogo</CardDescription>
       </CardHeader>
       <CardContent>
-        <AccountsTable 
+        <AccountsCompactList 
           accounts={filteredAccounts} 
           onEdit={setActiveAccount} 
           onDelete={deleteAccount} 
@@ -89,15 +90,24 @@ export default function AccountsList() {
       <>
         {subcategoryOrder.map(subcategory => {
           const accounts = groupedAccounts[subcategory] || [];
+          if (accounts.length === 0) return null;
+          
           return (
-            <AccountsSubcategoryGroup
-              key={subcategory}
-              subcategory={subcategory}
-              accounts={accounts}
-              onEdit={setActiveAccount}
-              onDelete={deleteAccount}
-              getTypeLabel={getTypeLabel}
-            />
+            <div key={subcategory} className="mb-6">
+              {subcategory !== "none" && (
+                <div className="flex items-center mb-3">
+                  <h3 className="text-lg font-semibold">
+                    {getSubcategoryLabel(subcategory)}
+                  </h3>
+                  <div className="h-px flex-1 bg-gray-200 ml-3"></div>
+                </div>
+              )}
+              <AccountsCompactList 
+                accounts={accounts} 
+                onEdit={setActiveAccount} 
+                onDelete={deleteAccount} 
+              />
+            </div>
           );
         })}
       </>
