@@ -1,4 +1,4 @@
-
+<lov-code>
 import React, { createContext, useContext, useReducer, ReactNode } from "react";
 import { 
   AccountingState, 
@@ -1043,44 +1043,4 @@ export function AccountingProvider({ children }: { children: ReactNode }) {
       .reduce((sum, account) => sum + account.balance, 0);
       
     const gastos = state.accounts
-      .filter(a => a.type === "gasto")
-      .reduce((sum, account) => sum + account.balance, 0);
-      
-    // El capital total incluye el capital contable más (ingresos - gastos)
-    const capital = capitalCuentas + (ingresos - gastos);
-    
-    // Verificar la ecuación contable A = P + C
-    const equation = Math.abs(activos - (pasivos + capital)) < 0.001;
-    
-    return { activos, pasivos, capital, equation };
-  };
-
-  return (
-    <AccountingContext.Provider
-      value={{
-        state,
-        addAccount,
-        updateAccount,
-        deleteAccount,
-        setActiveAccount,
-        addTransaction,
-        deleteTransaction,
-        filterAccounts,
-        getNatureLabel,
-        getTypeLabel,
-        getTypeIcon,
-        getTotalsByType,
-      }}
-    >
-      {children}
-    </AccountingContext.Provider>
-  );
-}
-
-export function useAccounting() {
-  const context = useContext(AccountingContext);
-  if (context === undefined) {
-    throw new Error("useAccounting must be used within an AccountingProvider");
-  }
-  return context;
-}
+      .filter(a => a.type === "

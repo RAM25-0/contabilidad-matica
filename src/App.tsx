@@ -1,27 +1,30 @@
+
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import { AccountingProvider } from "@/contexts/AccountingContext";
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import IndexPage from "@/pages/Index";
+import NotFound from "@/pages/NotFound";
+import JournalPage from "@/pages/JournalPage";
+import "./App.css";
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="accounting-theme">
+      <AccountingProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<IndexPage />} />
+            <Route path="/diario" element={<JournalPage />} />
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<Navigate replace to="/404" />} />
+          </Routes>
+        </Router>
+        <Toaster />
+      </AccountingProvider>
+    </ThemeProvider>
+  );
+}
 
 export default App;
