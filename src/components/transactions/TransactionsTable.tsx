@@ -12,7 +12,13 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Link } from "react-router-dom";
 import { TransactionEntry } from "./TransactionEntry";
-import { getTotalDebitsAndCredits } from "./TransactionUtils";
+
+// Function to calculate totals moved from TransactionUtils.ts
+export const getTotalDebitsAndCredits = (transaction: Transaction) => {
+  const totalDebits = transaction.entries.reduce((sum, entry) => sum + entry.debit, 0);
+  const totalCredits = transaction.entries.reduce((sum, entry) => sum + entry.credit, 0);
+  return { totalDebits, totalCredits };
+};
 
 type TransactionsTableProps = {
   transactions: Transaction[];
@@ -59,15 +65,13 @@ export function TransactionsTable({
                 <TableCell className="text-center align-top">
                   <div className="flex justify-center gap-1">
                     {showViewButton && (
-                      <Link to="/diario">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Eye className="h-4 w-4 text-primary" />
-                        </Button>
-                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Eye className="h-4 w-4 text-primary" />
+                      </Button>
                     )}
                     <Button
                       variant="ghost"
