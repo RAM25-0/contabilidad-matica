@@ -17,8 +17,8 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<IndexPage />} />
-            <Route path="/diario" element={<JournalPage />} />
-            <Route path="/mayor/:accountId" element={<LedgerPage />} />
+            <Route path="/journal" element={<JournalPage />} />
+            <Route path="/ledger/:accountId" element={<LedgerPage />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate replace to="/404" />} />
           </Routes>
