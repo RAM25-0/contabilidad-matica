@@ -126,7 +126,7 @@ export function TransactionForm() {
       toast({
         title: "Transacción registrada",
         description: "La transacción ha sido registrada exitosamente y está disponible en todos los módulos.",
-        variant: "success",
+        variant: "default", // Changed from "success" to "default" to match allowed variants
       });
       
       // Limpiar el formulario
