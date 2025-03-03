@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Link } from "react-router-dom";
 
 export default function JournalPage() {
   const { state } = useAccounting();
@@ -23,10 +24,12 @@ export default function JournalPage() {
 
   return (
     <div className="container mx-auto py-8 space-y-6 max-w-4xl">
-      {/* Header with filters */}
+      {/* Header with filters and navigation */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Libro Diario</h1>
-        {/* You could add date or account filters here */}
+        <Link to="/" className="text-primary hover:underline">
+          Volver al inicio
+        </Link>
       </div>
 
       {/* Transactions list */}
@@ -69,7 +72,9 @@ export default function JournalPage() {
                       <div className="flex items-center">
                         {entry.debit > 0 && <span className="mr-2 text-blue-600">→</span>}
                         {entry.credit > 0 && <span className="ml-6 mr-2 text-indigo-600">←</span>}
-                        <span className={entry.credit > 0 ? "ml-4" : ""}>{entry.accountName}</span>
+                        <Link to={`/ledger/${entry.accountId}`} className="hover:underline">
+                          <span className={entry.credit > 0 ? "ml-4" : ""}>{entry.accountName}</span>
+                        </Link>
                       </div>
                       <div className="flex gap-6 w-40 justify-end">
                         <span className="text-blue-600 w-16 text-right">

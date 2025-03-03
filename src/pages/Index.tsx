@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import AccountsList from "@/components/AccountsList";
@@ -8,11 +9,12 @@ import { AccountingSummary } from "@/components/AccountingSummary";
 import { AccountingProvider, useAccounting } from "@/contexts/AccountingContext";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { BookOpen, PieChart, LayoutDashboard } from "lucide-react";
+import { BookOpen, PieChart, PlayCircle } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { generateDemoTransactions } from "@/utils/demo-transactions";
 
 const IndexContent = () => {
-  const { state } = useAccounting();
+  const { state, addTransaction } = useAccounting();
   
   useEffect(() => {
     console.info("Sistema contable cargado - Transacciones disponibles:", state.transactions.length);
@@ -25,6 +27,16 @@ const IndexContent = () => {
       });
     }
   }, []);
+  
+  const handleRunDemo = () => {
+    if (state.transactions.length > 0) {
+      if (!confirm("Ya existen transacciones en el sistema. ¿Desea agregar más transacciones de ejemplo?")) {
+        return;
+      }
+    }
+    
+    generateDemoTransactions(state.accounts, addTransaction);
+  };
   
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
@@ -40,18 +52,20 @@ const IndexContent = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold tracking-tight">Sistema Contable</h2>
         <div className="flex gap-2">
-          <Link to="/diario">
+          <Link to="/journal">
             <Button className="gap-2">
               <BookOpen className="h-4 w-4" />
               Ir al Libro Diario
             </Button>
           </Link>
-          <Link to="/mayor">
-            <Button variant="secondary" className="gap-2 bg-gradient-to-r from-blue-500/90 to-purple-500/90 text-white hover:from-blue-600 hover:to-purple-600">
-              <PieChart className="h-4 w-4" />
-              Ir al Libro Mayor
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            className="gap-2" 
+            onClick={handleRunDemo}
+          >
+            <PlayCircle className="h-4 w-4" />
+            Generar transacciones de ejemplo
+          </Button>
         </div>
       </div>
       
