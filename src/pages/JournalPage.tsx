@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TransactionForm } from "@/components/TransactionForm";
@@ -26,15 +26,6 @@ export default function JournalPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined);
   const [isFiltering, setIsFiltering] = useState(false);
-  const [activeTab, setActiveTab] = useState("register");
-
-  // Function to determine which tab should be active based on transaction history
-  useEffect(() => {
-    // If we have transactions, we might want to show the history tab by default
-    if (state.transactions && state.transactions.length > 0) {
-      console.log("Found transactions:", state.transactions.length);
-    }
-  }, [state.transactions]);
 
   const clearFilters = () => {
     setSelectedDate(undefined);
@@ -70,38 +61,19 @@ export default function JournalPage() {
           </div>
         </div>
 
-        <Tabs 
-          defaultValue={state.transactions.length > 0 ? "history" : "register"} 
-          className="w-full"
-          value={activeTab}
-          onValueChange={setActiveTab}
-        >
+        <Tabs defaultValue="register" className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="register">Registrar Transacción</TabsTrigger>
-            <TabsTrigger value="history">
-              Historial de Transacciones 
-              {state.transactions.length > 0 && (
-                <span className="ml-2 bg-primary/20 text-primary rounded-full px-2 py-0.5 text-xs">
-                  {state.transactions.length}
-                </span>
-              )}
-            </TabsTrigger>
+            <TabsTrigger value="history">Historial de Transacciones</TabsTrigger>
           </TabsList>
           
           <TabsContent value="register" className="space-y-4">
-            <TransactionForm onSuccess={() => setActiveTab("history")} />
+            <TransactionForm />
           </TabsContent>
           
           <TabsContent value="history" className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-semibold">
-                Historial de Transacciones
-                {state.transactions.length > 0 && (
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">
-                    ({state.transactions.length} registros)
-                  </span>
-                )}
-              </h2>
+              <h2 className="text-2xl font-semibold">Historial de Transacciones</h2>
               <div className="flex items-center gap-2">
                 {isFiltering && (
                   <Button 
@@ -182,22 +154,10 @@ export default function JournalPage() {
               </div>
             </div>
             
-            {state.transactions.length === 0 ? (
-              <div className="text-center py-12 bg-muted/20 rounded-lg border border-dashed">
-                <h3 className="text-lg font-medium mb-2">No hay transacciones registradas</h3>
-                <p className="text-muted-foreground mb-4">
-                  Registra una nueva transacción para comenzar a utilizar el libro diario.
-                </p>
-                <Button onClick={() => setActiveTab("register")}>
-                  Registrar transacción
-                </Button>
-              </div>
-            ) : (
-              <TransactionsList 
-                dateFilter={selectedDate}
-                accountFilter={selectedAccount}
-              />
-            )}
+            <TransactionsList 
+              dateFilter={selectedDate}
+              accountFilter={selectedAccount}
+            />
           </TabsContent>
         </Tabs>
       </div>
