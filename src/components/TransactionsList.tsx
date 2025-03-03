@@ -1,5 +1,5 @@
 
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { 
   Card, 
@@ -40,6 +40,12 @@ export function TransactionsList({
 }: TransactionsListProps) {
   const { state, deleteTransaction } = useAccounting();
   const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null);
+  
+  // Log transactions when component mounts or updates
+  useEffect(() => {
+    console.info("TransactionsList mounted with transactions:", state.transactions.length);
+    console.info("Filtering transactions:", [dateFilter, accountFilter, limit]);
+  }, [state.transactions, dateFilter, accountFilter, limit]);
   
   const filteredTransactions = useMemo(() => {
     let transactions = [...state.transactions];

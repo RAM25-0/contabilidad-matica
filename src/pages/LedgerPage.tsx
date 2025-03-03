@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { TAccount } from "@/components/TAccount";
@@ -113,6 +113,11 @@ const subcategoryOrder: Record<AccountType, AccountSubcategory[]> = {
 export default function LedgerPage() {
   const { state, getTotalsByType } = useAccounting();
   const [activeTab, setActiveTab] = useState<AccountType | "todos">("activo");
+  
+  // Log transactions when component mounts or updates
+  useEffect(() => {
+    console.info("Ledger Page - Current transactions:", state.transactions.length);
+  }, [state.transactions]);
   
   // Obtener los totales para la ecuación contable
   const { activos, pasivos, capital, equation } = getTotalsByType();

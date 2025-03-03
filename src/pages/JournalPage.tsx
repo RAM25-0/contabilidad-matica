@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TransactionForm } from "@/components/TransactionForm";
@@ -26,11 +26,23 @@ export default function JournalPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedAccount, setSelectedAccount] = useState<string | undefined>(undefined);
   const [isFiltering, setIsFiltering] = useState(false);
+  const [activeTab, setActiveTab] = useState("register");
+
+  // Log transactions to console for debugging
+  useEffect(() => {
+    console.info("Journal Page - Current transactions:", state.transactions.length);
+  }, [state.transactions]);
 
   const clearFilters = () => {
     setSelectedDate(undefined);
     setSelectedAccount(undefined);
     setIsFiltering(false);
+  };
+
+  // Function to handle successful transaction submission
+  const handleTransactionSuccess = () => {
+    // Switch to history tab after successful transaction
+    setActiveTab("history");
   };
 
   return (
@@ -61,14 +73,14 @@ export default function JournalPage() {
           </div>
         </div>
 
-        <Tabs defaultValue="register" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4">
             <TabsTrigger value="register">Registrar Transacción</TabsTrigger>
             <TabsTrigger value="history">Historial de Transacciones</TabsTrigger>
           </TabsList>
           
           <TabsContent value="register" className="space-y-4">
-            <TransactionForm />
+            <TransactionForm onTransactionSuccess={handleTransactionSuccess} />
           </TabsContent>
           
           <TabsContent value="history" className="space-y-4">
