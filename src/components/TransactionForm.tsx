@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Card,
@@ -19,7 +18,7 @@ import { TransactionEntries } from "./transaction/TransactionEntries";
 import { TransactionBalance } from "./transaction/TransactionBalance";
 import { formSchema, FormData, defaultValues } from "./transaction/TransactionFormTypes";
 
-export function TransactionForm() {
+export function TransactionForm({ onSuccess }: { onSuccess: () => void }) {
   const { state, addTransaction } = useAccounting();
   
   const form = useForm<FormData>({
@@ -79,6 +78,9 @@ export function TransactionForm() {
         description: data.description,
         entries: transactionEntries,
       });
+      
+      // Call onSuccess callback
+      onSuccess();
     } catch (error) {
       console.error("Error al guardar la transacción:", error);
       toast({
