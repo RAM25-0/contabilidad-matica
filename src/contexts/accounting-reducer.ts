@@ -66,8 +66,8 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
       }));
       
       // Calculate if transaction is balanced
-      const totalDebits = entries.reduce((sum, entry) => sum + entry.debit, 0);
-      const totalCredits = entries.reduce((sum, entry) => sum + entry.credit, 0);
+      const totalDebits = entries.reduce((sum, entry) => sum + (entry.debit || 0), 0);
+      const totalCredits = entries.reduce((sum, entry) => sum + (entry.credit || 0), 0);
       const isBalanced = Math.abs(totalDebits - totalCredits) < 0.001; // Accounting for floating point errors
       
       if (!isBalanced) {
@@ -96,16 +96,26 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
         // Apply debits and credits according to account nature
         for (const entry of relatedEntries) {
           if (account.nature === "deudora") {
-            balanceChange += entry.debit - entry.credit;
+            balanceChange += (entry.debit || 0) - (entry.credit || 0);
           } else {
-            balanceChange += entry.credit - entry.debit;
+            balanceChange += (entry.credit || 0) - (entry.debit || 0);
           }
         }
+        
+        console.log(`Updating account ${account.name}, balance change: ${balanceChange}`);
         
         return {
           ...account,
           balance: account.balance + balanceChange
         };
+      });
+      
+      // Log the transaction being added
+      console.info("New transaction added:", {
+        id: newTransaction.id,
+        date: newTransaction.date,
+        description: newTransaction.description,
+        entriesCount: newTransaction.entries.length
       });
       
       return {
@@ -133,16 +143,24 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
         // Apply debits and credits according to account nature (reversed)
         for (const entry of relatedEntries) {
           if (account.nature === "deudora") {
-            balanceChange -= entry.debit - entry.credit;
+            balanceChange -= (entry.debit || 0) - (entry.credit || 0);
           } else {
-            balanceChange -= entry.credit - entry.debit;
+            balanceChange -= (entry.credit || 0) - (entry.debit || 0);
           }
         }
+        
+        console.log(`Reverting account ${account.name}, balance change: ${balanceChange}`);
         
         return {
           ...account,
           balance: account.balance + balanceChange
         };
+      });
+      
+      // Log the transaction being deleted
+      console.info("Transaction deleted:", {
+        id: action.payload,
+        description: transactionToDelete.description
       });
       
       return {
