@@ -22,9 +22,9 @@ const IndexContent = () => {
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
       <header className="mb-8 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Contabilidad Mática</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Sistema de Contabilidad Básica</h1>
         <p className="text-lg text-muted-foreground mt-2">
-          Sistema de contabilidad que sigue la ecuación A = P + C
+          Registro de transacciones siguiendo la ecuación contable A = P + C
         </p>
       </header>
       

@@ -4,6 +4,7 @@ import { useAccounting } from "@/contexts/AccountingContext";
 import { JournalHeader } from "@/components/journal/JournalHeader";
 import { JournalTabs } from "@/components/journal/JournalTabs";
 import { JournalLayout } from "@/components/journal/JournalLayout";
+import { JournalList } from "@/components/journal/JournalList";
 
 export default function JournalPage() {
   const { state } = useAccounting();
@@ -18,6 +19,12 @@ export default function JournalPage() {
     <JournalLayout>
       <JournalHeader />
       <JournalTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+      
+      {activeTab === "history" && (
+        <div className="mt-4">
+          <JournalList />
+        </div>
+      )}
     </JournalLayout>
   );
 }

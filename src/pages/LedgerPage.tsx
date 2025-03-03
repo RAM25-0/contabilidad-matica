@@ -5,7 +5,6 @@ import { useAccounting } from "@/contexts/AccountingContext";
 import { TAccount } from "@/components/TAccount";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import { 
   Card, 
   CardContent, 
@@ -17,20 +16,37 @@ import { Badge } from "@/components/ui/badge";
 import { AccountSubcategory, AccountType } from "@/types/accounting";
 import { formatCurrency } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, CheckCircle, XCircle, BookOpen, PieChart } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, BookOpen } from "lucide-react";
 
-// Tipo para agrupar cuentas por tipo y subcategoría
-type GroupedAccounts = {
-  [key in AccountType]?: {
-    [key in AccountSubcategory]?: {
-      label: string;
-      accounts: Array<{
-        account: any;
-        movements: any[];
-      }>;
-    };
-  };
-};
+// Función para obtener la etiqueta de la subcategoría
+function getSubcategoryLabel(subcategory: AccountSubcategory): string {
+  switch (subcategory) {
+    // Activos
+    case "circulante": return "Activo Circulante";
+    case "fijo": return "Activo Fijo";
+    case "diferido": return "Activo No Circulante";
+    
+    // Pasivos
+    case "corto_plazo": return "Pasivo a Corto Plazo";
+    case "largo_plazo": return "Pasivo a Largo Plazo";
+    
+    // Capital
+    case "contribuido": return "Capital Social";
+    case "ganado": return "Resultados y Reservas";
+    
+    // Resultados
+    case "operativos": return "Operativos";
+    case "no_operativos": return "No Operativos";
+    case "operativos_admin": return "Gastos de Administración";
+    case "operativos_venta": return "Gastos de Venta";
+    case "financieros": return "Financieros";
+    case "otros": return "Otros";
+    
+    case "none":
+    default:
+      return "Sin clasificar";
+  }
+}
 
 // Colores por tipo de cuenta
 const typeColors = {
@@ -71,36 +87,6 @@ const typeColors = {
   }
 };
 
-// Función para obtener la etiqueta de la subcategoría
-function getSubcategoryLabel(subcategory: AccountSubcategory): string {
-  switch (subcategory) {
-    // Activos
-    case "circulante": return "Activo Circulante";
-    case "fijo": return "Activo Fijo";
-    case "diferido": return "Activo No Circulante";
-    
-    // Pasivos
-    case "corto_plazo": return "Pasivo a Corto Plazo";
-    case "largo_plazo": return "Pasivo a Largo Plazo";
-    
-    // Capital
-    case "contribuido": return "Capital Social";
-    case "ganado": return "Resultados y Reservas";
-    
-    // Resultados
-    case "operativos": return "Operativos";
-    case "no_operativos": return "No Operativos";
-    case "operativos_admin": return "Gastos de Administración";
-    case "operativos_venta": return "Gastos de Venta";
-    case "financieros": return "Financieros";
-    case "otros": return "Otros";
-    
-    case "none":
-    default:
-      return "Sin clasificar";
-  }
-}
-
 // Orden de subcategorías para mostrar
 const subcategoryOrder: Record<AccountType, AccountSubcategory[]> = {
   activo: ["circulante", "fijo", "diferido"],
@@ -112,7 +98,7 @@ const subcategoryOrder: Record<AccountType, AccountSubcategory[]> = {
 
 export default function LedgerPage() {
   const { state, getTotalsByType } = useAccounting();
-  const [activeTab, setActiveTab] = useState<AccountType | "todos">("activo");
+  const [activeTab, setActiveTab] = useState<AccountType>("activo");
   
   // Log transactions when component mounts or updates
   useEffect(() => {
@@ -136,70 +122,30 @@ export default function LedgerPage() {
     });
   };
   
-  // Agrupar cuentas por tipo y subcategoría
-  const groupedAccounts: GroupedAccounts = state.accounts.reduce((acc, account) => {
-    const type = account.type as AccountType;
-    const subcategory = account.subcategory || "none";
-    
-    if (!acc[type]) {
-      acc[type] = {};
-    }
-    
-    if (!acc[type]![subcategory]) {
-      acc[type]![subcategory] = {
-        label: getSubcategoryLabel(subcategory as AccountSubcategory),
-        accounts: []
-      };
-    }
-    
-    const movements = getAccountMovements(account.id);
-    
-    if (movements.length > 0 || account.balance !== 0) {
-      acc[type]![subcategory]!.accounts.push({
-        account,
-        movements
-      });
-    }
-    
-    return acc;
-  }, {} as GroupedAccounts);
+  // Filtrar cuentas por tipo y que tengan movimientos o saldo
+  const accountsByType = (type: AccountType) => {
+    return state.accounts
+      .filter(account => account.type === type)
+      .map(account => {
+        const movements = getAccountMovements(account.id);
+        return { account, movements };
+      })
+      .filter(({ account, movements }) => movements.length > 0 || account.balance !== 0);
+  };
   
-  // Renderizado de las cuentas T agrupadas por subcategoría
-  const renderAccountsBySubcategory = (type: AccountType) => {
-    if (!groupedAccounts[type]) {
-      return (
-        <div className="text-center py-10 text-muted-foreground">
-          No hay cuentas del tipo {type} con movimientos.
-        </div>
-      );
-    }
+  // Agrupar cuentas por subcategoría
+  const groupAccountsBySubcategory = (accounts: Array<{account: any, movements: any[]}>) => {
+    const grouped: Record<string, Array<{account: any, movements: any[]}>> = {};
     
-    const colors = typeColors[type];
+    accounts.forEach(item => {
+      const subcategory = item.account.subcategory || "none";
+      if (!grouped[subcategory]) {
+        grouped[subcategory] = [];
+      }
+      grouped[subcategory].push(item);
+    });
     
-    return (
-      <div className="space-y-8">
-        {subcategoryOrder[type].map(subcategory => {
-          const group = groupedAccounts[type]?.[subcategory];
-          if (!group || group.accounts.length === 0) return null;
-          
-          return (
-            <div key={subcategory} className={`p-6 rounded-lg ${colors.bg} ${colors.border} border`}>
-              <h3 className={`text-lg font-semibold mb-4 ${colors.title}`}>{group.label}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {group.accounts.map(({ account, movements }) => (
-                  <TAccount 
-                    key={account.id} 
-                    account={account} 
-                    movements={movements} 
-                    colors={colors}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
+    return grouped;
   };
   
   return (
@@ -268,66 +214,105 @@ export default function LedgerPage() {
       
       <Tabs 
         value={activeTab} 
-        onValueChange={(value) => setActiveTab(value as AccountType | "todos")}
+        onValueChange={(value) => setActiveTab(value as AccountType)}
         className="w-full"
       >
-        <ScrollArea className="w-full">
-          <div className="p-1">
-            <TabsList className="mb-4 grid grid-cols-5 md:flex md:w-auto">
-              <TabsTrigger 
-                value="activo" 
-                className="data-[state=active]:bg-emerald-100 data-[state=active]:text-emerald-800"
-              >
-                Activo
-              </TabsTrigger>
-              <TabsTrigger 
-                value="pasivo" 
-                className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-800"
-              >
-                Pasivo
-              </TabsTrigger>
-              <TabsTrigger 
-                value="capital" 
-                className="data-[state=active]:bg-purple-100 data-[state=active]:text-purple-800"
-              >
-                Capital
-              </TabsTrigger>
-              <TabsTrigger 
-                value="ingreso" 
-                className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800"
-              >
-                Ingresos
-              </TabsTrigger>
-              <TabsTrigger 
-                value="gasto" 
-                className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800"
-              >
-                Gastos
-              </TabsTrigger>
-            </TabsList>
-          </div>
-        </ScrollArea>
+        <TabsList className="mb-4 grid grid-cols-5 md:flex md:w-auto">
+          <TabsTrigger 
+            value="activo" 
+            className="data-[state=active]:bg-emerald-100 data-[state=active]:text-emerald-800"
+          >
+            Activo
+          </TabsTrigger>
+          <TabsTrigger 
+            value="pasivo" 
+            className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-800"
+          >
+            Pasivo
+          </TabsTrigger>
+          <TabsTrigger 
+            value="capital" 
+            className="data-[state=active]:bg-purple-100 data-[state=active]:text-purple-800"
+          >
+            Capital
+          </TabsTrigger>
+          <TabsTrigger 
+            value="ingreso" 
+            className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800"
+          >
+            Ingresos
+          </TabsTrigger>
+          <TabsTrigger 
+            value="gasto" 
+            className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800"
+          >
+            Gastos
+          </TabsTrigger>
+        </TabsList>
         
         <TabsContent value="activo" className="mt-6">
-          {renderAccountsBySubcategory("activo")}
+          {renderAccountsByType("activo")}
         </TabsContent>
         
         <TabsContent value="pasivo" className="mt-6">
-          {renderAccountsBySubcategory("pasivo")}
+          {renderAccountsByType("pasivo")}
         </TabsContent>
         
         <TabsContent value="capital" className="mt-6">
-          {renderAccountsBySubcategory("capital")}
+          {renderAccountsByType("capital")}
         </TabsContent>
         
         <TabsContent value="ingreso" className="mt-6">
-          {renderAccountsBySubcategory("ingreso")}
+          {renderAccountsByType("ingreso")}
         </TabsContent>
         
         <TabsContent value="gasto" className="mt-6">
-          {renderAccountsBySubcategory("gasto")}
+          {renderAccountsByType("gasto")}
         </TabsContent>
       </Tabs>
     </div>
   );
+  
+  // Función para renderizar las cuentas por tipo
+  function renderAccountsByType(type: AccountType) {
+    const accounts = accountsByType(type);
+    
+    if (accounts.length === 0) {
+      return (
+        <div className="text-center py-10 text-muted-foreground">
+          No hay cuentas del tipo {type} con movimientos.
+        </div>
+      );
+    }
+    
+    const colors = typeColors[type];
+    const groupedAccounts = groupAccountsBySubcategory(accounts);
+    
+    return (
+      <div className="space-y-8">
+        {subcategoryOrder[type].map(subcategory => {
+          const accountsInSubcat = groupedAccounts[subcategory] || [];
+          if (accountsInSubcat.length === 0) return null;
+          
+          return (
+            <div key={subcategory} className={`p-6 rounded-lg ${colors.bg} ${colors.border} border`}>
+              <h3 className={`text-lg font-semibold mb-4 ${colors.title}`}>
+                {getSubcategoryLabel(subcategory)}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {accountsInSubcat.map(({ account, movements }) => (
+                  <TAccount 
+                    key={account.id} 
+                    account={account} 
+                    movements={movements} 
+                    colors={colors}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 }
