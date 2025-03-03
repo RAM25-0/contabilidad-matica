@@ -1,10 +1,9 @@
-
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import AccountsList from "@/components/AccountsList";
 import { AccountForm } from "@/components/AccountForm";
 import { TransactionForm } from "@/components/TransactionForm";
-import { TransactionsList } from "@/components/TransactionsList";
+import { TransactionsList } from "@/components/transactions/TransactionsList";
 import { AccountingSummary } from "@/components/AccountingSummary";
 import { AccountingProvider, useAccounting } from "@/contexts/AccountingContext";
 import { Separator } from "@/components/ui/separator";
@@ -12,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, PieChart, LayoutDashboard } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
-// Inner component to access context
 const IndexContent = () => {
   const { state } = useAccounting();
   
