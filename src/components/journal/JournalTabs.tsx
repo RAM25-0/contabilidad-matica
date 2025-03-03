@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TransactionForm } from "@/components/TransactionForm";
-import { TransactionsList } from "@/components/TransactionsList";
+import { TransactionsList } from "@/components/transactions/TransactionsList";
 import { JournalFilters } from "./JournalFilters";
 
 interface JournalTabsProps {
