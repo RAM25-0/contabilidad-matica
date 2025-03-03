@@ -57,7 +57,7 @@ export function TransactionsList({
             </CardTitle>
             {filteredTransactions.length > 0 && limit && filteredTransactions.length >= limit && (
               <CardDescription>
-                <Link to="/diario" className="text-primary hover:underline flex items-center gap-1">
+                <Link to="/journal" className="text-primary hover:underline flex items-center gap-1">
                   <BookOpen className="h-3 w-3" />
                   Ver todas las transacciones en el Libro Diario
                 </Link>
