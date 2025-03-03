@@ -31,6 +31,7 @@ export interface TransactionEntry {
   accountType: AccountType;
   debit: number;
   credit: number;
+  transactionId?: string; // Added transactionId property
 }
 
 export interface AccountingState {
