@@ -5,7 +5,8 @@ import {
   Card, 
   CardContent, 
   CardHeader, 
-  CardTitle 
+  CardTitle,
+  CardDescription 
 } from "@/components/ui/card";
 import {
   Table,
@@ -18,34 +19,41 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Trash2, AlertTriangle } from "lucide-react";
+import { Trash2, AlertTriangle, Eye, BookOpen } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { AccountBadge } from "@/components/accounts/AccountBadge";
+import { Link } from "react-router-dom";
 
 type TransactionsListProps = {
   dateFilter?: Date;
   accountFilter?: string;
   showHeader?: boolean;
   limit?: number;
+  showViewButton?: boolean;
 };
 
 export function TransactionsList({ 
   dateFilter, 
   accountFilter,
   showHeader = true,
-  limit 
+  limit,
+  showViewButton = false
 }: TransactionsListProps) {
   const { state, deleteTransaction } = useAccounting();
   const [confirmDeleteId, setConfirmDeleteId] = React.useState<string | null>(null);
   
   // Log transactions when component mounts or updates
   useEffect(() => {
-    console.info("TransactionsList mounted with transactions:", state.transactions.length);
-    console.info("Filtering transactions:", [dateFilter, accountFilter, limit]);
-  }, [state.transactions, dateFilter, accountFilter, limit]);
+    // Verificar si hay transacciones y notificar
+    if (state.transactions.length > 0) {
+      console.info(`Módulo de Transacciones: ${state.transactions.length} transacciones cargadas`);
+    } else {
+      console.info("Módulo de Transacciones: No hay transacciones registradas");
+    }
+  }, []);
   
   const filteredTransactions = useMemo(() => {
     let transactions = [...state.transactions];
@@ -88,12 +96,21 @@ export function TransactionsList({
   };
   
   const handleDeleteTransaction = (id: string) => {
-    deleteTransaction(id);
-    setConfirmDeleteId(null);
-    toast({
-      title: "Transacción eliminada",
-      description: "La transacción ha sido eliminada exitosamente.",
-    });
+    try {
+      deleteTransaction(id);
+      setConfirmDeleteId(null);
+      toast({
+        title: "Transacción eliminada",
+        description: "La transacción ha sido eliminada exitosamente del sistema.",
+      });
+    } catch (error) {
+      console.error("Error al eliminar la transacción:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar la transacción. Por favor, intente nuevamente.",
+        variant: "destructive"
+      });
+    }
   };
   
   return (
@@ -109,6 +126,14 @@ export function TransactionsList({
                 </span>
               )}
             </CardTitle>
+            {filteredTransactions.length > 0 && limit && filteredTransactions.length >= limit && (
+              <CardDescription>
+                <Link to="/diario" className="text-primary hover:underline flex items-center gap-1">
+                  <BookOpen className="h-3 w-3" />
+                  Ver todas las transacciones en el Libro Diario
+                </Link>
+              </CardDescription>
+            )}
           </CardHeader>
         )}
         <CardContent className="p-0">
@@ -126,7 +151,7 @@ export function TransactionsList({
                     <TableHead className="w-[120px]">Fecha</TableHead>
                     <TableHead>Descripción</TableHead>
                     <TableHead className="text-right">Monto</TableHead>
-                    <TableHead className="w-[80px] text-center">Acciones</TableHead>
+                    <TableHead className="w-[100px] text-center">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -164,14 +189,27 @@ export function TransactionsList({
                           {formatCurrency(totalDebits)}
                         </TableCell>
                         <TableCell className="text-center align-top">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setConfirmDeleteId(transaction.id)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
+                          <div className="flex justify-center gap-1">
+                            {showViewButton && (
+                              <Link to="/diario">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <Eye className="h-4 w-4 text-primary" />
+                                </Button>
+                              </Link>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setConfirmDeleteId(transaction.id)}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );

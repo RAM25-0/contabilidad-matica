@@ -10,19 +10,28 @@ import { AccountingProvider, useAccounting } from "@/contexts/AccountingContext"
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { BookOpen, PieChart, LayoutDashboard } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 // Inner component to access context
 const IndexContent = () => {
   const { state } = useAccounting();
   
   useEffect(() => {
-    console.info("Index Page - Current transactions:", state.transactions.length);
-  }, [state.transactions]);
+    console.info("Sistema contable cargado - Transacciones disponibles:", state.transactions.length);
+    
+    // Mostrar notificación si hay transacciones cargadas
+    if (state.transactions.length > 0) {
+      toast({
+        title: "Sistema contable iniciado",
+        description: `Se han cargado ${state.transactions.length} transacciones existentes.`,
+      });
+    }
+  }, []);
   
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
       <header className="mb-8 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Sistema de Contabilidad Básica</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Sistema de Contabilidad</h1>
         <p className="text-lg text-muted-foreground mt-2">
           Registro de transacciones siguiendo la ecuación contable A = P + C
         </p>
@@ -55,7 +64,10 @@ const IndexContent = () => {
       {/* Formulario de transacción */}
       <TransactionForm onSuccess={() => {
         console.log("Transaction registered successfully from Index page");
-        // No navigation needed in this case
+        toast({
+          title: "Transacción registrada",
+          description: "La transacción ha sido guardada exitosamente y está disponible en todos los módulos.",
+        });
       }} />
       
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] gap-8 mt-8">
@@ -65,7 +77,10 @@ const IndexContent = () => {
         </div>
         
         <div>
-          <TransactionsList limit={5} />
+          <TransactionsList 
+            limit={5} 
+            showViewButton={true}
+          />
         </div>
       </div>
     </div>
