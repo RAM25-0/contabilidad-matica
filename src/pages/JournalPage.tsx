@@ -80,7 +80,7 @@ export default function JournalPage() {
           </TabsList>
           
           <TabsContent value="register" className="space-y-4">
-            <TransactionForm onTransactionSuccess={handleTransactionSuccess} />
+            <TransactionForm />
           </TabsContent>
           
           <TabsContent value="history" className="space-y-4">
