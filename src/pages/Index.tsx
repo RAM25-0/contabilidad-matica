@@ -53,7 +53,10 @@ const IndexContent = () => {
       </p>
       
       {/* Formulario de transacción */}
-      <TransactionForm />
+      <TransactionForm onSuccess={() => {
+        console.log("Transaction registered successfully from Index page");
+        // No navigation needed in this case
+      }} />
       
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] gap-8 mt-8">
         <div>
