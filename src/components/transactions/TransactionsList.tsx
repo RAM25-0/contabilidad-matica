@@ -3,7 +3,6 @@ import React from "react";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
-import { Link } from "react-router-dom";
 import { TransactionsTable } from "./TransactionsTable";
 import { DeleteTransactionDialog } from "./DeleteTransactionDialog";
 import { toast } from "@/components/ui/use-toast";
@@ -55,14 +54,6 @@ export function TransactionsList({
                 </span>
               )}
             </CardTitle>
-            {filteredTransactions.length > 0 && limit && filteredTransactions.length >= limit && (
-              <CardDescription>
-                <Link to="/journal" className="text-primary hover:underline flex items-center gap-1">
-                  <BookOpen className="h-3 w-3" />
-                  Ver todas las transacciones en el Libro Diario
-                </Link>
-              </CardDescription>
-            )}
           </CardHeader>
         )}
         <CardContent className="p-0">

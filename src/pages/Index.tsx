@@ -1,15 +1,13 @@
 
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
 import AccountsList from "@/components/AccountsList";
 import { AccountForm } from "@/components/AccountForm";
 import { TransactionForm } from "@/components/TransactionForm";
 import { TransactionsList } from "@/components/transactions/TransactionsList";
 import { AccountingSummary } from "@/components/AccountingSummary";
 import { AccountingProvider, useAccounting } from "@/contexts/AccountingContext";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { BookOpen, PieChart, PlayCircle } from "lucide-react";
+import { PlayCircle } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { generateDemoTransactions } from "@/utils/demo-transactions";
 
@@ -52,12 +50,6 @@ const IndexContent = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold tracking-tight">Sistema Contable</h2>
         <div className="flex gap-2">
-          <Link to="/journal">
-            <Button className="gap-2">
-              <BookOpen className="h-4 w-4" />
-              Ir al Libro Diario
-            </Button>
-          </Link>
           <Button 
             variant="outline" 
             className="gap-2" 

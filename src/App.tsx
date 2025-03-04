@@ -6,7 +6,6 @@ import { AccountingProvider } from "@/contexts/AccountingContext";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import IndexPage from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
-import JournalPage from "@/pages/JournalPage";
 import { LedgerPage } from "@/pages/LedgerPage";
 import "./App.css";
 
@@ -17,7 +16,6 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" element={<IndexPage />} />
-            <Route path="/journal" element={<JournalPage />} />
             <Route path="/ledger/:accountId" element={<LedgerPage />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate replace to="/404" />} />
