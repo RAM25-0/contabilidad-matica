@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from "uuid";
 import { AccountingState, AccountType } from "@/types/accounting";
 import { AccountingAction } from "@/types/accounting-actions";
@@ -30,7 +29,6 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
       };
     }
     case "DELETE_ACCOUNT": {
-      // Check if account is used in any transaction
       const isUsed = state.transactions.some(t => 
         t.entries.some(e => e.accountId === action.payload)
       );
@@ -65,10 +63,9 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
         id: uuidv4()
       }));
       
-      // Calculate if transaction is balanced
       const totalDebits = entries.reduce((sum, entry) => sum + (entry.debit || 0), 0);
       const totalCredits = entries.reduce((sum, entry) => sum + (entry.credit || 0), 0);
-      const isBalanced = Math.abs(totalDebits - totalCredits) < 0.001; // Accounting for floating point errors
+      const isBalanced = Math.abs(totalDebits - totalCredits) < 0.001;
       
       if (!isBalanced) {
         toast({
@@ -86,14 +83,12 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
         isBalanced,
       };
       
-      // Update account balances
       const updatedAccounts = state.accounts.map(account => {
         const relatedEntries = entries.filter(entry => entry.accountId === account.id);
         if (relatedEntries.length === 0) return account;
         
         let balanceChange = 0;
         
-        // Apply debits and credits according to account nature
         for (const entry of relatedEntries) {
           if (account.nature === "deudora") {
             balanceChange += (entry.debit || 0) - (entry.credit || 0);
@@ -110,7 +105,6 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
         };
       });
       
-      // Log the transaction being added
       console.info("New transaction added:", {
         id: newTransaction.id,
         date: newTransaction.date,
@@ -131,7 +125,6 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
       
       if (!transactionToDelete) return state;
       
-      // Revert account balances
       const updatedAccounts = state.accounts.map(account => {
         const relatedEntries = transactionToDelete.entries.filter(
           entry => entry.accountId === account.id
@@ -140,7 +133,6 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
         
         let balanceChange = 0;
         
-        // Apply debits and credits according to account nature (reversed)
         for (const entry of relatedEntries) {
           if (account.nature === "deudora") {
             balanceChange -= (entry.debit || 0) - (entry.credit || 0);
@@ -157,7 +149,6 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
         };
       });
       
-      // Log the transaction being deleted
       console.info("Transaction deleted:", {
         id: action.payload,
         description: transactionToDelete.description
@@ -169,6 +160,20 @@ export const accountingReducer = (state: AccountingState, action: AccountingActi
         transactions: state.transactions.filter(
           transaction => transaction.id !== action.payload
         ),
+      };
+    }
+    case "DELETE_ALL_TRANSACTIONS": {
+      const resetAccounts = state.accounts.map(account => ({
+        ...account,
+        balance: 0
+      }));
+      
+      console.info("All transactions deleted, account balances reset to 0");
+      
+      return {
+        ...state,
+        accounts: resetAccounts,
+        transactions: []
       };
     }
     case "FILTER_ACCOUNTS": {

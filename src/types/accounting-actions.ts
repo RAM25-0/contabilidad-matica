@@ -8,5 +8,6 @@ export type AccountingAction =
   | { type: "SET_ACTIVE_ACCOUNT"; payload: Account | null }
   | { type: "ADD_TRANSACTION"; payload: Omit<Transaction, "id" | "isBalanced"> }
   | { type: "DELETE_TRANSACTION"; payload: string }
+  | { type: "DELETE_ALL_TRANSACTIONS" }
   | { type: "UPDATE_TRANSACTION"; payload: Transaction }
   | { type: "FILTER_ACCOUNTS"; payload: AccountType | "todos" };

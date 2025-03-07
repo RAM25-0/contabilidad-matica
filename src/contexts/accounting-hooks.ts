@@ -9,6 +9,7 @@ export interface AccountingContextMethods {
   setActiveAccount: (account: Account | null) => void;
   addTransaction: (transaction: Omit<Transaction, "id" | "isBalanced">) => void;
   deleteTransaction: (id: string) => void;
+  deleteAllTransactions: () => void;
   filterAccounts: (type: AccountType | "todos") => void;
   getNatureLabel: (nature: string) => string;
   getTypeLabel: (type: string) => string;
@@ -43,6 +44,10 @@ export function getAccountingMethods(
 
   const deleteTransaction = (id: string) => {
     dispatch({ type: "DELETE_TRANSACTION", payload: id });
+  };
+
+  const deleteAllTransactions = () => {
+    dispatch({ type: "DELETE_ALL_TRANSACTIONS" });
   };
 
   const filterAccounts = (type: AccountType | "todos") => {
@@ -90,6 +95,7 @@ export function getAccountingMethods(
     setActiveAccount,
     addTransaction,
     deleteTransaction,
+    deleteAllTransactions,
     filterAccounts,
     getNatureLabel,
     getTypeLabel,
