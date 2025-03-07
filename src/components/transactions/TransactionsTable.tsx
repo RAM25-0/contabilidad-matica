@@ -4,7 +4,6 @@ import { Transaction } from "@/types/accounting";
 import { 
   Table, TableBody, TableCell, TableHeader, TableHead, TableRow 
 } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Trash2, Eye } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
@@ -32,7 +31,7 @@ export function TransactionsTable({
   onDelete 
 }: TransactionsTableProps) {
   return (
-    <ScrollArea className="max-h-[500px]">
+    <div className="w-full">
       <Table>
         <TableHeader>
           <TableRow>
@@ -88,6 +87,6 @@ export function TransactionsTable({
           })}
         </TableBody>
       </Table>
-    </ScrollArea>
+    </div>
   );
 }

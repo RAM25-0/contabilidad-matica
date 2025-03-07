@@ -7,6 +7,7 @@ import { TransactionsTable } from "./TransactionsTable";
 import { DeleteTransactionDialog } from "./DeleteTransactionDialog";
 import { toast } from "@/components/ui/use-toast";
 import { useTransactionsList } from "./useTransactionsList";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type TransactionsListProps = {
   dateFilter?: Date;
@@ -14,6 +15,7 @@ type TransactionsListProps = {
   showHeader?: boolean;
   limit?: number;
   showViewButton?: boolean;
+  maxHeight?: string;
 };
 
 export function TransactionsList({ 
@@ -21,7 +23,8 @@ export function TransactionsList({
   accountFilter,
   showHeader = true,
   limit,
-  showViewButton = false
+  showViewButton = false,
+  maxHeight = "350px"
 }: TransactionsListProps) {
   const { state } = useAccounting();
   const { 
@@ -64,11 +67,13 @@ export function TransactionsList({
               {accountFilter && " para la cuenta seleccionada"}
             </div>
           ) : (
-            <TransactionsTable 
-              transactions={filteredTransactions} 
-              showViewButton={showViewButton}
-              onDelete={setConfirmDeleteId}
-            />
+            <ScrollArea className={`w-full ${maxHeight ? `max-h-[${maxHeight}]` : ""}`}>
+              <TransactionsTable 
+                transactions={filteredTransactions} 
+                showViewButton={showViewButton}
+                onDelete={setConfirmDeleteId}
+              />
+            </ScrollArea>
           )}
         </CardContent>
       </Card>
