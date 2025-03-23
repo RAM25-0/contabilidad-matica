@@ -5,7 +5,7 @@ import { useAccounting } from "@/contexts/AccountingContext";
 import { Sidebar } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, CircleDollarSign, Users, Package, BookText } from "lucide-react";
+import { Wallet, CircleDollarSign, Users, Package, BookText, BookOpen } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import { TransactionsList } from "@/components/transactions/TransactionsList";
 import { ChartContainer, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
@@ -105,6 +105,12 @@ export default function IndexPage() {
                   </CardDescription>
                 </div>
                 <div className="ml-auto flex gap-2">
+                  <Button asChild variant="outline">
+                    <Link to="/diario">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      Ver Libro Diario
+                    </Link>
+                  </Button>
                   <Button asChild variant="outline">
                     <Link to="/general-ledger">
                       <BookText className="mr-2 h-4 w-4" />
