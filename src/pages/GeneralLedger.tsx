@@ -83,7 +83,13 @@ export function GeneralLedger() {
                             <TAccount 
                               account={account} 
                               movements={accountMovements[account.id]} 
-                              colors={getAccountColorsByType(type)}
+                              colors={{
+                                border: getAccountColorsByType(type).border,
+                                bg: getAccountColorsByType(type).bg,
+                                text: "text-foreground",
+                                title: "text-foreground",
+                                header: ""
+                              }}
                             />
                           </Link>
                         </div>
@@ -114,6 +120,6 @@ function getAccountColorsByType(type: AccountType) {
     case "gasto":
       return { border: "border-amber-200", bg: "bg-amber-50/50" };
     default:
-      return {};
+      return { border: "", bg: "" };
   }
 }

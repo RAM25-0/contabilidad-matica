@@ -1,8 +1,10 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { Sidebar } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Wallet, CircleDollarSign, Users, Package, BookText } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import { TransactionsList } from "@/components/transactions/TransactionsList";
@@ -12,9 +14,9 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 const CHART_COLORS = ["#3498db", "#9b59b6", "#2ecc71", "#e74c3c", "#f39c12"];
 
 export default function IndexPage() {
-  const { state } = useAccounting();
+  const { state, getTotalsByType } = useAccounting();
 
-  const totals = state.getTotalsByType();
+  const totals = getTotalsByType();
 
   const chartData = React.useMemo(() => {
     return [
