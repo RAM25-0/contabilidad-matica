@@ -1,23 +1,21 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { Sidebar } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, CircleDollarSign, Users, Package, BookText, Plus } from "lucide-react";
+import { Wallet, CircleDollarSign, Users, Package, BookText } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import { TransactionsList } from "@/components/transactions/TransactionsList";
 import { ChartContainer, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { TransactionForm } from "@/components/TransactionForm";
-import { SimpleTransactionForm } from "@/components/SimpleTransactionForm";
 
 const CHART_COLORS = ["#3498db", "#9b59b6", "#2ecc71", "#e74c3c", "#f39c12"];
 
 export default function IndexPage() {
   const { state, getTotalsByType } = useAccounting();
-  const [showTransactionForm, setShowTransactionForm] = useState(false);
   
   const totals = getTotalsByType();
 
@@ -30,10 +28,6 @@ export default function IndexPage() {
       { name: "Gastos", value: state.accounts.filter(a => a.type === "gasto").length },
     ];
   }, [state.accounts]);
-
-  const handleTransactionSuccess = () => {
-    setShowTransactionForm(false);
-  };
 
   return (
     <div className="flex min-h-screen">
@@ -105,17 +99,12 @@ export default function IndexPage() {
             <Card className="col-span-full md:col-span-4">
               <CardHeader className="flex flex-row items-center">
                 <div className="grid gap-2">
-                  <CardTitle>Transacciones Recientes</CardTitle>
+                  <CardTitle>Nueva Transacción</CardTitle>
                   <CardDescription>
-                    Historial de las últimas transacciones registradas
+                    Registra una nueva transacción en el sistema
                   </CardDescription>
                 </div>
                 <div className="ml-auto flex gap-2">
-                  <SimpleTransactionForm />
-                  <Button onClick={() => setShowTransactionForm(!showTransactionForm)} variant="default">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Nueva Transacción
-                  </Button>
                   <Button asChild variant="outline">
                     <Link to="/general-ledger">
                       <BookText className="mr-2 h-4 w-4" />
@@ -125,17 +114,25 @@ export default function IndexPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {showTransactionForm ? (
-                  <TransactionForm onSuccess={handleTransactionSuccess} />
-                ) : (
-                  <TransactionsList 
-                    showViewButton={true}
-                    maxHeight="450px"
-                  />
-                )}
+                <TransactionForm onSuccess={() => {}} />
               </CardContent>
             </Card>
 
+            <Card className="col-span-full md:col-span-3">
+              <CardHeader>
+                <CardTitle>Transacciones Recientes</CardTitle>
+                <CardDescription>
+                  Historial de las últimas transacciones registradas
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TransactionsList 
+                  showViewButton={true}
+                  maxHeight="400px"
+                />
+              </CardContent>
+            </Card>
+            
             <Card className="col-span-full md:col-span-3">
               <CardHeader>
                 <CardTitle>Distribución de Cuentas</CardTitle>
