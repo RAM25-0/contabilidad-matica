@@ -80,6 +80,12 @@ export function Sidebar() {
             isActive={path === "/diario"}
           />
           <SidebarItem
+            icon={<BookText className="h-5 w-5" />}
+            title="Libro Mayor"
+            path="/general-ledger"
+            isActive={path === "/general-ledger"}
+          />
+          <SidebarItem
             icon={<LayoutList className="h-5 w-5" />}
             title="Catálogo de Cuentas"
             path="/cuentas"

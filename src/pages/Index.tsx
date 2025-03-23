@@ -1,102 +1,165 @@
-
-import React, { useEffect } from "react";
-import AccountsList from "@/components/AccountsList";
-import { AccountForm } from "@/components/AccountForm";
-import { TransactionForm } from "@/components/TransactionForm";
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAccounting } from "@/contexts/AccountingContext";
+import { Sidebar } from "@/components/ui/sidebar";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Wallet, CircleDollarSign, Users, Package, BookText } from "lucide-react";
+import { formatCurrency, cn } from "@/lib/utils";
 import { TransactionsList } from "@/components/transactions/TransactionsList";
-import { AccountingSummary } from "@/components/AccountingSummary";
-import { AccountingProvider, useAccounting } from "@/contexts/AccountingContext";
-import { Button } from "@/components/ui/button";
-import { PlayCircle } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-import { generateDemoTransactions } from "@/utils/demo-transactions";
+import { ChartContainer, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart";
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 
-const IndexContent = () => {
-  const { state, addTransaction } = useAccounting();
-  
-  useEffect(() => {
-    console.info("Sistema contable cargado - Transacciones disponibles:", state.transactions.length);
-    
-    // Mostrar notificación si hay transacciones cargadas
-    if (state.transactions.length > 0) {
-      toast({
-        title: "Sistema contable iniciado",
-        description: `Se han cargado ${state.transactions.length} transacciones existentes.`,
-      });
-    }
-  }, []);
-  
-  const handleRunDemo = () => {
-    if (state.transactions.length > 0) {
-      if (!confirm("Ya existen transacciones en el sistema. ¿Desea agregar más transacciones de ejemplo?")) {
-        return;
-      }
-    }
-    
-    generateDemoTransactions(state.accounts, addTransaction);
-  };
-  
+const CHART_COLORS = ["#3498db", "#9b59b6", "#2ecc71", "#e74c3c", "#f39c12"];
+
+export default function IndexPage() {
+  const { state } = useAccounting();
+
+  const totals = state.getTotalsByType();
+
+  const chartData = React.useMemo(() => {
+    return [
+      { name: "Activos", value: state.accounts.filter(a => a.type === "activo").length },
+      { name: "Pasivos", value: state.accounts.filter(a => a.type === "pasivo").length },
+      { name: "Capital", value: state.accounts.filter(a => a.type === "capital").length },
+      { name: "Ingresos", value: state.accounts.filter(a => a.type === "ingreso").length },
+      { name: "Gastos", value: state.accounts.filter(a => a.type === "gasto").length },
+    ];
+  }, [state.accounts]);
+
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
-      <header className="mb-8 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Sistema de Contabilidad</h1>
-        <p className="text-lg text-muted-foreground mt-2">
-          Registro de transacciones siguiendo la ecuación contable A = P + C
-        </p>
-      </header>
-      
-      <AccountingSummary />
-      
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold tracking-tight">Sistema Contable</h2>
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            className="gap-2" 
-            onClick={handleRunDemo}
-          >
-            <PlayCircle className="h-4 w-4" />
-            Generar transacciones de ejemplo
-          </Button>
-        </div>
-      </div>
-      
-      <p className="text-muted-foreground mt-1 mb-6">
-        Gestiona tus cuentas contables y registra transacciones
-      </p>
-      
-      {/* Formulario de transacción */}
-      <TransactionForm onSuccess={() => {
-        console.log("Transaction registered successfully from Index page");
-        toast({
-          title: "Transacción registrada",
-          description: "La transacción ha sido guardada exitosamente y está disponible en todos los módulos.",
-        });
-      }} />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr,1fr] gap-8 mt-8">
-        <div>
-          <AccountsList />
-          <AccountForm />
-        </div>
-        
-        <div>
-          <TransactionsList 
-            showViewButton={true}
-            maxHeight="450px"
-          />
-        </div>
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <div className="flex-1 pl-64">
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6">
+          <h1 className="text-lg font-semibold">Panel Principal</h1>
+        </header>
+        <main className="grid flex-1 gap-4 p-4 md:gap-8 md:p-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Activos Totales
+                </CardTitle>
+                <Wallet className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(totals.activos)}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Pasivos Totales
+                </CardTitle>
+                <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(totals.pasivos)}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Capital Total
+                </CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(totals.capital)}
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Ecuación Contable
+                </CardTitle>
+                <Package className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className={cn(
+                  "text-2xl font-bold",
+                  totals.equation ? "text-green-600" : "text-red-600"
+                )}>
+                  {totals.equation ? "Balanceado" : "Desbalanceado"}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <Card className="col-span-full md:col-span-4">
+              <CardHeader className="flex flex-row items-center">
+                <div className="grid gap-2">
+                  <CardTitle>Transacciones Recientes</CardTitle>
+                  <CardDescription>
+                    Historial de las últimas transacciones registradas
+                  </CardDescription>
+                </div>
+                <div className="ml-auto flex gap-2">
+                  <Button asChild variant="outline">
+                    <Link to="/general-ledger">
+                      <BookText className="mr-2 h-4 w-4" />
+                      Ver Libro Mayor
+                    </Link>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <TransactionsList 
+                  showViewButton={true}
+                  maxHeight="450px"
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="col-span-full md:col-span-3">
+              <CardHeader>
+                <CardTitle>Distribución de Cuentas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer 
+                  id="accounts-distribution"
+                  className="aspect-square w-full p-2"
+                  config={{
+                    activo: { color: "#3498db" },
+                    pasivo: { color: "#9b59b6" },
+                    capital: { color: "#2ecc71" },
+                    ingreso: { color: "#27ae60" },
+                    gasto: { color: "#f39c12" },
+                  }}
+                >
+                  <PieChart data={chartData}>
+                    <Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                      nameKey="name"
+                      fill="#8884d8"
+                      label
+                    >
+                      {chartData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<ChartTooltipContent />} />
+                    <Legend content={<ChartLegendContent />} />
+                  </PieChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
       </div>
     </div>
   );
-};
-
-const Index = () => {
-  return (
-    <AccountingProvider>
-      <IndexContent />
-    </AccountingProvider>
-  );
-};
-
-export default Index;
+}

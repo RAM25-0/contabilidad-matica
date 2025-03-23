@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import IndexPage from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
 import { LedgerPage } from "@/pages/LedgerPage";
+import { GeneralLedger } from "@/pages/GeneralLedger";
 import "./App.css";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<IndexPage />} />
             <Route path="/ledger/:accountId" element={<LedgerPage />} />
+            <Route path="/general-ledger" element={<GeneralLedger />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate replace to="/404" />} />
           </Routes>
