@@ -7,10 +7,9 @@ import { toast } from "@/components/ui/use-toast";
 type UseTransactionsListProps = {
   dateFilter?: Date;
   accountFilter?: string;
-  limit?: number;
 };
 
-export function useTransactionsList({ dateFilter, accountFilter, limit }: UseTransactionsListProps) {
+export function useTransactionsList({ dateFilter, accountFilter }: UseTransactionsListProps) {
   const { state, deleteTransaction } = useAccounting();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   
@@ -36,13 +35,8 @@ export function useTransactionsList({ dateFilter, accountFilter, limit }: UseTra
       );
     }
     
-    // Limitar la cantidad de transacciones si se especifica
-    if (limit && transactions.length > limit) {
-      transactions = transactions.slice(0, limit);
-    }
-    
     return transactions;
-  }, [state.transactions, dateFilter, accountFilter, limit]);
+  }, [state.transactions, dateFilter, accountFilter]);
   
   const handleDeleteTransaction = (id: string) => {
     try {

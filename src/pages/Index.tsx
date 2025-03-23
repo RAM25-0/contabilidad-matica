@@ -82,8 +82,8 @@ const IndexContent = () => {
         
         <div>
           <TransactionsList 
-            limit={5} 
             showViewButton={true}
+            maxHeight="450px"
           />
         </div>
       </div>

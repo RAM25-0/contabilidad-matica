@@ -24,7 +24,6 @@ export function TransactionsList({
   dateFilter, 
   accountFilter,
   showHeader = true,
-  limit,
   showViewButton = false,
   maxHeight = "350px"
 }: TransactionsListProps) {
@@ -34,7 +33,10 @@ export function TransactionsList({
     confirmDeleteId, 
     setConfirmDeleteId, 
     handleDeleteTransaction 
-  } = useTransactionsList({ dateFilter, accountFilter, limit });
+  } = useTransactionsList({ 
+    dateFilter, 
+    accountFilter 
+  });
   
   const [showDeleteAllDialog, setShowDeleteAllDialog] = React.useState(false);
   
