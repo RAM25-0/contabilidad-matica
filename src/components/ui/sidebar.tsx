@@ -2,119 +2,69 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
-  BookOpen,
   BookText,
-  BarChart3,
-  Settings,
-  ChevronRight,
-  CircleDollarSign,
-  Package,
-  Users,
-  CreditCard,
-  LineChart,
-  Wallet,
-  FileCog,
+  BookOpen,
   FileSpreadsheet,
-  FileCheck,
-  LayoutList,
+  ClipboardList,
+  ListTodo,
 } from "lucide-react";
-
-interface SidebarItemProps {
-  icon: React.ReactNode;
-  title: string;
-  path: string;
-  isActive?: boolean;
-  isSubItem?: boolean;
-}
-
-const SidebarItem: React.FC<SidebarItemProps> = ({
-  icon,
-  title,
-  path,
-  isActive = false,
-  isSubItem = false,
-}) => {
-  return (
-    <Link
-      to={path}
-      className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary",
-        isActive
-          ? "bg-muted font-medium text-primary"
-          : "text-muted-foreground",
-        isSubItem ? "pl-10" : ""
-      )}
-    >
-      {icon}
-      <span>{title}</span>
-      {isActive && (
-        <ChevronRight className="ml-auto h-4 w-4 text-primary" />
-      )}
-    </Link>
-  );
-};
 
 export function Sidebar() {
   const location = useLocation();
-  const path = location.pathname;
-
+  
+  const links = [
+    {
+      href: "/",
+      label: "Panel",
+      icon: <LayoutDashboard className="w-5 h-5 mr-2" />,
+    },
+    {
+      href: "/general-ledger",
+      label: "Libro Mayor",
+      icon: <BookText className="w-5 h-5 mr-2" />,
+    },
+    {
+      href: "/diario",
+      label: "Libro Diario",
+      icon: <BookOpen className="w-5 h-5 mr-2" />,
+    },
+    {
+      href: "/cuentas",
+      label: "Catálogo",
+      icon: <ListTodo className="w-5 h-5 mr-2" />,
+    },
+    {
+      href: "/balanza",
+      label: "Balanza",
+      icon: <ClipboardList className="w-5 h-5 mr-2" />,
+    },
+  ];
+  
   return (
-    <div className="group fixed inset-y-0 flex h-full flex-col border-r pb-10 pt-2">
-      <div className="flex h-12 w-full shrink-0 items-center justify-start border-b px-4">
-        <span className="text-xl font-semibold tracking-tight">EasyAccounting</span>
-      </div>
-      <div className="flex-1 overflow-auto py-2">
-        <nav className="grid items-start px-2 text-sm font-medium">
-          <SidebarItem
-            icon={<LayoutDashboard className="h-5 w-5" />}
-            title="Panel Principal"
-            path="/"
-            isActive={path === "/"}
-          />
-          <SidebarItem
-            icon={<BookOpen className="h-5 w-5" />}
-            title="Libro Diario"
-            path="/diario"
-            isActive={path === "/diario"}
-          />
-          <SidebarItem
-            icon={<BookText className="h-5 w-5" />}
-            title="Libro Mayor"
-            path="/general-ledger"
-            isActive={path === "/general-ledger"}
-          />
-          <SidebarItem
-            icon={<LayoutList className="h-5 w-5" />}
-            title="Catálogo de Cuentas"
-            path="/cuentas"
-            isActive={path === "/cuentas"}
-          />
-          <SidebarItem
-            icon={<FileCheck className="h-5 w-5" />}
-            title="Balance General"
-            path="/balance"
-            isActive={path === "/balance"}
-          />
-          <SidebarItem
-            icon={<FileSpreadsheet className="h-5 w-5" />}
-            title="Estado de Resultados"
-            path="/resultados"
-            isActive={path === "/resultados"}
-          />
-          <SidebarItem
-            icon={<LineChart className="h-5 w-5" />}
-            title="Gráficos y Reportes"
-            path="/reportes"
-            isActive={path === "/reportes"}
-          />
-          <SidebarItem
-            icon={<Settings className="h-5 w-5" />}
-            title="Configuración"
-            path="/configuracion"
-            isActive={path === "/configuracion"}
-          />
+    <div className="fixed inset-y-0 left-0 w-64 bg-background border-r">
+      <div className="flex flex-col h-full">
+        <div className="p-4 border-b">
+          <h2 className="text-lg font-bold">Sistema Contable</h2>
+          <p className="text-sm text-muted-foreground">Gestión financiera</p>
+        </div>
+        <nav className="p-4 space-y-2">
+          {links.map((link) => (
+            <Link to={link.href} key={link.href}>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start",
+                  location.pathname === link.href && "bg-muted"
+                )}
+              >
+                {link.icon}
+                {link.label}
+              </Button>
+            </Link>
+          ))}
         </nav>
       </div>
     </div>

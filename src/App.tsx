@@ -10,6 +10,7 @@ import { LedgerPage } from "@/pages/LedgerPage";
 import { GeneralLedger } from "@/pages/GeneralLedger";
 import { JournalPage } from "@/pages/JournalPage";
 import { CatalogPage } from "@/pages/CatalogPage";
+import { BalancePage } from "@/pages/BalancePage";
 import "./App.css";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
             <Route path="/general-ledger" element={<GeneralLedger />} />
             <Route path="/diario" element={<JournalPage />} />
             <Route path="/cuentas" element={<CatalogPage />} />
+            <Route path="/balanza" element={<BalancePage />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate replace to="/404" />} />
           </Routes>
