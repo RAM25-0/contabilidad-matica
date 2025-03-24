@@ -22,7 +22,8 @@ export function IncomeStatementPage() {
   
   // Format date range for the header (first day of current month to today)
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const dateRangeString = `DEL 1° AL ${currentDate.getDate()} DE ${currentDate.toLocaleString('es-MX', { month: 'uppercase' })} ${currentDate.getFullYear()}`;
+  const monthName = currentDate.toLocaleString('es-MX', { month: 'long' }).toUpperCase();
+  const dateRangeString = `DEL 1° AL ${currentDate.getDate()} DE ${monthName} ${currentDate.getFullYear()}`;
 
   // Get all accounts by type
   const getAccountsByType = (type: "ingreso" | "gasto") => {
