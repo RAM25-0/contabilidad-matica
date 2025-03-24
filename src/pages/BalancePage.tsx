@@ -1,12 +1,13 @@
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Sidebar } from "@/components/ui/sidebar";
-import { ArrowLeft, ClipboardList } from "lucide-react";
+import { ArrowLeft, ClipboardList, FilterX, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { Account, AccountType } from "@/types/accounting";
 import { formatCurrency } from "@/lib/utils";
+import { AccountBadge } from "@/components/accounts/AccountBadge";
 import {
   Table,
   TableHeader,
@@ -18,6 +19,7 @@ import {
 
 export function BalancePage() {
   const { state } = useAccounting();
+  const [showOnlyUsed, setShowOnlyUsed] = useState(false);
 
   // Utility function to get total debits/credits for an account from all transactions
   const getAccountMovements = (accountId: string) => {
@@ -48,6 +50,13 @@ export function BalancePage() {
     }
   };
 
+  // Determine if an account has been used in any transaction
+  const hasAccountBeenUsed = (accountId: string) => {
+    return state.transactions.some(transaction => 
+      transaction.entries.some(entry => entry.accountId === accountId)
+    );
+  };
+
   // Group accounts by type and calculate movements
   const accountsWithMovements = useMemo(() => {
     const order: AccountType[] = ["activo", "pasivo", "capital", "ingreso", "gasto"];
@@ -55,20 +64,27 @@ export function BalancePage() {
     const result = state.accounts.map(account => {
       const { totalDebit, totalCredit } = getAccountMovements(account.id);
       const balance = calculateBalance(account, totalDebit, totalCredit);
+      const used = hasAccountBeenUsed(account.id);
       
       return {
         ...account,
         debit: totalDebit,
         credit: totalCredit,
         balance,
+        used
       };
     });
     
+    // Filter out unused accounts if the toggle is on
+    const filteredResults = showOnlyUsed 
+      ? result.filter(account => account.used) 
+      : result;
+    
     // Sort by the predefined order
-    return result.sort((a, b) => {
+    return filteredResults.sort((a, b) => {
       return order.indexOf(a.type) - order.indexOf(b.type);
     });
-  }, [state.accounts, state.transactions]);
+  }, [state.accounts, state.transactions, showOnlyUsed]);
 
   // Calculate sums for the table footer
   const totals = useMemo(() => {
@@ -117,12 +133,31 @@ export function BalancePage() {
                 </p>
               </div>
             </div>
-            <Link to="/">
-              <Button variant="outline">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver al Panel Principal
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowOnlyUsed(!showOnlyUsed)}
+                className="flex items-center gap-2"
+              >
+                {showOnlyUsed ? (
+                  <>
+                    <FilterX className="h-4 w-4" />
+                    Mostrar todas las cuentas
+                  </>
+                ) : (
+                  <>
+                    <Filter className="h-4 w-4" />
+                    Mostrar solo cuentas usadas
+                  </>
+                )}
               </Button>
-            </Link>
+              <Link to="/">
+                <Button variant="outline">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Volver al Panel Principal
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <div className="rounded-md border">
@@ -164,33 +199,57 @@ export function BalancePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {accountsWithMovements.map((account) => (
-                  <TableRow key={account.id}>
-                    <TableCell className="font-medium">
-                      {account.name}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {account.debit > 0 ? formatCurrency(account.debit) : ""}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {account.credit > 0 ? formatCurrency(account.credit) : ""}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {account.balance > 0 && account.nature === "deudora" ? 
-                        formatCurrency(account.balance) : 
-                        account.balance < 0 && account.nature === "acreedora" ? 
-                          formatCurrency(Math.abs(account.balance)) : 
-                          ""}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {account.balance > 0 && account.nature === "acreedora" ? 
-                        formatCurrency(account.balance) : 
-                        account.balance < 0 && account.nature === "deudora" ? 
-                          formatCurrency(Math.abs(account.balance)) : 
-                          ""}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {/* Group and render accounts by type */}
+                {["activo", "pasivo", "capital", "ingreso", "gasto"].map((type) => {
+                  const accountsOfType = accountsWithMovements.filter(a => a.type === type);
+                  if (accountsOfType.length === 0) return null;
+                  
+                  return (
+                    <React.Fragment key={type}>
+                      {/* Category header */}
+                      <TableRow className="bg-muted/30">
+                        <TableCell colSpan={5} className="font-semibold py-2">
+                          <AccountBadge type={type as AccountType} label={
+                            type === "activo" ? "ACTIVOS" : 
+                            type === "pasivo" ? "PASIVOS" : 
+                            type === "capital" ? "CAPITAL" : 
+                            type === "ingreso" ? "INGRESOS" : "GASTOS"
+                          } />
+                        </TableCell>
+                      </TableRow>
+                      
+                      {/* Accounts of this type */}
+                      {accountsOfType.map((account) => (
+                        <TableRow key={account.id}>
+                          <TableCell className="font-medium pl-6">
+                            {account.name}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {account.debit > 0 ? formatCurrency(account.debit) : ""}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {account.credit > 0 ? formatCurrency(account.credit) : ""}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {account.balance > 0 && account.nature === "deudora" ? 
+                              formatCurrency(account.balance) : 
+                              account.balance < 0 && account.nature === "acreedora" ? 
+                                formatCurrency(Math.abs(account.balance)) : 
+                                ""}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {account.balance > 0 && account.nature === "acreedora" ? 
+                              formatCurrency(account.balance) : 
+                              account.balance < 0 && account.nature === "deudora" ? 
+                                formatCurrency(Math.abs(account.balance)) : 
+                                ""}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </React.Fragment>
+                  );
+                })}
+                
                 {/* Footer row with totals */}
                 <TableRow className="bg-muted/50 font-bold">
                   <TableCell className="font-bold text-right">TOTALES</TableCell>
