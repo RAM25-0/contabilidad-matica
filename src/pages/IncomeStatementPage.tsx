@@ -396,13 +396,6 @@ export function IncomeStatementPage() {
                     {formatCurrency(financials.netIncome)}
                   </TableCell>
                 </TableRow>
-                <TableRow className="bg-blue-100">
-                  <TableCell className="font-bold text-blue-800 text-lg">UTILIDAD NETA</TableCell>
-                  <TableCell></TableCell>
-                  <TableCell className="text-right font-bold text-lg">
-                    {formatCurrency(financials.netIncome)}
-                  </TableCell>
-                </TableRow>
               </TableBody>
             </Table>
           </div>
