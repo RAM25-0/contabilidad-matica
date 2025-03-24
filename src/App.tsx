@@ -11,6 +11,7 @@ import { GeneralLedger } from "@/pages/GeneralLedger";
 import { JournalPage } from "@/pages/JournalPage";
 import { CatalogPage } from "@/pages/CatalogPage";
 import { BalancePage } from "@/pages/BalancePage";
+import { IncomeStatementPage } from "@/pages/IncomeStatementPage";
 import "./App.css";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
             <Route path="/diario" element={<JournalPage />} />
             <Route path="/cuentas" element={<CatalogPage />} />
             <Route path="/balanza" element={<BalancePage />} />
+            <Route path="/resultados" element={<IncomeStatementPage />} />
             <Route path="/404" element={<NotFound />} />
             <Route path="*" element={<Navigate replace to="/404" />} />
           </Routes>

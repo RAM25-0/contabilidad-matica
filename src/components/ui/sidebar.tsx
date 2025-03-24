@@ -1,72 +1,78 @@
 
-import React from "react";
+import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  BookText,
-  BookOpen,
-  FileSpreadsheet,
-  ClipboardList,
-  ListTodo,
-} from "lucide-react";
+import { Book, LayoutDashboard, ListChecks, ClipboardList, FileText } from "lucide-react";
 
-export function Sidebar() {
+type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
+
+export function Sidebar({ className, ...props }: SidebarProps) {
   const location = useLocation();
-  
-  const links = [
+
+  const isCurrentPath = (path: string) => {
+    if (path === "/" && location.pathname !== "/") {
+      return false;
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  const navItems = [
     {
       href: "/",
-      label: "Panel",
-      icon: <LayoutDashboard className="w-5 h-5 mr-2" />,
-    },
-    {
-      href: "/general-ledger",
-      label: "Libro Mayor",
-      icon: <BookText className="w-5 h-5 mr-2" />,
+      icon: <LayoutDashboard className="h-5 w-5" />,
+      title: "Panel Principal",
     },
     {
       href: "/diario",
-      label: "Libro Diario",
-      icon: <BookOpen className="w-5 h-5 mr-2" />,
+      icon: <Book className="h-5 w-5" />,
+      title: "Libro Diario",
+    },
+    {
+      href: "/general-ledger",
+      icon: <ListChecks className="h-5 w-5" />,
+      title: "Libro Mayor",
     },
     {
       href: "/cuentas",
-      label: "Catálogo",
-      icon: <ListTodo className="w-5 h-5 mr-2" />,
+      icon: <Book className="h-5 w-5" />,
+      title: "Catálogo de Cuentas",
     },
     {
       href: "/balanza",
-      label: "Balanza",
-      icon: <ClipboardList className="w-5 h-5 mr-2" />,
+      icon: <ClipboardList className="h-5 w-5" />,
+      title: "Balanza de Comprobación",
     },
+    {
+      href: "/resultados",
+      icon: <FileText className="h-5 w-5" />,
+      title: "Estado de Resultados",
+    }
   ];
-  
+
   return (
-    <div className="fixed inset-y-0 left-0 w-64 bg-background border-r">
-      <div className="flex flex-col h-full">
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-bold">Sistema Contable</h2>
-          <p className="text-sm text-muted-foreground">Gestión financiera</p>
-        </div>
-        <nav className="p-4 space-y-2">
-          {links.map((link) => (
-            <Link to={link.href} key={link.href}>
-              <Button
-                variant="ghost"
+    <div className="fixed inset-y-0 z-10 flex w-64 flex-col bg-white border-r">
+      <div className="flex h-14 items-center border-b bg-white px-4">
+        <span className="font-semibold">Sistema Contable</span>
+      </div>
+      <nav className="flex-1 overflow-auto py-3 px-2">
+        <ul className="flex flex-col gap-1">
+          {navItems.map((item) => (
+            <li key={item.href}>
+              <Link
+                to={item.href}
                 className={cn(
-                  "w-full justify-start",
-                  location.pathname === link.href && "bg-muted"
+                  "flex h-10 items-center gap-2 rounded-md px-3 text-gray-500 transition-colors hover:text-gray-900",
+                  isCurrentPath(item.href) &&
+                    "bg-gray-100 text-gray-900 font-medium",
                 )}
               >
-                {link.icon}
-                {link.label}
-              </Button>
-            </Link>
+                {item.icon}
+                {item.title}
+              </Link>
+            </li>
           ))}
-        </nav>
-      </div>
+        </ul>
+      </nav>
     </div>
   );
 }
