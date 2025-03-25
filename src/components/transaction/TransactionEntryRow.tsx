@@ -17,9 +17,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { useAccounting } from "@/contexts/AccountingContext";
 import { UseFormReturn } from "react-hook-form";
+import { getTextColorForType, getBgColorForType } from "@/components/accounts/AccountBadge";
 import { FormData } from "./TransactionFormTypes";
-import { SearchableAccountSelect } from "./SearchableAccountSelect";
 
 interface TransactionEntryRowProps {
   index: number;
@@ -28,9 +29,46 @@ interface TransactionEntryRowProps {
 }
 
 export function TransactionEntryRow({ index, form, removeEntry }: TransactionEntryRowProps) {
+  const { state } = useAccounting();
+
   return (
     <div className="grid grid-cols-[1fr,auto,1fr,auto] gap-2 items-center">
-      <SearchableAccountSelect index={index} form={form} />
+      <FormField
+        control={form.control}
+        name={`entries.${index}.accountId`}
+        render={({ field }) => (
+          <FormItem className="space-y-1">
+            <FormLabel className="sr-only">Cuenta</FormLabel>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value}
+            >
+              <FormControl>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Selecciona cuenta" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {state.accounts.map((account) => {
+                  const textColor = getTextColorForType(account.type, account.subcategory);
+                  const bgColor = getBgColorForType(account.type, account.subcategory);
+                  
+                  return (
+                    <SelectItem 
+                      key={account.id} 
+                      value={account.id}
+                      className={`${textColor} ${bgColor} rounded my-1`}
+                    >
+                      {account.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       
       <FormField
         control={form.control}
