@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FormField,
   FormItem,
@@ -36,18 +36,27 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
   const { state } = useAccounting();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filteredAccounts, setFilteredAccounts] = useState<Array<any>>([]);
   
   const accountId = form.watch(`entries.${index}.accountId`);
-  const selectedAccount = state.accounts?.find(account => account.id === accountId);
+  const selectedAccount = state.accounts?.find(account => account && account.id === accountId);
   
-  // Filtrar cuentas basado en la consulta de búsqueda
-  const filteredAccounts = state.accounts
-    ? state.accounts.filter(account => 
-        account && 
-        account.name && 
-        account.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
+  // Initialize and update filtered accounts when component mounts, 
+  // when accounts change, or when search query changes
+  useEffect(() => {
+    if (!Array.isArray(state.accounts)) {
+      setFilteredAccounts([]);
+      return;
+    }
+    
+    const filtered = state.accounts.filter(account => 
+      account && 
+      account.name && 
+      account.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    setFilteredAccounts(filtered);
+  }, [searchQuery, state.accounts]);
 
   return (
     <FormField
@@ -83,7 +92,7 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                 />
                 <CommandEmpty>No se encontraron cuentas.</CommandEmpty>
                 <CommandGroup className="max-h-64 overflow-y-auto">
-                  {filteredAccounts.length > 0 ? (
+                  {filteredAccounts && filteredAccounts.length > 0 ? (
                     filteredAccounts.map((account, idx) => {
                       if (!account) return null;
                       
@@ -92,7 +101,7 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                       
                       return (
                         <CommandItem
-                          key={account.id || idx}
+                          key={account.id || `account-${idx}`}
                           value={account.id}
                           onSelect={() => {
                             form.setValue(`entries.${index}.accountId`, account.id);
