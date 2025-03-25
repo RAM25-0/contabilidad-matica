@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FormField,
   FormItem,
@@ -36,14 +36,23 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
   const { state } = useAccounting();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filteredAccounts, setFilteredAccounts] = useState(state.accounts);
   
   const accountId = form.watch(`entries.${index}.accountId`);
   const selectedAccount = state.accounts.find(account => account.id === accountId);
   
-  // Filter accounts based on search query
-  const filteredAccounts = state.accounts.filter(account => 
-    account.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Update filtered accounts whenever search query changes
+  useEffect(() => {
+    if (!state.accounts) {
+      setFilteredAccounts([]);
+      return;
+    }
+    
+    const filtered = state.accounts.filter(account => 
+      account && account.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredAccounts(filtered);
+  }, [searchQuery, state.accounts]);
 
   return (
     <FormField
@@ -77,7 +86,9 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                   onValueChange={setSearchQuery}
                   className="h-9"
                 />
-                <CommandEmpty>No se encontraron cuentas.</CommandEmpty>
+                {filteredAccounts && filteredAccounts.length === 0 && (
+                  <CommandEmpty>No se encontraron cuentas.</CommandEmpty>
+                )}
                 <CommandGroup className="max-h-64 overflow-y-auto">
                   {filteredAccounts && filteredAccounts.length > 0 ? (
                     filteredAccounts.map(account => {
