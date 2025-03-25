@@ -69,7 +69,7 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
+            <PopoverContent className="w-[200px] p-0">
               <Command>
                 <CommandInput 
                   placeholder="Buscar cuenta..." 
@@ -90,6 +90,7 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                         onSelect={() => {
                           form.setValue(`entries.${index}.accountId`, account.id);
                           setOpen(false);
+                          setSearchQuery(""); // Reset search query when selecting an account
                         }}
                         className={`${textColor} ${bgColor} rounded my-1`}
                       >
