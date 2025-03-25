@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { 
   Card, 
   CardContent, 
@@ -18,6 +17,7 @@ import { AccountsCompactList } from "./accounts/AccountsCompactList";
 import { getSubcategoryLabel } from "./accounts/AccountBadge";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/utils";
+import { SearchInput } from "./SearchInput";
 
 export default function AccountsList() {
   const { 
@@ -28,9 +28,27 @@ export default function AccountsList() {
     filterAccounts 
   } = useAccounting();
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   const handleTabChange = (value: string) => {
     filterAccounts(value as AccountType | "todos");
   };
+
+  const filteredAccounts = useMemo(() => {
+    let accounts = state.selectedAccountType === "todos"
+      ? state.accounts
+      : state.accounts.filter(account => account.type === state.selectedAccountType);
+      
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      accounts = accounts.filter(account => 
+        account.name.toLowerCase().includes(query) || 
+        (account.code && account.code.toLowerCase().includes(query))
+      );
+    }
+    
+    return accounts;
+  }, [state.accounts, state.selectedAccountType, searchQuery]);
 
   const groupAccountsBySubcategory = (accounts: Account[]) => {
     const grouped: Record<string, Account[]> = {};
@@ -46,7 +64,6 @@ export default function AccountsList() {
     return grouped;
   };
 
-  // Agrupamos cuentas por tipo para la vista compacta
   const groupAccountsByType = (accounts: Account[]) => {
     const grouped: Record<string, Account[]> = {};
     
@@ -61,16 +78,10 @@ export default function AccountsList() {
     return grouped;
   };
 
-  // Filtramos las cuentas según el tipo seleccionado
-  const filteredAccounts = state.selectedAccountType === "todos"
-    ? state.accounts
-    : state.accounts.filter(account => account.type === state.selectedAccountType);
-
   const groupedAccounts = state.selectedAccountType === "todos" 
     ? groupAccountsByType(filteredAccounts)
     : groupAccountsBySubcategory(filteredAccounts);
 
-  // Define el orden para mostrar las subcategorías
   const subcategoryOrder: AccountSubcategory[] = [
     "circulante", "fijo", "diferido", 
     "corto_plazo", "largo_plazo", 
@@ -80,12 +91,10 @@ export default function AccountsList() {
     "financieros", "otros", "none"
   ];
 
-  // Define el orden para mostrar los tipos de cuenta
   const typeOrder: AccountType[] = [
     "activo", "pasivo", "capital", "ingreso", "gasto"
   ];
 
-  // Renderiza una versión compacta que muestra todas las cuentas agrupadas por tipo
   const renderAllAccountsContent = () => (
     <Card>
       <CardHeader className="pb-2">
@@ -107,7 +116,6 @@ export default function AccountsList() {
                 const accounts = groupedAccounts[type] || [];
                 if (accounts.length === 0) return null;
                 
-                // Calcular el saldo total de todas las cuentas de este tipo
                 const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0);
                 
                 return (
@@ -132,12 +140,11 @@ export default function AccountsList() {
     </Card>
   );
 
-  // Renderiza el contenido para las pestañas de tipos específicos
   const renderTypeAccountsContent = () => {
     if (Object.keys(groupedAccounts).length === 0) {
       return (
         <p className="text-muted-foreground text-center py-8">
-          No hay cuentas en esta categoría. Crea una nueva cuenta.
+          No hay cuentas que coincidan con tu búsqueda. Intenta con otro término o crea una nueva cuenta.
         </p>
       );
     }
@@ -172,23 +179,31 @@ export default function AccountsList() {
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <h2 className="text-2xl font-semibold tracking-tight">Catálogo de Cuentas</h2>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => setActiveAccount({ 
-            id: "", 
-            name: "", 
-            code: "", // Añadimos el código vacío para cumplir con el tipo Account
-            type: "activo", 
-            nature: "deudora", 
-            balance: 0 
-          })}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Nueva Cuenta
-        </Button>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <SearchInput 
+            placeholder="Buscar cuenta..." 
+            value={searchQuery} 
+            onChange={setSearchQuery}
+            className="w-full sm:w-64"
+          />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setActiveAccount({ 
+              id: "", 
+              name: "", 
+              code: "",
+              type: "activo", 
+              nature: "deudora", 
+              balance: 0 
+            })}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nueva Cuenta
+          </Button>
+        </div>
       </div>
       
       <AccountsTabs 
