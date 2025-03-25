@@ -69,7 +69,7 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
+            <PopoverContent className="w-[300px] p-0">
               <Command>
                 <CommandInput 
                   placeholder="Buscar cuenta..." 
@@ -79,31 +79,37 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                 />
                 <CommandEmpty>No se encontraron cuentas.</CommandEmpty>
                 <CommandGroup className="max-h-64 overflow-y-auto">
-                  {filteredAccounts.map(account => {
-                    const textColor = getTextColorForType(account.type, account.subcategory);
-                    const bgColor = getBgColorForType(account.type, account.subcategory);
-                    
-                    return (
-                      <CommandItem
-                        key={account.id}
-                        value={account.id}
-                        onSelect={() => {
-                          form.setValue(`entries.${index}.accountId`, account.id);
-                          setOpen(false);
-                          setSearchQuery(""); // Reset search query when selecting an account
-                        }}
-                        className={`${textColor} ${bgColor} rounded my-1`}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            account.id === field.value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {account.name}
-                      </CommandItem>
-                    );
-                  })}
+                  {filteredAccounts && filteredAccounts.length > 0 ? (
+                    filteredAccounts.map(account => {
+                      if (!account) return null;
+                      
+                      const textColor = getTextColorForType(account.type, account.subcategory);
+                      const bgColor = getBgColorForType(account.type, account.subcategory);
+                      
+                      return (
+                        <CommandItem
+                          key={account.id}
+                          value={account.id}
+                          onSelect={() => {
+                            form.setValue(`entries.${index}.accountId`, account.id);
+                            setOpen(false);
+                            setSearchQuery(""); // Reset search query when selecting an account
+                          }}
+                          className={`${textColor} ${bgColor} rounded my-1`}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              account.id === field.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {account.name}
+                        </CommandItem>
+                      );
+                    })
+                  ) : (
+                    <div className="py-6 text-center text-sm">No hay cuentas disponibles.</div>
+                  )}
                 </CommandGroup>
               </Command>
             </PopoverContent>
