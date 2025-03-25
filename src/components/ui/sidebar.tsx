@@ -46,6 +46,11 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       href: "/resultados",
       icon: <FileText className="h-5 w-5" />,
       title: "Estado de Resultados",
+    },
+    {
+      href: "/balance",
+      icon: <FileText className="h-5 w-5" />,
+      title: "Estado de Situación Financiera",
     }
   ];
 
