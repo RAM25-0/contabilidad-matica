@@ -36,20 +36,29 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
   const { state } = useAccounting();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredAccounts, setFilteredAccounts] = useState(state.accounts);
+  const [filteredAccounts, setFilteredAccounts] = useState<typeof state.accounts>([]);
   
   const accountId = form.watch(`entries.${index}.accountId`);
-  const selectedAccount = state.accounts.find(account => account.id === accountId);
+  const selectedAccount = state.accounts?.find(account => account?.id === accountId);
+  
+  // Initialize filtered accounts when component mounts and when state.accounts changes
+  useEffect(() => {
+    if (Array.isArray(state.accounts)) {
+      setFilteredAccounts(state.accounts);
+    } else {
+      setFilteredAccounts([]);
+    }
+  }, [state.accounts]);
   
   // Update filtered accounts whenever search query changes
   useEffect(() => {
-    if (!state.accounts) {
+    if (!Array.isArray(state.accounts)) {
       setFilteredAccounts([]);
       return;
     }
     
     const filtered = state.accounts.filter(account => 
-      account && account.name.toLowerCase().includes(searchQuery.toLowerCase())
+      account && account.name && account.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredAccounts(filtered);
   }, [searchQuery, state.accounts]);
@@ -86,12 +95,12 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                   onValueChange={setSearchQuery}
                   className="h-9"
                 />
-                {filteredAccounts && filteredAccounts.length === 0 && (
+                {(!filteredAccounts || filteredAccounts.length === 0) && (
                   <CommandEmpty>No se encontraron cuentas.</CommandEmpty>
                 )}
                 <CommandGroup className="max-h-64 overflow-y-auto">
                   {filteredAccounts && filteredAccounts.length > 0 ? (
-                    filteredAccounts.map(account => {
+                    filteredAccounts.map((account, idx) => {
                       if (!account) return null;
                       
                       const textColor = getTextColorForType(account.type, account.subcategory);
@@ -99,7 +108,7 @@ export function SearchableAccountSelect({ index, form }: SearchableAccountSelect
                       
                       return (
                         <CommandItem
-                          key={account.id}
+                          key={account.id || idx}
                           value={account.id}
                           onSelect={() => {
                             form.setValue(`entries.${index}.accountId`, account.id);
