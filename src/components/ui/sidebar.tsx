@@ -2,12 +2,14 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Book, LayoutDashboard, ListChecks, ClipboardList, FileText } from "lucide-react";
+import { Book, LayoutDashboard, ListChecks, ClipboardList, FileText, Users } from "lucide-react";
+import { useProfile } from "@/contexts/ProfileContext";
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
 
 export function Sidebar({ className, ...props }: SidebarProps) {
   const location = useLocation();
+  const { setProfileSelectorOpen } = useProfile();
 
   const isCurrentPath = (path: string) => {
     if (path === "/" && location.pathname !== "/") {
@@ -76,6 +78,17 @@ export function Sidebar({ className, ...props }: SidebarProps) {
               </Link>
             </li>
           ))}
+          
+          {/* Profile selector button */}
+          <li>
+            <button
+              onClick={() => setProfileSelectorOpen(true)}
+              className="w-full flex h-10 items-center gap-2 rounded-md px-3 text-gray-500 transition-colors hover:text-gray-900 hover:bg-gray-100"
+            >
+              <Users className="h-5 w-5" />
+              Gestionar Perfiles
+            </button>
+          </li>
         </ul>
       </nav>
     </div>

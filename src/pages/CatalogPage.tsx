@@ -7,6 +7,7 @@ import { ArrowLeft, Plus } from "lucide-react";
 import AccountsList from "@/components/AccountsList";
 import { AccountForm } from "@/components/AccountForm";
 import { useAccounting } from "@/contexts/AccountingContext";
+import { ProfileBadge } from "@/components/profile/ProfileBadge";
 
 export function CatalogPage() {
   const { setActiveAccount } = useAccounting();
@@ -28,6 +29,9 @@ export function CatalogPage() {
       <div className="flex-1 pl-64">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-6">
           <h1 className="text-lg font-semibold">Catálogo de Cuentas</h1>
+          <div className="ml-auto">
+            <ProfileBadge />
+          </div>
         </header>
         <main className="p-6">
           <div className="flex justify-between items-center mb-6">
