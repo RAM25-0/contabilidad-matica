@@ -14,15 +14,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue 
-} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Building2, Briefcase, User } from "lucide-react";
+import { IconSelector } from "./IconSelector";
+import { PasswordField } from "./PasswordField";
+import { CurrencySelector } from "./CurrencySelector";
 
 interface ProfileFormProps {
   onCancel: () => void;
@@ -97,70 +92,9 @@ export function ProfileForm({ onCancel, profile }: ProfileFormProps) {
           )}
         />
         
-        <FormField
-          control={form.control}
-          name="currency"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Moneda</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar moneda" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="MXN">MXN - Peso Mexicano</SelectItem>
-                  <SelectItem value="USD">USD - Dólar Estadounidense</SelectItem>
-                  <SelectItem value="EUR">EUR - Euro</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <CurrencySelector control={form.control} name="currency" />
         
-        <FormField
-          control={form.control}
-          name="iconName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Icono</FormLabel>
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className={`flex flex-1 flex-col items-center gap-2 p-4 ${field.value === "building" ? "border-primary ring-1 ring-primary" : ""}`}
-                  onClick={() => field.onChange("building")}
-                >
-                  <Building2 className="h-6 w-6" />
-                  <span className="text-xs">Empresa</span>
-                </Button>
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  className={`flex flex-1 flex-col items-center gap-2 p-4 ${field.value === "briefcase" ? "border-primary ring-1 ring-primary" : ""}`}
-                  onClick={() => field.onChange("briefcase")}
-                >
-                  <Briefcase className="h-6 w-6" />
-                  <span className="text-xs">Trabajo</span>
-                </Button>
-                
-                <Button
-                  type="button"
-                  variant="outline"
-                  className={`flex flex-1 flex-col items-center gap-2 p-4 ${field.value === "user" ? "border-primary ring-1 ring-primary" : ""}`}
-                  onClick={() => field.onChange("user")}
-                >
-                  <User className="h-6 w-6" />
-                  <span className="text-xs">Personal</span>
-                </Button>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <IconSelector control={form.control} name="iconName" />
         
         <FormField
           control={form.control}
@@ -180,21 +114,11 @@ export function ProfileForm({ onCancel, profile }: ProfileFormProps) {
           )}
         />
         
-        {hasPassword && (
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contraseña</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="Ingrese su contraseña" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
+        <PasswordField 
+          control={form.control} 
+          name="password" 
+          showField={hasPassword} 
+        />
         
         <div className="flex gap-2 justify-end">
           <Button type="button" variant="outline" onClick={onCancel}>
