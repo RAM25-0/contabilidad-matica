@@ -68,7 +68,14 @@ export function ProfileForm({ onCancel, profile }: ProfileFormProps) {
         password: values.password || profile.password
       });
     } else {
-      addProfile(values);
+      // Fix: Ensure name and currency are not undefined when passing to addProfile
+      addProfile({
+        name: values.name, // This is required by the Profile type
+        currency: values.currency, // This is required by the Profile type
+        iconName: values.iconName,
+        hasPassword: values.hasPassword,
+        password: values.password
+      });
     }
     onCancel();
   }
