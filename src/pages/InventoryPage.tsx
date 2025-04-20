@@ -1,12 +1,31 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ChevronLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { InventoryTable } from "@/components/inventory/InventoryTable";
+import { InventoryOperation } from "@/types/inventory";
 
 export function InventoryPage() {
+  const [operations, setOperations] = useState<InventoryOperation[]>([]);
+
+  const handleAddOperation = () => {
+    // Will implement in next step
+    console.log("Add operation clicked");
+  };
+
+  const handleCalculateAverage = () => {
+    // Will implement in next step
+    console.log("Calculate average clicked");
+  };
+
+  const handleViewHistory = () => {
+    // Will implement in next step
+    console.log("View history clicked");
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="flex items-center gap-4 mb-6">
@@ -30,9 +49,12 @@ export function InventoryPage() {
               <CardTitle>Método de Valuación - Promedio</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Sistema de valuación de inventarios por método de Costo Promedio.
-              </p>
+              <InventoryTable 
+                operations={operations}
+                onAddOperation={handleAddOperation}
+                onCalculateAverage={handleCalculateAverage}
+                onViewHistory={handleViewHistory}
+              />
             </CardContent>
           </Card>
         </TabsContent>
