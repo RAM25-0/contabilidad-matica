@@ -31,7 +31,14 @@ export function EditOperationDialog({ operation, onSubmit, open, onOpenChange }:
   });
 
   const handleSubmit = (values: InventoryOperationFormValues) => {
-    onSubmit(values);
+    // Ensure we're passing a complete object with all required properties
+    onSubmit({
+      date: values.date,
+      type: values.type,
+      units: values.units,
+      unitCost: values.unitCost,
+      description: values.description,
+    });
     onOpenChange(false);
   };
 
