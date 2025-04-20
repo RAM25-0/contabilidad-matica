@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { useInventory } from "@/hooks/useInventory";
+import { PepsInventoryPlaceholder } from "@/components/inventory/PepsInventoryPlaceholder";
 
 export function InventoryPage() {
   const {
@@ -30,8 +31,9 @@ export function InventoryPage() {
         <h1 className="text-2xl font-bold">Inventarios</h1>
       </div>
       <Tabs defaultValue="promedio" className="w-full">
-        <TabsList className="w-full justify-start">
+        <TabsList className="w-full justify-start space-x-2">
           <TabsTrigger value="promedio">Promedio</TabsTrigger>
+          <TabsTrigger value="peps">PEPS</TabsTrigger>
         </TabsList>
         <TabsContent value="promedio">
           <Card>
@@ -49,6 +51,9 @@ export function InventoryPage() {
               />
             </CardContent>
           </Card>
+        </TabsContent>
+        <TabsContent value="peps">
+          <PepsInventoryPlaceholder />
         </TabsContent>
       </Tabs>
     </div>
