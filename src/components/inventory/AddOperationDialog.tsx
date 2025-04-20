@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +22,7 @@ export function AddOperationDialog({ onSubmit }: AddOperationDialogProps) {
     resolver: zodResolver(inventoryOperationSchema),
     defaultValues: {
       description: "",
+      unitCost: undefined,
     },
   });
 
@@ -30,6 +31,9 @@ export function AddOperationDialog({ onSubmit }: AddOperationDialogProps) {
     form.reset();
     setOpen(false);
   };
+
+  const operationType = form.watch("type");
+  const showUnitCost = operationType === "COMPRA" || operationType === "SALDO_INICIAL";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -61,11 +65,12 @@ export function AddOperationDialog({ onSubmit }: AddOperationDialogProps) {
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            {form.watch("type") === "COMPRA" && (
+            {showUnitCost && (
               <FormField
                 control={form.control}
                 name="unitCost"
@@ -77,8 +82,10 @@ export function AddOperationDialog({ onSubmit }: AddOperationDialogProps) {
                         type="number"
                         {...field}
                         onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value === undefined ? '' : field.value}
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -97,6 +104,7 @@ export function AddOperationDialog({ onSubmit }: AddOperationDialogProps) {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
