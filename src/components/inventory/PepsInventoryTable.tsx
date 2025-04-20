@@ -37,6 +37,7 @@ export function PepsInventoryTable() {
 
   return (
     <div className="space-y-4">
+      {/* Botones de operaciones (igual que antes) */}
       <div className="flex flex-wrap gap-2">
         <Button 
           onClick={() => setOperationType('SALDO_INICIAL')}
@@ -77,48 +78,52 @@ export function PepsInventoryTable() {
 
       <Card>
         <CardContent className="p-0">
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <ScrollArea className="h-[600px]">
               <Table>
-                <TableHeader>
+                {/* Primera fila de encabezados agrupados */}
+                <thead>
                   <TableRow>
-                    <TableHead className="w-[100px]">Fecha</TableHead>
-                    <TableHead className="w-[200px]">Operación</TableHead>
-                    <TableHead className="text-center">Entrada</TableHead>
-                    <TableHead className="text-center">Salida</TableHead>
-                    <TableHead className="text-center">Existencia</TableHead>
-                    <TableHead className="text-center">UNITARIO</TableHead>
-                    <TableHead className="text-right">Debe</TableHead>
-                    <TableHead className="text-right">Haber</TableHead>
-                    <TableHead className="text-right">Saldo</TableHead>
+                    <TableHead className="border-b border-r bg-gray-50 font-semibold text-base" style={{ minWidth: 110 }}>MÉTODO DE VALUACIÓN: PEPS</TableHead>
+                    <TableHead colSpan={3} className="border-b border-r bg-blue-100 text-center font-semibold text-base">UNIDADES</TableHead>
+                    <TableHead colSpan={1} className="border-b border-r bg-green-100 text-center font-semibold text-base">COSTO</TableHead>
+                    <TableHead colSpan={3} className="border-b bg-rose-100 text-center font-semibold text-base">VALORES</TableHead>
                   </TableRow>
-                </TableHeader>
+                  <TableRow>
+                    <TableHead className="border-b border-r bg-gray-50">Fecha</TableHead>
+                    <TableHead className="border-b border-r bg-gray-50">Operación</TableHead>
+                    <TableHead className="border-b border-r bg-blue-50 text-center">Entrada</TableHead>
+                    <TableHead className="border-b border-r bg-blue-50 text-center">Salida</TableHead>
+                    <TableHead className="border-b border-r bg-blue-50 text-center">Existencia</TableHead>
+                    <TableHead className="border-b border-r bg-green-50 text-center">Entrada $</TableHead>
+                    <TableHead className="border-b border-r bg-rose-50 text-center">Debe</TableHead>
+                    <TableHead className="border-b border-r bg-rose-50 text-center">Haber</TableHead>
+                    <TableHead className="border-b bg-rose-50 text-center">Saldo</TableHead>
+                  </TableRow>
+                </thead>
                 <TableBody>
                   {state.operations.map((operation) => {
-                    // For sales and returns, we may need multiple rows
+                    // Lógica de filas (como antes, sin cambios)
                     if (operation.type === 'VENTA' && operation.lots.length > 1) {
-                      // First row has the operation description
                       const rows = [];
-                      
-                      // Create multiple rows, one for each lot used
                       operation.lots.forEach((lot, index) => {
                         rows.push(
                           <TableRow key={`${operation.id}-${index}`}>
                             {index === 0 && (
                               <>
-                                <TableCell rowSpan={operation.lots.length}>{formatDate(operation.date)}</TableCell>
-                                <TableCell rowSpan={operation.lots.length}>{operation.description}</TableCell>
-                                <TableCell className="text-center" rowSpan={operation.lots.length}></TableCell>
+                                <TableCell rowSpan={operation.lots.length} className="border-r">{formatDate(operation.date)}</TableCell>
+                                <TableCell rowSpan={operation.lots.length} className="border-r">{operation.description}</TableCell>
+                                <TableCell className="border-r text-center" rowSpan={operation.lots.length}></TableCell>
                               </>
                             )}
                             {index !== 0 && <></>}
-                            <TableCell className="text-center">{lot.units}</TableCell>
-                            <TableCell className="text-center">
+                            <TableCell className="border-r text-center">{lot.units}</TableCell>
+                            <TableCell className="border-r text-center">
                               {index === operation.lots.length - 1 ? state.lots.reduce((sum, l) => sum + l.remainingUnits, 0) : ''}
                             </TableCell>
-                            <TableCell className="text-center">{lot.unitCost}</TableCell>
-                            <TableCell className="text-right"></TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="border-r text-center">{lot.unitCost}</TableCell>
+                            <TableCell className="border-r text-right"></TableCell>
+                            <TableCell className="border-r text-right">
                               {index === operation.lots.length - 1 ? formatCurrency(operation.totalCost) : formatCurrency(lot.units * lot.unitCost)}
                             </TableCell>
                             <TableCell className="text-right">
@@ -127,21 +132,18 @@ export function PepsInventoryTable() {
                           </TableRow>
                         );
                       });
-                      
                       return rows;
                     }
-                    
-                    // Standard row for other operations
                     return (
                       <TableRow key={operation.id}>
-                        <TableCell>{formatDate(operation.date)}</TableCell>
-                        <TableCell>{operation.description}</TableCell>
-                        <TableCell className="text-center">{operation.inUnits > 0 ? operation.inUnits : ''}</TableCell>
-                        <TableCell className="text-center">{operation.outUnits > 0 ? operation.outUnits : ''}</TableCell>
-                        <TableCell className="text-center">{state.lots.reduce((sum, lot) => sum + lot.remainingUnits, 0)}</TableCell>
-                        <TableCell className="text-center">{operation.unitCost}</TableCell>
-                        <TableCell className="text-right">{operation.totalCost > 0 && operation.type !== 'VENTA' ? formatCurrency(operation.totalCost) : ''}</TableCell>
-                        <TableCell className="text-right">{operation.type === 'VENTA' ? formatCurrency(operation.totalCost) : ''}</TableCell>
+                        <TableCell className="border-r">{formatDate(operation.date)}</TableCell>
+                        <TableCell className="border-r">{operation.description}</TableCell>
+                        <TableCell className="border-r text-center">{operation.inUnits > 0 ? operation.inUnits : ''}</TableCell>
+                        <TableCell className="border-r text-center">{operation.outUnits > 0 ? operation.outUnits : ''}</TableCell>
+                        <TableCell className="border-r text-center">{state.lots.reduce((sum, lot) => sum + lot.remainingUnits, 0)}</TableCell>
+                        <TableCell className="border-r text-center">{operation.unitCost}</TableCell>
+                        <TableCell className="border-r text-right">{operation.totalCost > 0 && operation.type !== 'VENTA' ? formatCurrency(operation.totalCost) : ''}</TableCell>
+                        <TableCell className="border-r text-right">{operation.type === 'VENTA' ? formatCurrency(operation.totalCost) : ''}</TableCell>
                         <TableCell className="text-right">{formatCurrency(operation.balance)}</TableCell>
                       </TableRow>
                     );
@@ -153,7 +155,7 @@ export function PepsInventoryTable() {
         </CardContent>
       </Card>
 
-      {/* Dialogs for different operations */}
+      {/* Dialogs para operaciones */}
       {operationType && (
         <PepsOperationDialog
           type={operationType}
