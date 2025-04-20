@@ -1,6 +1,13 @@
 
 import React, { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Plus, Calculator } from "lucide-react";
@@ -19,56 +26,68 @@ export function PepsInventoryTable() {
     handleAddReturn,
     getAvailableLots,
   } = usePepsInventory();
-  
-  const [operationType, setOperationType] = useState<'SALDO_INICIAL' | 'COMPRA' | 'VENTA' | 'DEVOLUCION' | null>(null);
 
-  const handleCloseDialog = () => {
-    setOperationType(null);
-  };
+  const [operationType, setOperationType] = useState<
+    "SALDO_INICIAL" | "COMPRA" | "VENTA" | "DEVOLUCION" | null
+  >(null);
 
-  // Format date for display
+  const handleCloseDialog = () => setOperationType(null);
+
+  // Formato de fecha para mostrar
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('es-MX', {
-      year: 'numeric',
-      month: 'short',
-      day: '2-digit'
+    return new Intl.DateTimeFormat("es-MX", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
     }).format(date);
   };
 
+  // DIVIDER CELL: similar a tabla de promedio
+  const DividerCell = () => (
+    <td
+      style={{
+        width: "2px",
+        background: "#403E43",
+        padding: 0,
+        border: "none"
+      }}
+      aria-hidden
+    ></td>
+  );
+
   return (
     <div className="space-y-4">
-      {/* Botones de operaciones (igual que antes) */}
       <div className="flex flex-wrap gap-2">
-        <Button 
-          onClick={() => setOperationType('SALDO_INICIAL')}
+        <Button
+          onClick={() => setOperationType("SALDO_INICIAL")}
           disabled={state.hasInitialBalance}
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
           Saldo Inicial
         </Button>
-        
-        <Button 
-          onClick={() => setOperationType('COMPRA')} 
+        <Button
+          onClick={() => setOperationType("COMPRA")}
           disabled={!state.hasInitialBalance}
           className="gap-2"
         >
           <Plus className="h-4 w-4" />
           Compra (Nuevo Lote)
         </Button>
-        
-        <Button 
-          onClick={() => setOperationType('VENTA')} 
-          disabled={!state.hasInitialBalance || state.lots.every(lot => lot.remainingUnits === 0)}
+        <Button
+          onClick={() => setOperationType("VENTA")}
+          disabled={
+            !state.hasInitialBalance ||
+            state.lots.every((lot) => lot.remainingUnits === 0)
+          }
           className="gap-2"
         >
           <Calculator className="h-4 w-4" />
           Venta
         </Button>
-        
-        <Button 
-          onClick={() => setOperationType('DEVOLUCION')} 
-          disabled={!state.operations.some(op => op.type === 'VENTA')}
+        <Button
+          onClick={() => setOperationType("DEVOLUCION")}
+          disabled={!state.operations.some((op) => op.type === "VENTA")}
           className="gap-2"
         >
           <Calculator className="h-4 w-4" />
@@ -81,70 +100,187 @@ export function PepsInventoryTable() {
           <div className="rounded-md border overflow-x-auto">
             <ScrollArea className="h-[600px]">
               <Table>
-                {/* Primera fila de encabezados agrupados */}
-                <thead>
+                <TableHeader>
                   <TableRow>
-                    <TableHead className="border-b border-r bg-gray-50 font-semibold text-base" style={{ minWidth: 110 }}>MÉTODO DE VALUACIÓN: PEPS</TableHead>
-                    <TableHead colSpan={3} className="border-b border-r bg-blue-100 text-center font-semibold text-base">UNIDADES</TableHead>
-                    <TableHead colSpan={1} className="border-b border-r bg-green-100 text-center font-semibold text-base">COSTO</TableHead>
-                    <TableHead colSpan={3} className="border-b bg-rose-100 text-center font-semibold text-base">VALORES</TableHead>
+                    <TableHead
+                      className="w-[220px] bg-[#F6F6F7] text-[#403E43] border-b border-gray-200"
+                      colSpan={2}
+                    >
+                      <div className="font-semibold text-center">
+                        MÉTODO DE VALUACIÓN: PEPS
+                      </div>
+                    </TableHead>
+                    <DividerCell />
+                    <TableHead
+                      className="text-[#403E43] bg-[#D3E4FD] text-center border-r border-[#403E43]"
+                      colSpan={3}
+                    >
+                      UNIDADES
+                    </TableHead>
+                    <DividerCell />
+                    <TableHead
+                      className="text-[#403E43] bg-[#E1FBE1] text-center border-r border-[#403E43]"
+                      colSpan={2}
+                    >
+                      COSTO
+                    </TableHead>
+                    <DividerCell />
+                    <TableHead
+                      className="text-[#403E43] bg-[#FFDEE2] text-center"
+                      colSpan={3}
+                    >
+                      VALORES
+                    </TableHead>
                   </TableRow>
-                  <TableRow>
-                    <TableHead className="border-b border-r bg-gray-50">Fecha</TableHead>
-                    <TableHead className="border-b border-r bg-gray-50">Operación</TableHead>
-                    <TableHead className="border-b border-r bg-blue-50 text-center">Entrada</TableHead>
-                    <TableHead className="border-b border-r bg-blue-50 text-center">Salida</TableHead>
-                    <TableHead className="border-b border-r bg-blue-50 text-center">Existencia</TableHead>
-                    <TableHead className="border-b border-r bg-green-50 text-center">Entrada $</TableHead>
-                    <TableHead className="border-b border-r bg-rose-50 text-center">Debe</TableHead>
-                    <TableHead className="border-b border-r bg-rose-50 text-center">Haber</TableHead>
-                    <TableHead className="border-b bg-rose-50 text-center">Saldo</TableHead>
+                  <TableRow className="border-b border-[#403E43]">
+                    <TableHead className="w-[120px] text-[#403E43] border-r border-[#403E43] bg-[#F6F6F7]">
+                      Fecha
+                    </TableHead>
+                    <TableHead className="w-[100px] text-[#403E43] border-r border-[#403E43] bg-[#F6F6F7]">
+                      Operación
+                    </TableHead>
+                    <DividerCell />
+                    <TableHead className="w-[90px] bg-[#D3E4FD] text-center text-[#403E43] border-r border-[#403E43]">
+                      Entrada
+                    </TableHead>
+                    <TableHead className="w-[90px] bg-[#D3E4FD] text-center text-[#403E43] border-r border-[#403E43]">
+                      Salida
+                    </TableHead>
+                    <TableHead className="w-[90px] bg-[#D3E4FD] text-center text-[#403E43]">
+                      Existencia
+                    </TableHead>
+                    <DividerCell />
+                    <TableHead className="w-[90px] bg-[#E1FBE1] text-center text-[#403E43] border-r border-[#403E43]">
+                      Entrada $
+                    </TableHead>
+                    <TableHead className="w-[90px] bg-[#E1FBE1] text-center text-[#403E43]">
+                      {/* En PEPS aquí va unitario */}
+                      {/* Muestra costo unitario aquí */}
+                      C/Unitario
+                    </TableHead>
+                    <DividerCell />
+                    <TableHead className="w-[90px] bg-[#FFDEE2] text-center text-[#403E43] border-r border-[#403E43]">
+                      Debe
+                    </TableHead>
+                    <TableHead className="w-[90px] bg-[#FFDEE2] text-center text-[#403E43] border-r border-[#403E43]">
+                      Haber
+                    </TableHead>
+                    <TableHead className="w-[90px] bg-[#FFDEE2] text-center text-[#403E43]">
+                      Saldo
+                    </TableHead>
                   </TableRow>
-                </thead>
+                </TableHeader>
                 <TableBody>
                   {state.operations.map((operation) => {
-                    // Lógica de filas (como antes, sin cambios)
-                    if (operation.type === 'VENTA' && operation.lots.length > 1) {
+                    // PEPS multi-lotes para venta: cada fila sale con celdas y divisores alineados
+                    if (operation.type === "VENTA" && operation.lots.length > 1) {
                       const rows = [];
                       operation.lots.forEach((lot, index) => {
                         rows.push(
-                          <TableRow key={`${operation.id}-${index}`}>
+                          <TableRow key={`${operation.id}-${index}`} className="hover:bg-[#F6F6F7] border-b border-[#403E43]">
+                            {/* Fecha y Operación solo en la primera fila */}
                             {index === 0 && (
                               <>
-                                <TableCell rowSpan={operation.lots.length} className="border-r">{formatDate(operation.date)}</TableCell>
-                                <TableCell rowSpan={operation.lots.length} className="border-r">{operation.description}</TableCell>
-                                <TableCell className="border-r text-center" rowSpan={operation.lots.length}></TableCell>
+                                <TableCell
+                                  className="w-[120px] text-[#403E43] bg-white border-r border-[#403E43]"
+                                  rowSpan={operation.lots.length}
+                                >
+                                  {formatDate(operation.date)}
+                                </TableCell>
+                                <TableCell
+                                  className="w-[100px] text-[#403E43] bg-white border-r border-[#403E43]"
+                                  rowSpan={operation.lots.length}
+                                >
+                                  {operation.description}
+                                </TableCell>
+                                <DividerCell />
+                                <TableCell
+                                  className="text-center w-[90px] bg-[#D3E4FD] border-r border-[#403E43]"
+                                  rowSpan={operation.lots.length}
+                                />
                               </>
                             )}
-                            {index !== 0 && <></>}
-                            <TableCell className="border-r text-center">{lot.units}</TableCell>
-                            <TableCell className="border-r text-center">
-                              {index === operation.lots.length - 1 ? state.lots.reduce((sum, l) => sum + l.remainingUnits, 0) : ''}
+                            {index !== 0 && null}
+                            {/* Salida (mostrada para cada lote) */}
+                            <TableCell className="text-center w-[90px] bg-[#D3E4FD] border-r border-[#403E43]">
+                              {lot.units}
                             </TableCell>
-                            <TableCell className="border-r text-center">{lot.unitCost}</TableCell>
-                            <TableCell className="border-r text-right"></TableCell>
-                            <TableCell className="border-r text-right">
-                              {index === operation.lots.length - 1 ? formatCurrency(operation.totalCost) : formatCurrency(lot.units * lot.unitCost)}
+                            <TableCell className="text-center w-[90px] bg-[#D3E4FD]">
+                              {index === operation.lots.length - 1
+                                ? state.lots.reduce(
+                                    (sum, l) => sum + l.remainingUnits,
+                                    0
+                                  )
+                                : ""}
                             </TableCell>
-                            <TableCell className="text-right">
-                              {index === operation.lots.length - 1 ? formatCurrency(operation.balance) : ''}
+                            <DividerCell />
+                            <TableCell className="text-center w-[90px] bg-[#E1FBE1] border-r border-[#403E43]">
+                              {/* Entrada $ solo para la última fila */}
+                              {""}
+                            </TableCell>
+                            <TableCell className="text-center w-[90px] bg-[#E1FBE1]">
+                              {lot.unitCost}
+                            </TableCell>
+                            <DividerCell />
+                            <TableCell className="text-right w-[90px] bg-[#FFDEE2] border-r border-[#403E43]">
+                              {/* Debe*/}
+                            </TableCell>
+                            <TableCell className="text-right w-[90px] bg-[#FFDEE2] border-r border-[#403E43]">
+                              {formatCurrency(lot.units * lot.unitCost)}
+                            </TableCell>
+                            <TableCell className="text-right w-[90px] bg-[#FFDEE2]">
+                              {index === operation.lots.length - 1
+                                ? formatCurrency(operation.balance)
+                                : ""}
                             </TableCell>
                           </TableRow>
                         );
                       });
                       return rows;
                     }
+
+                    // Resto de operaciones normal (Saldo Inicial, Compra, Venta simple, Devolución)
                     return (
-                      <TableRow key={operation.id}>
-                        <TableCell className="border-r">{formatDate(operation.date)}</TableCell>
-                        <TableCell className="border-r">{operation.description}</TableCell>
-                        <TableCell className="border-r text-center">{operation.inUnits > 0 ? operation.inUnits : ''}</TableCell>
-                        <TableCell className="border-r text-center">{operation.outUnits > 0 ? operation.outUnits : ''}</TableCell>
-                        <TableCell className="border-r text-center">{state.lots.reduce((sum, lot) => sum + lot.remainingUnits, 0)}</TableCell>
-                        <TableCell className="border-r text-center">{operation.unitCost}</TableCell>
-                        <TableCell className="border-r text-right">{operation.totalCost > 0 && operation.type !== 'VENTA' ? formatCurrency(operation.totalCost) : ''}</TableCell>
-                        <TableCell className="border-r text-right">{operation.type === 'VENTA' ? formatCurrency(operation.totalCost) : ''}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(operation.balance)}</TableCell>
+                      <TableRow key={operation.id} className="hover:bg-[#F6F6F7] border-b border-[#403E43]">
+                        <TableCell className="w-[120px] text-[#403E43] bg-white border-r border-[#403E43]">
+                          {formatDate(operation.date)}
+                        </TableCell>
+                        <TableCell className="w-[100px] text-[#403E43] bg-white border-r border-[#403E43]">
+                          {operation.description}
+                        </TableCell>
+                        <DividerCell />
+                        <TableCell className="text-center w-[90px] bg-[#D3E4FD] border-r border-[#403E43]">
+                          {operation.inUnits > 0 ? operation.inUnits : ""}
+                        </TableCell>
+                        <TableCell className="text-center w-[90px] bg-[#D3E4FD] border-r border-[#403E43]">
+                          {operation.outUnits > 0 ? operation.outUnits : ""}
+                        </TableCell>
+                        <TableCell className="text-center w-[90px] bg-[#D3E4FD]">
+                          {state.lots.reduce((sum, lot) => sum + lot.remainingUnits, 0)}
+                        </TableCell>
+                        <DividerCell />
+                        <TableCell className="text-center w-[90px] bg-[#E1FBE1] border-r border-[#403E43]">
+                          {/* Entrada $ (solo entrada, no para venta/salida) */}
+                          {operation.inUnits > 0 ? operation.unitCost : ""}
+                        </TableCell>
+                        <TableCell className="text-center w-[90px] bg-[#E1FBE1]">
+                          {operation.unitCost}
+                        </TableCell>
+                        <DividerCell />
+                        <TableCell className="text-right w-[90px] bg-[#FFDEE2] border-r border-[#403E43]">
+                          {operation.totalCost > 0 &&
+                          operation.type !== "VENTA"
+                            ? formatCurrency(operation.totalCost)
+                            : ""}
+                        </TableCell>
+                        <TableCell className="text-right w-[90px] bg-[#FFDEE2] border-r border-[#403E43]">
+                          {operation.type === "VENTA"
+                            ? formatCurrency(operation.totalCost)
+                            : ""}
+                        </TableCell>
+                        <TableCell className="text-right w-[90px] bg-[#FFDEE2]">
+                          {formatCurrency(operation.balance)}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
@@ -154,8 +290,6 @@ export function PepsInventoryTable() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Dialogs para operaciones */}
       {operationType && (
         <PepsOperationDialog
           type={operationType}
