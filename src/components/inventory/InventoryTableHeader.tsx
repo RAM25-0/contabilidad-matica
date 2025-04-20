@@ -5,18 +5,18 @@ export function InventoryTableHeader() {
   return (
     <TableHeader>
       <TableRow>
-        <TableHead className="w-24">Fecha</TableHead>
-        <TableHead className="w-28">Operación</TableHead>
-        <TableHead className="w-40">Descripción</TableHead>
-        <TableHead className="text-right w-20">Entrada</TableHead>
-        <TableHead className="text-right w-20">Salida</TableHead>
-        <TableHead className="text-right w-24">Existencia</TableHead>
-        <TableHead className="text-right w-24">Entrada $</TableHead>
-        <TableHead className="text-right w-24">Salida $</TableHead>
-        <TableHead className="text-right w-24">Promedio</TableHead>
-        <TableHead className="text-right w-20">Debe</TableHead>
-        <TableHead className="text-right w-20">Haber</TableHead>
-        <TableHead className="text-right w-24">Saldo</TableHead>
+        <TableHead className="w-[100px]">Fecha</TableHead>
+        <TableHead className="w-[120px]">Operación</TableHead>
+        <TableHead className="w-[180px]">Descripción</TableHead>
+        <TableHead className="text-right w-[90px]">Entrada</TableHead>
+        <TableHead className="text-right w-[90px]">Salida</TableHead>
+        <TableHead className="text-right w-[100px]">Existencia</TableHead>
+        <TableHead className="text-right w-[110px]">Entrada $</TableHead>
+        <TableHead className="text-right w-[110px]">Salida $</TableHead>
+        <TableHead className="text-right w-[110px]">Promedio</TableHead>
+        <TableHead className="text-right w-[90px]">Debe</TableHead>
+        <TableHead className="text-right w-[90px]">Haber</TableHead>
+        <TableHead className="text-right w-[110px]">Saldo</TableHead>
       </TableRow>
     </TableHeader>
   );

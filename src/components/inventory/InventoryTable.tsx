@@ -4,6 +4,7 @@ import { InventoryOperation } from "@/types/inventory";
 import { TableActions } from "./TableActions";
 import { InventoryTableHeader } from "./InventoryTableHeader";
 import { InventoryTableRow } from "./InventoryTableRow";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface InventoryTableProps {
   operations: InventoryOperation[];
@@ -26,18 +27,20 @@ export function InventoryTable({
         onViewHistory={onViewHistory}
       />
 
-      <div className="rounded-md border w-full">
-        <Table>
-          <InventoryTableHeader />
-          <TableBody className="w-full">
-            {operations.map((operation) => (
-              <InventoryTableRow 
-                key={operation.id} 
-                operation={operation}
-              />
-            ))}
-          </TableBody>
-        </Table>
+      <div className="rounded-md border">
+        <ScrollArea className="h-[600px]">
+          <Table>
+            <InventoryTableHeader />
+            <TableBody>
+              {operations.map((operation) => (
+                <InventoryTableRow 
+                  key={operation.id} 
+                  operation={operation}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </ScrollArea>
       </div>
     </div>
   );
