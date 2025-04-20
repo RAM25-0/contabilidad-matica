@@ -26,10 +26,10 @@ export function InventoryTable({
         onViewHistory={onViewHistory}
       />
 
-      <div className="rounded-md border">
+      <div className="rounded-md border w-full">
         <Table>
           <InventoryTableHeader />
-          <TableBody>
+          <TableBody className="w-full">
             {operations.map((operation) => (
               <InventoryTableRow 
                 key={operation.id} 
