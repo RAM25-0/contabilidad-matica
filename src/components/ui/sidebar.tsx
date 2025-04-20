@@ -2,7 +2,15 @@
 import * as React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Book, LayoutDashboard, ListChecks, ClipboardList, FileText, Users } from "lucide-react";
+import { 
+  Book, 
+  LayoutDashboard, 
+  ListChecks, 
+  ClipboardList, 
+  FileText, 
+  Users,
+  Package 
+} from "lucide-react";
 import { useProfile } from "@/contexts/ProfileContext";
 
 type SidebarProps = React.HTMLAttributes<HTMLDivElement>;
@@ -53,6 +61,11 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       href: "/balance",
       icon: <FileText className="h-5 w-5" />,
       title: "Estado de Situación Financiera",
+    },
+    {
+      href: "/inventarios",
+      icon: <Package className="h-5 w-5" />,
+      title: "Inventarios",
     }
   ];
 
