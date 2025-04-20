@@ -10,12 +10,11 @@ interface InventoryTableRowProps {
 export function InventoryTableRow({ operation }: InventoryTableRowProps) {
   const isEntry = operation.type === 'COMPRA' || operation.type === 'SALDO_INICIAL' || operation.type === 'DEVOLUCION';
 
-  // Helper para divisor de columnas
   const DividerCell = () => (
     <td
       style={{
         width: "2px",
-        background: "#C8C8C9",
+        background: "#403E43", // Darker divider color
         padding: 0,
         border: "none"
       }}
@@ -24,16 +23,20 @@ export function InventoryTableRow({ operation }: InventoryTableRowProps) {
   );
 
   return (
-    <TableRow className="hover:bg-[#F6F6F7]">
-      <TableCell className="w-[120px] text-[#403E43] bg-white">{new Date(operation.date).toLocaleDateString()}</TableCell>
-      <TableCell className="w-[230px] text-[#403E43] bg-white">{operation.description || operation.type}</TableCell>
+    <TableRow className="hover:bg-[#F6F6F7] border-b border-[#403E43]">
+      <TableCell className="w-[120px] text-[#403E43] bg-white border-r border-[#403E43]">
+        {new Date(operation.date).toLocaleDateString()}
+      </TableCell>
+      <TableCell className="w-[230px] text-[#403E43] bg-white border-r border-[#403E43]">
+        {operation.description || operation.type}
+      </TableCell>
       <DividerCell />
 
       {/* UNIDADES */}
-      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#D3E4FD]">
+      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#D3E4FD] border-r border-[#403E43]">
         {isEntry ? operation.units : ''}
       </TableCell>
-      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#D3E4FD]">
+      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#D3E4FD] border-r border-[#403E43]">
         {!isEntry ? operation.units : ''}
       </TableCell>
       <TableCell className="text-center w-[120px] text-[#403E43] bg-[#D3E4FD]">
@@ -42,7 +45,7 @@ export function InventoryTableRow({ operation }: InventoryTableRowProps) {
       <DividerCell />
 
       {/* COSTO */}
-      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#F2FCE2]">
+      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#F2FCE2] border-r border-[#403E43]">
         {isEntry && operation.unitCost ? formatCurrency(operation.unitCost) : ''}
       </TableCell>
       <TableCell className="text-center w-[120px] text-[#403E43] bg-[#F2FCE2]">
@@ -51,10 +54,10 @@ export function InventoryTableRow({ operation }: InventoryTableRowProps) {
       <DividerCell />
 
       {/* VALORES */}
-      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#FFDEE2]">
+      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#FFDEE2] border-r border-[#403E43]">
         {isEntry ? formatCurrency(operation.totalCost) : ''}
       </TableCell>
-      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#FFDEE2]">
+      <TableCell className="text-center w-[120px] text-[#403E43] bg-[#FFDEE2] border-r border-[#403E43]">
         {!isEntry ? formatCurrency(operation.totalCost) : ''}
       </TableCell>
       <TableCell className="text-center w-[120px] text-[#403E43] bg-[#FFDEE2]">
