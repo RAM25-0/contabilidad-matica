@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { DatePicker } from "./DatePickerField";
+import { DatePickerField } from "./DatePickerField";
 import { OperationTypeField } from "./OperationTypeField";
 import { InventoryOperation } from "@/types/inventory";
 import { inventoryOperationSchema, InventoryOperationFormValues } from "./types";
@@ -53,7 +53,7 @@ export function EditOperationDialog({ operation, onSubmit, open, onOpenChange }:
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <DatePicker form={form} />
+            <DatePickerField />
             <OperationTypeField form={form} />
             
             <FormField
@@ -122,4 +122,3 @@ export function EditOperationDialog({ operation, onSubmit, open, onOpenChange }:
     </Dialog>
   );
 }
-

@@ -8,7 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { DatePicker } from "./DatePickerField";
+import { DatePickerField } from "./DatePickerField";
 import { OperationTypeField } from "./OperationTypeField";
 import { inventoryOperationSchema, InventoryOperationFormValues } from "./types";
 
@@ -49,7 +49,7 @@ export function AddOperationDialog({ onSubmit }: AddOperationDialogProps) {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <DatePicker form={form} />
+            <DatePickerField />
             <OperationTypeField form={form} />
             
             <FormField
@@ -118,4 +118,3 @@ export function AddOperationDialog({ onSubmit }: AddOperationDialogProps) {
     </Dialog>
   );
 }
-
