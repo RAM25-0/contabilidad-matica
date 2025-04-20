@@ -51,6 +51,7 @@ export function InventoryTableRow({ operation, onEdit, onDelete }: InventoryTabl
 
       {/* COSTO */}
       <TableCell className="text-center w-[120px] text-[#403E43] bg-[#F2FCE2] border-r border-[#403E43]">
+        {/* Solo mostrar costo unitario (no total) en la columna de costo de entrada */}
         {isEntry && operation.unitCost ? formatCurrency(operation.unitCost) : ''}
       </TableCell>
       <TableCell className="text-center w-[120px] text-[#403E43] bg-[#F2FCE2]">
@@ -69,7 +70,7 @@ export function InventoryTableRow({ operation, onEdit, onDelete }: InventoryTabl
         {formatCurrency(operation.balance)}
       </TableCell>
 
-      {/* Actions */}
+      {/* Columna de acciones */}
       <TableCell className="w-[120px] text-[#403E43] bg-white border-l border-[#403E43]">
         <div className="flex gap-2 justify-center">
           <Button
@@ -77,6 +78,7 @@ export function InventoryTableRow({ operation, onEdit, onDelete }: InventoryTabl
             size="icon"
             onClick={() => onEdit(operation)}
             className="h-8 w-8"
+            aria-label="Editar"
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -85,6 +87,7 @@ export function InventoryTableRow({ operation, onEdit, onDelete }: InventoryTabl
             size="icon"
             onClick={() => onDelete(operation)}
             className="h-8 w-8 text-red-500 hover:text-red-600"
+            aria-label="Borrar"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -93,3 +96,4 @@ export function InventoryTableRow({ operation, onEdit, onDelete }: InventoryTabl
     </TableRow>
   );
 }
+
