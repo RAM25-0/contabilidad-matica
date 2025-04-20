@@ -16,7 +16,7 @@ import { AddOperationDialog } from "./AddOperationDialog";
 
 interface InventoryTableProps {
   operations: InventoryOperation[];
-  onAddOperation: () => void;
+  onAddOperation: (values: Omit<InventoryOperation, 'id' | 'averageCost' | 'balance' | 'stockBalance' | 'totalCost'>) => void;
   onCalculateAverage: () => void;
   onViewHistory: () => void;
 }
