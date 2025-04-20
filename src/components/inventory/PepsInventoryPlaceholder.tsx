@@ -2,6 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package } from "lucide-react";
+import { PepsInventoryTable } from "./PepsInventoryTable";
 
 export function PepsInventoryPlaceholder() {
   return (
@@ -13,12 +14,7 @@ export function PepsInventoryPlaceholder() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="p-4 border rounded bg-violet-50 text-violet-700 mb-4">
-          Esta sección está lista para implementar la herramienta de inventarios PEPS (Primeras Entradas, Primeras Salidas).
-        </div>
-        <div className="text-sm text-gray-500">
-          Proximamente podrás registrar operaciones bajo la metodología PEPS y comparar sus efectos respecto al método de Promedio.
-        </div>
+        <PepsInventoryTable />
       </CardContent>
     </Card>
   );
