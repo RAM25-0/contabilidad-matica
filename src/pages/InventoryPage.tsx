@@ -49,6 +49,21 @@ export function InventoryPage() {
 
     switch (newOp.type) {
       case 'SALDO_INICIAL':
+        if (!newOp.unitCost) {
+          toast({
+            title: "Error",
+            description: "El costo unitario es requerido para el saldo inicial",
+            variant: "destructive",
+          });
+          return null;
+        }
+        stockBalance = newOp.units;
+        totalCost = newOp.units * newOp.unitCost;
+        balance = totalCost;
+        averageCost = newOp.unitCost;
+        break;
+
+      // ... mantener el resto del código igual
       case 'COMPRA':
         if (!newOp.unitCost) {
           toast({
@@ -101,6 +116,7 @@ export function InventoryPage() {
     };
   };
 
+  // ... mantener resto del código igual
   const handleCalculateAverage = () => {
     if (state.operations.length === 0) {
       toast({
@@ -122,6 +138,7 @@ export function InventoryPage() {
   };
 
   return (
+    // ... mantener código existente
     <div className="container mx-auto p-6">
       <div className="flex items-center gap-4 mb-6">
         <Button variant="outline" size="icon" asChild>
@@ -157,3 +174,4 @@ export function InventoryPage() {
     </div>
   );
 }
+
