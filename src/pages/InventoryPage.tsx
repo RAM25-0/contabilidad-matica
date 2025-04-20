@@ -1,13 +1,20 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package } from "lucide-react";
+import { Package, ChevronLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export function InventoryPage() {
   return (
     <div className="container mx-auto p-6">
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="outline" size="icon" asChild>
+          <Link to="/">
+            <ChevronLeft className="h-4 w-4" />
+          </Link>
+        </Button>
         <Package className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Inventarios</h1>
       </div>
