@@ -2,7 +2,8 @@
 export interface InventoryOperation {
   id: string;
   date: Date;
-  type: 'COMPRA' | 'VENTA';
+  type: 'SALDO_INICIAL' | 'COMPRA' | 'VENTA' | 'DEVOLUCION';
+  description: string;
   units: number;
   unitCost?: number;
   totalCost: number;

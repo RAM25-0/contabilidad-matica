@@ -9,9 +9,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Calculator, List } from "lucide-react";
+import { Calculator, List } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { InventoryOperation } from "@/types/inventory";
+import { AddOperationDialog } from "./AddOperationDialog";
 
 interface InventoryTableProps {
   operations: InventoryOperation[];
@@ -29,10 +30,7 @@ export function InventoryTable({
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
-        <Button onClick={onAddOperation} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Agregar Operación
-        </Button>
+        <AddOperationDialog onSubmit={onAddOperation} />
         <Button onClick={onCalculateAverage} variant="secondary" className="gap-2">
           <Calculator className="h-4 w-4" />
           Calcular Promedio Automático
@@ -49,6 +47,7 @@ export function InventoryTable({
             <TableRow>
               <TableHead>Fecha</TableHead>
               <TableHead>Operación</TableHead>
+              <TableHead>Descripción</TableHead>
               <TableHead className="text-right">Entrada</TableHead>
               <TableHead className="text-right">Salida</TableHead>
               <TableHead className="text-right">Existencia</TableHead>
@@ -67,15 +66,16 @@ export function InventoryTable({
                   {new Date(op.date).toLocaleDateString()}
                 </TableCell>
                 <TableCell>{op.type}</TableCell>
+                <TableCell>{op.description}</TableCell>
                 <TableCell className="text-right">
-                  {op.type === 'COMPRA' ? op.units : ''}
+                  {op.type === 'COMPRA' || op.type === 'DEVOLUCION' ? op.units : ''}
                 </TableCell>
                 <TableCell className="text-right">
                   {op.type === 'VENTA' ? op.units : ''}
                 </TableCell>
                 <TableCell className="text-right">{op.stockBalance}</TableCell>
                 <TableCell className="text-right">
-                  {op.type === 'COMPRA' ? formatCurrency(op.totalCost) : ''}
+                  {(op.type === 'COMPRA' || op.type === 'DEVOLUCION') ? formatCurrency(op.totalCost) : ''}
                 </TableCell>
                 <TableCell className="text-right">
                   {op.type === 'VENTA' ? formatCurrency(op.totalCost) : ''}
@@ -84,7 +84,7 @@ export function InventoryTable({
                   {formatCurrency(op.averageCost)}
                 </TableCell>
                 <TableCell className="text-right">
-                  {op.type === 'COMPRA' ? formatCurrency(op.totalCost) : ''}
+                  {(op.type === 'COMPRA' || op.type === 'DEVOLUCION') ? formatCurrency(op.totalCost) : ''}
                 </TableCell>
                 <TableCell className="text-right">
                   {op.type === 'VENTA' ? formatCurrency(op.totalCost) : ''}
