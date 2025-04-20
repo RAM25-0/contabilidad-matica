@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { useInventory } from "@/hooks/useInventory";
-import { PepsInventoryPlaceholder } from "@/components/inventory/PepsInventoryPlaceholder";
+import { PepsInventoryTable } from "@/components/inventory/PepsInventoryTable";
 
 export function InventoryPage() {
   const {
@@ -53,7 +53,17 @@ export function InventoryPage() {
           </Card>
         </TabsContent>
         <TabsContent value="peps">
-          <PepsInventoryPlaceholder />
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Package className="h-5 w-5 text-violet-500" />
+                <CardTitle>Método de Valuación - PEPS</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <PepsInventoryTable />
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
