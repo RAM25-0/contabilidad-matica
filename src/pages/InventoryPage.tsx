@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ChevronLeft } from "lucide-react";
@@ -36,6 +35,70 @@ export function InventoryPage() {
     });
   };
 
+  const handleEditOperation = (id: string, newOperation: Omit<InventoryOperation, 'id' | 'averageCost' | 'balance' | 'stockBalance' | 'totalCost'>) => {
+    const operationIndex = state.operations.findIndex(op => op.id === id);
+    if (operationIndex === -1) return;
+
+    const updatedOperation = calculateOperation(newOperation);
+    if (!updatedOperation) return;
+
+    const newOperations = [...state.operations];
+    newOperations[operationIndex] = { ...updatedOperation, id };
+
+    // Recalculate all subsequent operations
+    for (let i = operationIndex + 1; i < newOperations.length; i++) {
+      const nextOp = calculateOperation({
+        date: newOperations[i].date,
+        type: newOperations[i].type,
+        description: newOperations[i].description,
+        units: newOperations[i].units,
+        unitCost: newOperations[i].unitCost,
+      });
+      if (nextOp) {
+        newOperations[i] = { ...nextOp, id: newOperations[i].id };
+      }
+    }
+
+    const lastOperation = newOperations[newOperations.length - 1];
+    setState(prevState => ({
+      ...prevState,
+      operations: newOperations,
+      currentAverageCost: lastOperation.averageCost,
+      currentStock: lastOperation.stockBalance,
+      currentBalance: lastOperation.balance
+    }));
+  };
+
+  const handleDeleteOperation = (id: string) => {
+    const operationIndex = state.operations.findIndex(op => op.id === id);
+    if (operationIndex === -1) return;
+
+    const newOperations = state.operations.filter(op => op.id !== id);
+
+    // Recalculate all subsequent operations
+    for (let i = operationIndex; i < newOperations.length; i++) {
+      const nextOp = calculateOperation({
+        date: newOperations[i].date,
+        type: newOperations[i].type,
+        description: newOperations[i].description,
+        units: newOperations[i].units,
+        unitCost: newOperations[i].unitCost,
+      });
+      if (nextOp) {
+        newOperations[i] = { ...nextOp, id: newOperations[i].id };
+      }
+    }
+
+    const lastOperation = newOperations[newOperations.length - 1] || { averageCost: 0, stockBalance: 0, balance: 0 };
+    setState(prevState => ({
+      ...prevState,
+      operations: newOperations,
+      currentAverageCost: lastOperation.averageCost,
+      currentStock: lastOperation.stockBalance,
+      currentBalance: lastOperation.balance
+    }));
+  };
+
   const calculateOperation = (newOp: Omit<InventoryOperation, 'id' | 'averageCost' | 'balance' | 'stockBalance' | 'totalCost'>): InventoryOperation | null => {
     const prevOperation = state.operations[state.operations.length - 1];
     const prevStock = prevOperation?.stockBalance || 0;
@@ -63,7 +126,6 @@ export function InventoryPage() {
         averageCost = newOp.unitCost;
         break;
 
-      // ... mantener el resto del código igual
       case 'COMPRA':
         if (!newOp.unitCost) {
           toast({
@@ -116,7 +178,6 @@ export function InventoryPage() {
     };
   };
 
-  // ... mantener resto del código igual
   const handleCalculateAverage = () => {
     if (state.operations.length === 0) {
       toast({
@@ -134,11 +195,13 @@ export function InventoryPage() {
   };
 
   const handleViewHistory = () => {
-    console.log("View history clicked");
+    toast({
+      title: "Historial Completo",
+      description: "Ya estás viendo el historial completo de operaciones.",
+    });
   };
 
   return (
-    // ... mantener código existente
     <div className="container mx-auto p-6">
       <div className="flex items-center gap-4 mb-6">
         <Button variant="outline" size="icon" asChild>
@@ -166,6 +229,8 @@ export function InventoryPage() {
                 onAddOperation={handleAddOperation}
                 onCalculateAverage={handleCalculateAverage}
                 onViewHistory={handleViewHistory}
+                onEditOperation={handleEditOperation}
+                onDeleteOperation={handleDeleteOperation}
               />
             </CardContent>
           </Card>
@@ -174,4 +239,3 @@ export function InventoryPage() {
     </div>
   );
 }
-

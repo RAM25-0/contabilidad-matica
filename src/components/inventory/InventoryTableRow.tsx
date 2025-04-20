@@ -1,20 +1,23 @@
-
 import { TableCell, TableRow } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/utils";
 import { InventoryOperation } from "@/types/inventory";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2 } from "lucide-react";
 
 interface InventoryTableRowProps {
   operation: InventoryOperation;
+  onEdit: (operation: InventoryOperation) => void;
+  onDelete: (operation: InventoryOperation) => void;
 }
 
-export function InventoryTableRow({ operation }: InventoryTableRowProps) {
+export function InventoryTableRow({ operation, onEdit, onDelete }: InventoryTableRowProps) {
   const isEntry = operation.type === 'COMPRA' || operation.type === 'SALDO_INICIAL' || operation.type === 'DEVOLUCION';
 
   const DividerCell = () => (
     <td
       style={{
         width: "2px",
-        background: "#403E43", // Darker divider color
+        background: "#403E43",
         padding: 0,
         border: "none"
       }}
@@ -62,6 +65,28 @@ export function InventoryTableRow({ operation }: InventoryTableRowProps) {
       </TableCell>
       <TableCell className="text-center w-[120px] text-[#403E43] bg-[#FFDEE2]">
         {formatCurrency(operation.balance)}
+      </TableCell>
+
+      {/* Actions */}
+      <TableCell className="w-[120px] text-[#403E43] bg-white border-l border-[#403E43]">
+        <div className="flex gap-2 justify-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onEdit(operation)}
+            className="h-8 w-8"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(operation)}
+            className="h-8 w-8 text-red-500 hover:text-red-600"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </TableCell>
     </TableRow>
   );
