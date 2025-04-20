@@ -1,12 +1,11 @@
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { DatePickerField } from "./DatePickerField";
 import { OperationTypeField } from "./OperationTypeField";
 import { InventoryOperation } from "@/types/inventory";
@@ -14,7 +13,7 @@ import { inventoryOperationSchema, InventoryOperationFormValues } from "./types"
 
 interface EditOperationDialogProps {
   operation: InventoryOperation;
-  onSubmit: (values: InventoryOperationFormValues) => void;
+  onSubmit: (values: Omit<InventoryOperation, 'id' | 'averageCost' | 'balance' | 'stockBalance' | 'totalCost'>) => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -43,7 +42,7 @@ export function EditOperationDialog({ operation, onSubmit, open, onOpenChange }:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Editar Operación de Inventario</DialogTitle>
+          <DialogTitle>Editar Operación</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -79,7 +78,7 @@ export function EditOperationDialog({ operation, onSubmit, open, onOpenChange }:
                       <Input
                         type="number"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                         value={field.value === undefined ? '' : field.value}
                       />
                     </FormControl>

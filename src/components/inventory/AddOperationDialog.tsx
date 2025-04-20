@@ -81,7 +81,7 @@ export function AddOperationDialog({ onSubmit }: AddOperationDialogProps) {
                       <Input
                         type="number"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                         value={field.value === undefined ? '' : field.value}
                       />
                     </FormControl>

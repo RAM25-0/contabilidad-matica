@@ -138,7 +138,10 @@ export function InventoryPage() {
         stockBalance = prevStock + newOp.units;
         totalCost = newOp.units * newOp.unitCost;
         balance = prevBalance + totalCost;
-        averageCost = balance / stockBalance;
+        
+        if (stockBalance > 0) {
+          averageCost = balance / stockBalance;
+        }
         break;
 
       case 'VENTA':
@@ -153,6 +156,7 @@ export function InventoryPage() {
         stockBalance = prevStock - newOp.units;
         totalCost = newOp.units * prevAverageCost;
         balance = prevBalance - totalCost;
+        
         averageCost = stockBalance > 0 ? balance / stockBalance : prevAverageCost;
         break;
 
@@ -160,8 +164,17 @@ export function InventoryPage() {
         stockBalance = prevStock + newOp.units;
         totalCost = newOp.units * prevAverageCost;
         balance = prevBalance + totalCost;
+        
         averageCost = balance / stockBalance;
         break;
+        
+      default:
+        toast({
+          title: "Error",
+          description: "Tipo de operación no válido",
+          variant: "destructive",
+        });
+        return null;
     }
 
     return {
