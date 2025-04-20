@@ -71,6 +71,18 @@ export function calculateOperation(
       break;
 
     case "DEVOLUCION":
+      // Buscar la última operación de tipo compra para usar su costo unitario
+      let costToUse = prevAverageCost;
+      
+      // Buscar hacia atrás la última entrada (compra o saldo inicial) para usar su costo unitario
+      for (let i = previousOperations.length - 1; i >= 0; i--) {
+        const op = previousOperations[i];
+        if (op.type === "COMPRA" || op.type === "SALDO_INICIAL") {
+          costToUse = Math.round(op.unitCost || prevAverageCost);
+          break;
+        }
+      }
+      
       if (newOp.units > prevStock) {
         toast?.({
           title: "Error",
@@ -80,7 +92,8 @@ export function calculateOperation(
         return null;
       }
       stockBalance = prevStock - Math.round(newOp.units);
-      totalCost = Math.round(newOp.units) * prevAverageCost;
+      // Usar el costo de la última entrada en lugar del promedio
+      totalCost = Math.round(newOp.units) * costToUse;
       balance = prevBalance - totalCost;
       averageCost = stockBalance > 0 ? Math.round(balance / stockBalance) : prevAverageCost;
       break;
