@@ -122,7 +122,8 @@ export function InventoryPage() {
           return null;
         }
         stockBalance = newOp.units;
-        totalCost = newOp.units * newOp.unitCost;
+        // Ensure whole number calculation
+        totalCost = Math.round(newOp.units * newOp.unitCost);
         balance = totalCost;
         averageCost = newOp.unitCost;
         break;
@@ -137,11 +138,13 @@ export function InventoryPage() {
           return null;
         }
         stockBalance = prevStock + newOp.units;
-        totalCost = newOp.units * newOp.unitCost;
+        // Ensure whole number calculation
+        totalCost = Math.round(newOp.units * newOp.unitCost);
         balance = prevBalance + totalCost;
         
         if (stockBalance > 0) {
-          averageCost = balance / stockBalance;
+          // Round the average cost to get a clean whole number
+          averageCost = Math.round(balance / stockBalance);
         }
         break;
 
@@ -155,14 +158,14 @@ export function InventoryPage() {
           return null;
         }
         stockBalance = prevStock - newOp.units;
-        totalCost = newOp.units * prevAverageCost;
+        // Use Math.round to ensure whole numbers in calculations
+        totalCost = Math.round(newOp.units * prevAverageCost);
         balance = prevBalance - totalCost;
         
-        averageCost = stockBalance > 0 ? balance / stockBalance : prevAverageCost;
+        averageCost = stockBalance > 0 ? Math.round(balance / stockBalance) : prevAverageCost;
         break;
 
       case 'DEVOLUCION':
-        // Corregido: Las devoluciones son salidas que reducen el stock
         if (newOp.units > prevStock) {
           toast({
             title: "Error",
@@ -172,10 +175,11 @@ export function InventoryPage() {
           return null;
         }
         stockBalance = prevStock - newOp.units;
-        totalCost = newOp.units * prevAverageCost;
+        // Use Math.round to ensure whole numbers in calculations
+        totalCost = Math.round(newOp.units * prevAverageCost);
         balance = prevBalance - totalCost;
         
-        averageCost = stockBalance > 0 ? balance / stockBalance : prevAverageCost;
+        averageCost = stockBalance > 0 ? Math.round(balance / stockBalance) : prevAverageCost;
         break;
         
       default:
