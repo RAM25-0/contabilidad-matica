@@ -1,3 +1,4 @@
+
 import { TableCell, TableRow } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/utils";
 import { InventoryOperation } from "@/types/inventory";
@@ -11,7 +12,8 @@ interface InventoryTableRowProps {
 }
 
 export function InventoryTableRow({ operation, onEdit, onDelete }: InventoryTableRowProps) {
-  const isEntry = operation.type === 'COMPRA' || operation.type === 'SALDO_INICIAL' || operation.type === 'DEVOLUCION';
+  // Actualizado: DEVOLUCION ahora se considera una salida, no una entrada
+  const isEntry = operation.type === 'COMPRA' || operation.type === 'SALDO_INICIAL';
 
   const DividerCell = () => (
     <td

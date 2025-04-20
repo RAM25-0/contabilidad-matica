@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ChevronLeft } from "lucide-react";
@@ -161,11 +162,20 @@ export function InventoryPage() {
         break;
 
       case 'DEVOLUCION':
-        stockBalance = prevStock + newOp.units;
+        // Corregido: Las devoluciones son salidas que reducen el stock
+        if (newOp.units > prevStock) {
+          toast({
+            title: "Error",
+            description: "No hay suficiente stock para realizar la devolución",
+            variant: "destructive",
+          });
+          return null;
+        }
+        stockBalance = prevStock - newOp.units;
         totalCost = newOp.units * prevAverageCost;
-        balance = prevBalance + totalCost;
+        balance = prevBalance - totalCost;
         
-        averageCost = balance / stockBalance;
+        averageCost = stockBalance > 0 ? balance / stockBalance : prevAverageCost;
         break;
         
       default:
