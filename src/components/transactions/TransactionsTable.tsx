@@ -35,10 +35,10 @@ export function TransactionsTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[120px]">Fecha</TableHead>
-            <TableHead>Descripción</TableHead>
-            <TableHead className="text-right">Monto</TableHead>
-            <TableHead className="w-[100px] text-center">Acciones</TableHead>
+            <TableHead className="w-[120px] text-center">Fecha</TableHead>
+            <TableHead className="text-center">Descripción</TableHead>
+            <TableHead className="text-center w-[150px]">Monto</TableHead>
+            <TableHead className="w-[120px] text-center">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -47,7 +47,7 @@ export function TransactionsTable({
             
             return (
               <TableRow key={transaction.id} className="group">
-                <TableCell className="font-medium align-top">
+                <TableCell className="font-medium align-top text-center">
                   {format(new Date(transaction.date), "dd/MM/yyyy", { locale: es })}
                 </TableCell>
                 <TableCell className="align-top">
