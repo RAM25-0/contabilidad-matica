@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ChevronLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { useInventory } from "@/hooks/useInventory";
 import { PepsInventoryTable } from "@/components/inventory/PepsInventoryTable";
+import { usePepsInventory } from "@/hooks/usePepsInventory";
 
 export function InventoryPage() {
   const {
@@ -18,6 +19,9 @@ export function InventoryPage() {
     handleEditOperation,
     handleDeleteOperation,
   } = useInventory();
+
+  const pepsInventory = usePepsInventory();
+  const [activeTab, setActiveTab] = useState<string>("promedio");
 
   return (
     <div className="container mx-auto p-6">
@@ -30,7 +34,12 @@ export function InventoryPage() {
         <Package className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Inventarios</h1>
       </div>
-      <Tabs defaultValue="promedio" className="w-full">
+      <Tabs 
+        defaultValue="promedio" 
+        className="w-full" 
+        value={activeTab} 
+        onValueChange={setActiveTab}
+      >
         <TabsList className="w-full justify-start space-x-2">
           <TabsTrigger value="promedio">Promedio</TabsTrigger>
           <TabsTrigger value="peps">PEPS</TabsTrigger>
@@ -61,7 +70,14 @@ export function InventoryPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <PepsInventoryTable />
+              <PepsInventoryTable 
+                state={pepsInventory.state}
+                onAddInitialBalance={pepsInventory.handleAddInitialBalance}
+                onAddPurchase={pepsInventory.handleAddPurchase}
+                onAddSale={pepsInventory.handleAddSale}
+                onAddReturn={pepsInventory.handleAddReturn}
+                getAvailableLots={pepsInventory.getAvailableLots}
+              />
             </CardContent>
           </Card>
         </TabsContent>
