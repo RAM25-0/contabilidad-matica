@@ -3,8 +3,18 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package } from "lucide-react";
 import { PepsInventoryTable } from "./PepsInventoryTable";
+import { usePepsInventory } from "@/hooks/usePepsInventory";
 
 export function PepsInventoryPlaceholder() {
+  const {
+    state,
+    handleAddInitialBalance,
+    handleAddPurchase,
+    handleAddSale,
+    handleAddReturn,
+    getAvailableLots,
+  } = usePepsInventory();
+
   return (
     <Card>
       <CardHeader>
@@ -14,7 +24,14 @@ export function PepsInventoryPlaceholder() {
         </div>
       </CardHeader>
       <CardContent>
-        <PepsInventoryTable />
+        <PepsInventoryTable 
+          state={state}
+          onAddInitialBalance={handleAddInitialBalance}
+          onAddPurchase={handleAddPurchase}
+          onAddSale={handleAddSale}
+          onAddReturn={handleAddReturn}
+          getAvailableLots={getAvailableLots}
+        />
       </CardContent>
     </Card>
   );
