@@ -24,6 +24,8 @@ interface PepsInventoryTableProps {
   onAddSale: (date: Date, units: number, description: string) => void;
   onAddReturn: (date: Date, lotId: string, units: number, description: string) => void;
   getAvailableLots: () => PepsLot[];
+  onEditOperation: (operationId: string, values: Partial<Omit<PepsOperation, "id" | "balance">>) => void;
+  onDeleteOperation: (operationId: string) => void;
 }
 
 export function PepsInventoryTable({
@@ -32,7 +34,9 @@ export function PepsInventoryTable({
   onAddPurchase,
   onAddSale,
   onAddReturn,
-  getAvailableLots
+  getAvailableLots,
+  onEditOperation,
+  onDeleteOperation
 }: PepsInventoryTableProps) {
   const [operationType, setOperationType] = useState<
     "SALDO_INICIAL" | "COMPRA" | "VENTA" | "DEVOLUCION" | null
@@ -43,7 +47,6 @@ export function PepsInventoryTable({
 
   const handleCloseDialog = () => setOperationType(null);
 
-  // Formato de fecha para mostrar
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("es-MX", {
       year: "numeric",
@@ -52,7 +55,6 @@ export function PepsInventoryTable({
     }).format(date);
   };
 
-  // DIVIDER CELL: similar a tabla de promedio
   const DividerCell = () => (
     <td
       style={{
@@ -65,7 +67,6 @@ export function PepsInventoryTable({
     ></td>
   );
 
-  // NUEVO: Renderizar columna de acciones solo para registros de operaciones
   const renderActionsCell = (operation: PepsOperation) => (
     <td className="w-[90px] bg-white border-l border-[#403E43] text-center">
       <div className="flex gap-1 justify-center">
@@ -201,9 +202,7 @@ export function PepsInventoryTable({
                 <TableBody>
                   {state.operations.map((operation) => {
                     if (operation.type === "VENTA" && operation.lots.length > 1) {
-                      // Manejo especial para ventas con múltiples lotes
                       const rows = [];
-                      // Primera fila de venta múltiple
                       rows.push(
                         <TableRow key={`${operation.id}-main`} className="hover:bg-[#F6F6F7] border-b border-[#403E43]">
                           <TableCell 
@@ -238,14 +237,12 @@ export function PepsInventoryTable({
                         </TableRow>
                       );
 
-                      // Filas subsecuentes de la venta múltiple
                       for (let i = 1; i < operation.lots.length; i++) {
                         const lot = operation.lots[i];
                         const isLastRow = i === operation.lots.length - 1;
                         
                         rows.push(
                           <TableRow key={`${operation.id}-${i}`} className="hover:bg-[#F6F6F7] border-b border-[#403E43]">
-                            {/* Fecha y operación ya están en rowSpan de la primera fila */}
                             <DividerCell />
                             <TableCell className="text-center w-[90px] bg-[#D3E4FD] border-r border-[#403E43]" />
                             <TableCell className="text-center w-[90px] bg-[#D3E4FD] border-r border-[#403E43]">
@@ -273,7 +270,6 @@ export function PepsInventoryTable({
                       return rows;
                     }
 
-                    // Operaciones normales (Saldo Inicial, Compra, Venta simple, Devolución)
                     return (
                       <TableRow key={operation.id} className="hover:bg-[#F6F6F7] border-b border-[#403E43]">
                         <TableCell className="w-[120px] text-[#403E43] bg-white border-r border-[#403E43]">
@@ -337,7 +333,7 @@ export function PepsInventoryTable({
         operation={editingOperation}
         onSubmit={(values) => {
           if (editingOperation) {
-            onAddInitialBalance?.handleEditOperation?.(editingOperation.id, values);
+            onEditOperation(editingOperation.id, values);
             setEditingOperation(null);
           }
         }}
@@ -348,7 +344,7 @@ export function PepsInventoryTable({
         operation={deletingOperation}
         onConfirm={() => {
           if (deletingOperation) {
-            onAddInitialBalance?.handleDeleteOperation?.(deletingOperation.id);
+            onDeleteOperation(deletingOperation.id);
             setDeletingOperation(null);
           }
         }}

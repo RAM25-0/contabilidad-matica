@@ -77,6 +77,8 @@ export function InventoryPage() {
                 onAddSale={pepsInventory.handleAddSale}
                 onAddReturn={pepsInventory.handleAddReturn}
                 getAvailableLots={pepsInventory.getAvailableLots}
+                onEditOperation={pepsInventory.handleEditOperation}
+                onDeleteOperation={pepsInventory.handleDeleteOperation}
               />
             </CardContent>
           </Card>

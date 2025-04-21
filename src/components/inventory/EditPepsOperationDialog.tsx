@@ -21,9 +21,23 @@ export function EditPepsOperationDialog({
   const [description, setDescription] = useState(operation?.description || "");
   const [date, setDate] = useState(operation ? operation.date.toISOString().slice(0, 10) : "");
 
+  // NUEVO: Estado para cantidades editables
+  // Si es entrada, editamos inUnits; si salida, outUnits
+  const isEntry = operation ? operation.inUnits > 0 : false;
+  const [units, setUnits] = useState(
+    isEntry ? (operation?.inUnits ?? 0) : (operation?.outUnits ?? 0)
+  );
+
   React.useEffect(() => {
     setDescription(operation?.description || "");
     setDate(operation ? operation.date.toISOString().slice(0, 10) : "");
+    setUnits(
+      operation
+        ? operation.inUnits > 0 
+          ? operation.inUnits 
+          : operation.outUnits
+        : 0
+    );
   }, [operation]);
 
   if (!operation) return null;
@@ -50,15 +64,31 @@ export function EditPepsOperationDialog({
               onChange={e => setDescription(e.target.value)}
             />
           </label>
+          <label className="block font-medium text-sm">
+            {isEntry ? "Cantidad (Entrada):" : "Cantidad (Salida):"}
+            <Input
+              type="number"
+              value={units}
+              min={1}
+              onChange={e => setUnits(Number(e.target.value))}
+            />
+          </label>
         </div>
         <DialogFooter>
           <Button
             type="button"
             onClick={() => {
-              onSubmit({
+              // Mandar unidades editadas dependiendo si es entrada o salida
+              const values: Partial<Omit<PepsOperation, "id" | "balance">> = {
                 date: new Date(date),
                 description,
-              });
+              };
+              if (isEntry) {
+                values.inUnits = units;
+              } else {
+                values.outUnits = units;
+              }
+              onSubmit(values);
               onOpenChange(false);
             }}
           >
