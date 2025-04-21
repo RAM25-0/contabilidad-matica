@@ -9,6 +9,7 @@ import { InventoryTable } from "@/components/inventory/InventoryTable";
 import { useInventory } from "@/hooks/useInventory";
 import { PepsInventoryTable } from "@/components/inventory/PepsInventoryTable";
 import { usePepsInventory } from "@/hooks/usePepsInventory";
+import { PepsOperation } from "@/types/peps-inventory";
 
 export function InventoryPage() {
   const {
@@ -22,6 +23,25 @@ export function InventoryPage() {
 
   const pepsInventory = usePepsInventory();
   const [activeTab, setActiveTab] = useState<string>("promedio");
+  
+  // Adapter functions to match expected prop types
+  const handlePepsEdit = (operation: PepsOperation) => {
+    pepsInventory.handleEditOperation(operation.id, {
+      date: operation.date,
+      type: operation.type,
+      description: operation.description,
+      lots: operation.lots,
+      inUnits: operation.inUnits,
+      outUnits: operation.outUnits,
+      unitCost: operation.unitCost,
+      totalCost: operation.totalCost,
+      targetLotId: operation.targetLotId
+    });
+  };
+  
+  const handlePepsDelete = (operation: PepsOperation) => {
+    pepsInventory.handleDeleteOperation(operation.id);
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -77,8 +97,8 @@ export function InventoryPage() {
                 onAddSale={pepsInventory.handleAddSale}
                 onAddReturn={pepsInventory.handleAddReturn}
                 getAvailableLots={pepsInventory.getAvailableLots}
-                onEditOperation={pepsInventory.handleEditOperation}
-                onDeleteOperation={pepsInventory.handleDeleteOperation}
+                onEditOperation={handlePepsEdit}
+                onDeleteOperation={handlePepsDelete}
               />
             </CardContent>
           </Card>
