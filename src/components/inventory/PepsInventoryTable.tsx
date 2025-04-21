@@ -14,8 +14,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PepsLot, PepsOperation, PepsState } from "@/types/peps-inventory";
 import { formatCurrency } from "@/lib/utils";
 import { PepsOperationDialog } from "./PepsOperationDialog";
-import { EditPepsOperationDialog } from "./EditPepsOperationDialog";
-import { DeletePepsOperationDialog } from "./DeletePepsOperationDialog";
 
 interface PepsInventoryTableProps {
   state: PepsState;
@@ -24,8 +22,8 @@ interface PepsInventoryTableProps {
   onAddSale: (date: Date, units: number, description: string) => void;
   onAddReturn: (date: Date, lotId: string, units: number, description: string) => void;
   getAvailableLots: () => PepsLot[];
-  onEditOperation: (operationId: string, values: Partial<Omit<PepsOperation, "id" | "balance">>) => void;
-  onDeleteOperation: (operationId: string) => void;
+  onEditOperation: (operation: PepsOperation) => void;
+  onDeleteOperation: (operation: PepsOperation) => void;
 }
 
 export function PepsInventoryTable({
@@ -41,9 +39,6 @@ export function PepsInventoryTable({
   const [operationType, setOperationType] = useState<
     "SALDO_INICIAL" | "COMPRA" | "VENTA" | "DEVOLUCION" | null
   >(null);
-
-  const [editingOperation, setEditingOperation] = useState<PepsOperation | null>(null);
-  const [deletingOperation, setDeletingOperation] = useState<PepsOperation | null>(null);
 
   const handleCloseDialog = () => setOperationType(null);
 
@@ -73,14 +68,14 @@ export function PepsInventoryTable({
         <button
           className="p-1 rounded hover:bg-violet-100"
           title="Editar"
-          onClick={() => setEditingOperation(operation)}
+          onClick={() => onEditOperation(operation)}
         >
           <Edit size={18} color="#7E69AB" />
         </button>
         <button
           className="p-1 rounded hover:bg-red-100"
           title="Borrar"
-          onClick={() => setDeletingOperation(operation)}
+          onClick={() => onDeleteOperation(operation)}
         >
           <Trash2 size={18} color="#ea384c" />
         </button>
@@ -327,28 +322,6 @@ export function PepsInventoryTable({
           availableLots={getAvailableLots()}
         />
       )}
-      <EditPepsOperationDialog
-        open={!!editingOperation}
-        onOpenChange={(open) => !open && setEditingOperation(null)}
-        operation={editingOperation}
-        onSubmit={(values) => {
-          if (editingOperation) {
-            onEditOperation(editingOperation.id, values);
-            setEditingOperation(null);
-          }
-        }}
-      />
-      <DeletePepsOperationDialog
-        open={!!deletingOperation}
-        onOpenChange={(open) => !open && setDeletingOperation(null)}
-        operation={deletingOperation}
-        onConfirm={() => {
-          if (deletingOperation) {
-            onDeleteOperation(deletingOperation.id);
-            setDeletingOperation(null);
-          }
-        }}
-      />
     </div>
   );
 }

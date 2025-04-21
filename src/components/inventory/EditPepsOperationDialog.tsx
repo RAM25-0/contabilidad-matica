@@ -21,12 +21,15 @@ export function EditPepsOperationDialog({
   const [description, setDescription] = useState(operation?.description || "");
   const [date, setDate] = useState(operation ? operation.date.toISOString().slice(0, 10) : "");
 
-  // NUEVO: Estado para cantidades editables
+  // Estado para cantidades editables
   // Si es entrada, editamos inUnits; si salida, outUnits
   const isEntry = operation ? operation.inUnits > 0 : false;
   const [units, setUnits] = useState(
     isEntry ? (operation?.inUnits ?? 0) : (operation?.outUnits ?? 0)
   );
+  
+  // Nuevo: Agregar estado para costo unitario
+  const [unitCost, setUnitCost] = useState(operation?.unitCost || 0);
 
   React.useEffect(() => {
     setDescription(operation?.description || "");
@@ -38,6 +41,7 @@ export function EditPepsOperationDialog({
           : operation.outUnits
         : 0
     );
+    setUnitCost(operation?.unitCost || 0);
   }, [operation]);
 
   if (!operation) return null;
@@ -73,6 +77,18 @@ export function EditPepsOperationDialog({
               onChange={e => setUnits(Number(e.target.value))}
             />
           </label>
+          {isEntry && (
+            <label className="block font-medium text-sm">
+              Costo Unitario:
+              <Input
+                type="number"
+                value={unitCost}
+                min={0.01}
+                step={0.01}
+                onChange={e => setUnitCost(Number(e.target.value))}
+              />
+            </label>
+          )}
         </div>
         <DialogFooter>
           <Button
@@ -85,6 +101,7 @@ export function EditPepsOperationDialog({
               };
               if (isEntry) {
                 values.inUnits = units;
+                values.unitCost = unitCost;
               } else {
                 values.outUnits = units;
               }
