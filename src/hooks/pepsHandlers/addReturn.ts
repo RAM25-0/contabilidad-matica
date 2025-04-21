@@ -20,21 +20,12 @@ export function addReturn(
     return prev;
   }
 
-  const salesFromLot = prev.operations
-    .filter(op => op.type === "VENTA")
-    .flatMap(op => op.lots.filter(lot => lot.id === lotId))
-    .reduce((sum, lot) => sum + lot.units, 0);
-
-  const returnsToLot = prev.operations
-    .filter(op => op.type === "DEVOLUCION" && op.targetLotId === lotId)
-    .reduce((sum, op) => sum + op.inUnits, 0);
-
-  const maxReturnable = salesFromLot - returnsToLot;
-
-  if (units <= 0 || units > maxReturnable) {
+  // Para devoluciones, solo verificamos que no estemos devolviendo más unidades
+  // de las que existen en el lote
+  if (units <= 0 || units > targetLot.remainingUnits) {
     toast({
       title: "Error",
-      description: `Solo puede devolver hasta ${maxReturnable} unidades de este lote.`,
+      description: `Solo puede devolver hasta ${targetLot.remainingUnits} unidades de este lote.`,
       variant: "destructive",
     });
     return prev;
@@ -45,16 +36,17 @@ export function addReturn(
     id: uuidv4(),
     units,
     remainingUnits: units,
+    type: "DEVOLUCION"
   };
 
   const updatedLots = prev.lots.map(lot =>
     lot.id === lotId
-      ? { ...lot, remainingUnits: lot.remainingUnits + units }
+      ? { ...lot, remainingUnits: lot.remainingUnits - units }
       : lot
   );
 
   const totalCost = units * targetLot.unitCost;
-  const newBalance = prev.currentBalance + totalCost;
+  const newBalance = prev.currentBalance - totalCost;
 
   const newOperation: PepsOperation = {
     id: uuidv4(),
@@ -62,8 +54,8 @@ export function addReturn(
     type: "DEVOLUCION",
     description,
     lots: [returnLot],
-    inUnits: units,
-    outUnits: 0,
+    inUnits: 0,
+    outUnits: units,
     balance: newBalance,
     unitCost: targetLot.unitCost,
     totalCost,
@@ -72,7 +64,7 @@ export function addReturn(
 
   toast({
     title: "Devolución Registrada",
-    description: `Se han devuelto ${units} unidades al lote ${targetLot.lotName} con un valor total de $${totalCost.toFixed(2)}`,
+    description: `Se han devuelto ${units} unidades del lote ${targetLot.lotName} con un valor total de $${totalCost.toFixed(2)}`,
   });
 
   return {
