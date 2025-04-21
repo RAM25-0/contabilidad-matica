@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -12,21 +11,27 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Plus, Calculator } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { PepsOperation } from "@/types/peps-inventory";
+import { PepsLot, PepsOperation, PepsState } from "@/types/peps-inventory";
 import { formatCurrency } from "@/lib/utils";
 import { PepsOperationDialog } from "./PepsOperationDialog";
-import { usePepsInventory } from "@/hooks/usePepsInventory";
 
-export function PepsInventoryTable() {
-  const {
-    state,
-    handleAddInitialBalance,
-    handleAddPurchase,
-    handleAddSale,
-    handleAddReturn,
-    getAvailableLots,
-  } = usePepsInventory();
+interface PepsInventoryTableProps {
+  state: PepsState;
+  onAddInitialBalance: (date: Date, units: number, unitCost: number, description: string) => void;
+  onAddPurchase: (date: Date, lotName: string, units: number, unitCost: number, description: string) => void;
+  onAddSale: (date: Date, units: number, description: string) => void;
+  onAddReturn: (date: Date, lotId: string, units: number, description: string) => void;
+  getAvailableLots: () => PepsLot[];
+}
 
+export function PepsInventoryTable({
+  state,
+  onAddInitialBalance,
+  onAddPurchase,
+  onAddSale,
+  onAddReturn,
+  getAvailableLots
+}: PepsInventoryTableProps) {
   const [operationType, setOperationType] = useState<
     "SALDO_INICIAL" | "COMPRA" | "VENTA" | "DEVOLUCION" | null
   >(null);
@@ -289,10 +294,10 @@ export function PepsInventoryTable() {
         <PepsOperationDialog
           type={operationType}
           onClose={handleCloseDialog}
-          onAddInitialBalance={handleAddInitialBalance}
-          onAddPurchase={handleAddPurchase}
-          onAddSale={handleAddSale}
-          onAddReturn={handleAddReturn}
+          onAddInitialBalance={onAddInitialBalance}
+          onAddPurchase={onAddPurchase}
+          onAddSale={onAddSale}
+          onAddReturn={onAddReturn}
           availableLots={getAvailableLots()}
         />
       )}
