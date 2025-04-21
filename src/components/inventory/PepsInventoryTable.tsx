@@ -9,11 +9,13 @@ import {
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Plus, Calculator } from "lucide-react";
+import { Plus, Calculator, Edit, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PepsLot, PepsOperation, PepsState } from "@/types/peps-inventory";
 import { formatCurrency } from "@/lib/utils";
 import { PepsOperationDialog } from "./PepsOperationDialog";
+import { EditPepsOperationDialog } from "./EditPepsOperationDialog";
+import { DeletePepsOperationDialog } from "./DeletePepsOperationDialog";
 
 interface PepsInventoryTableProps {
   state: PepsState;
@@ -35,6 +37,9 @@ export function PepsInventoryTable({
   const [operationType, setOperationType] = useState<
     "SALDO_INICIAL" | "COMPRA" | "VENTA" | "DEVOLUCION" | null
   >(null);
+
+  const [editingOperation, setEditingOperation] = useState<PepsOperation | null>(null);
+  const [deletingOperation, setDeletingOperation] = useState<PepsOperation | null>(null);
 
   const handleCloseDialog = () => setOperationType(null);
 
@@ -58,6 +63,28 @@ export function PepsInventoryTable({
       }}
       aria-hidden
     ></td>
+  );
+
+  // NUEVO: Renderizar columna de acciones solo para registros de operaciones
+  const renderActionsCell = (operation: PepsOperation) => (
+    <td className="w-[90px] bg-white border-l border-[#403E43] text-center">
+      <div className="flex gap-1 justify-center">
+        <button
+          className="p-1 rounded hover:bg-violet-100"
+          title="Editar"
+          onClick={() => setEditingOperation(operation)}
+        >
+          <Edit size={18} color="#7E69AB" />
+        </button>
+        <button
+          className="p-1 rounded hover:bg-red-100"
+          title="Borrar"
+          onClick={() => setDeletingOperation(operation)}
+        >
+          <Trash2 size={18} color="#ea384c" />
+        </button>
+      </div>
+    </td>
   );
 
   return (
@@ -168,6 +195,7 @@ export function PepsInventoryTable({
                     <TableHead className="w-[90px] bg-[#FFDEE2] text-center text-[#403E43]">
                       Saldo
                     </TableHead>
+                    <TableHead className="w-[90px] text-[#403E43] bg-[#F6F6F7]">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -206,6 +234,7 @@ export function PepsInventoryTable({
                             {formatCurrency(operation.lots[0].units * operation.lots[0].unitCost)}
                           </TableCell>
                           <TableCell className="text-right w-[90px] bg-[#FFDEE2]" />
+                          {renderActionsCell(operation)}
                         </TableRow>
                       );
 
@@ -281,6 +310,7 @@ export function PepsInventoryTable({
                         <TableCell className="text-right w-[90px] bg-[#FFDEE2]">
                           {formatCurrency(operation.balance)}
                         </TableCell>
+                        {renderActionsCell(operation)}
                       </TableRow>
                     );
                   })}
@@ -301,6 +331,28 @@ export function PepsInventoryTable({
           availableLots={getAvailableLots()}
         />
       )}
+      <EditPepsOperationDialog
+        open={!!editingOperation}
+        onOpenChange={(open) => !open && setEditingOperation(null)}
+        operation={editingOperation}
+        onSubmit={(values) => {
+          if (editingOperation) {
+            onAddInitialBalance?.handleEditOperation?.(editingOperation.id, values);
+            setEditingOperation(null);
+          }
+        }}
+      />
+      <DeletePepsOperationDialog
+        open={!!deletingOperation}
+        onOpenChange={(open) => !open && setDeletingOperation(null)}
+        operation={deletingOperation}
+        onConfirm={() => {
+          if (deletingOperation) {
+            onAddInitialBalance?.handleDeleteOperation?.(deletingOperation.id);
+            setDeletingOperation(null);
+          }
+        }}
+      />
     </div>
   );
 }
