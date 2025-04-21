@@ -9,6 +9,8 @@ import { PepsLot, PepsOperation, PepsState } from "@/types/peps-inventory";
 import { PepsOperationDialog } from "./PepsOperationDialog";
 import { PepsTableHeader } from "./PepsTableHeader";
 import { PepsTableRow } from "./PepsTableRow";
+import { EditPepsOperationDialog } from "./EditPepsOperationDialog";
+import { DeletePepsOperationDialog } from "./DeletePepsOperationDialog";
 
 interface PepsInventoryTableProps {
   state: PepsState;
@@ -35,7 +37,41 @@ export function PepsInventoryTable({
     "SALDO_INICIAL" | "COMPRA" | "VENTA" | "DEVOLUCION" | null
   >(null);
 
+  // Estados para controlar los diálogos de edición y eliminación
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [operationToEdit, setOperationToEdit] = useState<PepsOperation | null>(null);
+  const [operationToDelete, setOperationToDelete] = useState<PepsOperation | null>(null);
+
   const handleCloseDialog = () => setOperationType(null);
+
+  // Funciones para manejar la edición
+  const handleEditClick = (operation: PepsOperation) => {
+    setOperationToEdit(operation);
+    setEditDialogOpen(true);
+  };
+
+  // Funciones para manejar la eliminación
+  const handleDeleteClick = (operation: PepsOperation) => {
+    setOperationToDelete(operation);
+    setDeleteDialogOpen(true);
+  };
+
+  // Función para confirmar la edición
+  const handleEditConfirm = (values: Partial<Omit<PepsOperation, "id" | "balance">>) => {
+    if (operationToEdit) {
+      onEditOperation(operationToEdit);
+      setEditDialogOpen(false);
+    }
+  };
+
+  // Función para confirmar la eliminación
+  const handleDeleteConfirm = () => {
+    if (operationToDelete) {
+      onDeleteOperation(operationToDelete);
+      setDeleteDialogOpen(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -89,8 +125,8 @@ export function PepsInventoryTable({
                       key={operation.id}
                       operation={operation}
                       state={state}
-                      onEdit={onEditOperation}
-                      onDelete={onDeleteOperation}
+                      onEdit={handleEditClick}
+                      onDelete={handleDeleteClick}
                     />
                   ))}
                 </TableBody>
@@ -99,6 +135,8 @@ export function PepsInventoryTable({
           </div>
         </CardContent>
       </Card>
+
+      {/* Diálogo para agregar operaciones */}
       {operationType && (
         <PepsOperationDialog
           type={operationType}
@@ -110,6 +148,22 @@ export function PepsInventoryTable({
           availableLots={getAvailableLots()}
         />
       )}
+
+      {/* Diálogo para editar operaciones */}
+      <EditPepsOperationDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        operation={operationToEdit}
+        onSubmit={handleEditConfirm}
+      />
+
+      {/* Diálogo para eliminar operaciones */}
+      <DeletePepsOperationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        operation={operationToDelete}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }
