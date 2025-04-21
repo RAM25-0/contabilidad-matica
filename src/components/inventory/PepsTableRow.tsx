@@ -26,12 +26,36 @@ function DividerCell() {
   );
 }
 
+// Función para calcular la existencia en cada punto de la operación
+function calculateExistenceAtOperation(operations: PepsOperation[], currentOperationId: string): number {
+  let totalExistence = 0;
+  
+  // Recorremos todas las operaciones hasta la actual
+  for (const op of operations) {
+    // Sumamos entradas
+    totalExistence += op.inUnits;
+    
+    // Restamos salidas
+    totalExistence -= op.outUnits;
+    
+    // Si llegamos a la operación actual, devolvemos el resultado
+    if (op.id === currentOperationId) {
+      return totalExistence;
+    }
+  }
+  
+  return totalExistence;
+}
+
 export function PepsTableRow({
   operation,
   state,
   onEdit,
   onDelete,
 }: PepsTableRowProps) {
+  // Calculamos la existencia real en el punto de esta operación
+  const existenceAtThisPoint = calculateExistenceAtOperation(state.operations, operation.id);
+
   // Handle VENTA operation with multiple lots (multi-row)
   if (operation.type === "VENTA" && operation.lots.length > 1) {
     const rows = [];
@@ -84,7 +108,7 @@ export function PepsTableRow({
             {lot.units}
           </TableCell>
           <TableCell className="text-center w-[90px] bg-[#D3E4FD]">
-            {isLastRow ? state.lots.reduce((sum, l) => sum + l.remainingUnits, 0) : ""}
+            {isLastRow ? existenceAtThisPoint : ""}
           </TableCell>
           <DividerCell />
           <TableCell className="text-center w-[90px] bg-[#E1FBE1]">
@@ -125,7 +149,7 @@ export function PepsTableRow({
         {operation.outUnits > 0 ? operation.outUnits : ""}
       </TableCell>
       <TableCell className="text-center w-[90px] bg-[#D3E4FD]">
-        {state.lots.reduce((sum, lot) => sum + lot.remainingUnits, 0)}
+        {existenceAtThisPoint}
       </TableCell>
       <DividerCell />
       <TableCell className="text-center w-[90px] bg-[#E1FBE1]">
