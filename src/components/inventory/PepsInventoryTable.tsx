@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Table, TableBody } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -37,7 +36,6 @@ export function PepsInventoryTable({
     "SALDO_INICIAL" | "COMPRA" | "VENTA" | "DEVOLUCION" | null
   >(null);
 
-  // Estados para controlar los diálogos de edición y eliminación
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [operationToEdit, setOperationToEdit] = useState<PepsOperation | null>(null);
@@ -45,19 +43,16 @@ export function PepsInventoryTable({
 
   const handleCloseDialog = () => setOperationType(null);
 
-  // Funciones para manejar la edición
   const handleEditClick = (operation: PepsOperation) => {
     setOperationToEdit(operation);
     setEditDialogOpen(true);
   };
 
-  // Funciones para manejar la eliminación
   const handleDeleteClick = (operation: PepsOperation) => {
     setOperationToDelete(operation);
     setDeleteDialogOpen(true);
   };
 
-  // Función para confirmar la edición
   const handleEditConfirm = (values: Partial<Omit<PepsOperation, "id" | "balance">>) => {
     if (operationToEdit) {
       onEditOperation(operationToEdit);
@@ -65,7 +60,6 @@ export function PepsInventoryTable({
     }
   };
 
-  // Función para confirmar la eliminación
   const handleDeleteConfirm = () => {
     if (operationToDelete) {
       onDeleteOperation(operationToDelete);
@@ -105,7 +99,7 @@ export function PepsInventoryTable({
         </Button>
         <Button
           onClick={() => setOperationType("DEVOLUCION")}
-          disabled={!state.operations.some((op) => op.type === "VENTA")}
+          disabled={!state.lots.some(lot => lot.type === "COMPRA")}
           className="gap-2"
         >
           <Calculator className="h-4 w-4" />
@@ -136,7 +130,6 @@ export function PepsInventoryTable({
         </CardContent>
       </Card>
 
-      {/* Diálogo para agregar operaciones */}
       {operationType && (
         <PepsOperationDialog
           type={operationType}
@@ -149,7 +142,6 @@ export function PepsInventoryTable({
         />
       )}
 
-      {/* Diálogo para editar operaciones */}
       <EditPepsOperationDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
@@ -157,7 +149,6 @@ export function PepsInventoryTable({
         onSubmit={handleEditConfirm}
       />
 
-      {/* Diálogo para eliminar operaciones */}
       <DeletePepsOperationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
