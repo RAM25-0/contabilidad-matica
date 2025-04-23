@@ -42,6 +42,7 @@ export function addPurchaseReturn(
   // Calcula costos
   const totalCost = Number((units * lot.unitCost).toFixed(2));
   const newBalance = Number((prev.currentBalance - totalCost).toFixed(2));
+  
   // Registrar operación de devolución de compra:
   const returnLot: UepsLot = {
     ...lot,
@@ -58,10 +59,10 @@ export function addPurchaseReturn(
     description,
     lots: [returnLot],
     inUnits: 0,
-    outUnits: units,
+    outUnits: units, // Son unidades de salida porque salen del inventario
     balance: newBalance,
     unitCost: lot.unitCost,
-    totalCost,
+    totalCost, // Este será mostrado en la columna "Haber"
     targetLotId: lotId,
   };
 

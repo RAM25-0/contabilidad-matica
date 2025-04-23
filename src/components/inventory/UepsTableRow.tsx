@@ -12,7 +12,7 @@ import { InventoryOperation } from "@/types/inventory";
 import { formatCurrency } from "@/lib/utils";
 
 interface UepsTableRowProps {
-  operation: UepsOperation;
+  operation: UepsOperation & { stockBalance?: number };
   onEdit: (operationId: string, values: Partial<UepsOperation>) => void;
   onDelete: (operationId: string) => void;
 }
@@ -50,15 +50,15 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     DEVOLUCION: "Devolución",
   };
 
-  // Determine values for debe/haber/saldo
-  const debeValue = operation.type === "SALDO_INICIAL" || operation.type === "COMPRA" || operation.type === "DEVOLUCION"
+  // Determine values for debe/haber columns
+  // Changed: DEVOLUCION should now go in the haber (credit) column, not in debe
+  const debeValue = operation.type === "SALDO_INICIAL" || operation.type === "COMPRA"
     ? operation.totalCost
     : 0;
   
-  const haberValue = operation.type === "VENTA" ? operation.totalCost : 0;
-  
-  // Calcular el total de unidades existentes (para la columna de existencias)
-  const stockBalance = operation.lots.reduce((total, lot) => total + lot.remainingUnits, 0);
+  const haberValue = operation.type === "VENTA" || operation.type === "DEVOLUCION" 
+    ? operation.totalCost 
+    : 0;
   
   // Create a compatible inventory operation object for the EditOperationDialog
   const adaptedOperation: InventoryOperation = {
@@ -71,7 +71,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     totalCost: operation.totalCost,
     averageCost: operation.unitCost,
     balance: operation.balance,
-    stockBalance: stockBalance
+    stockBalance: operation.stockBalance || 0  // Use the provided stock balance
   };
   
   return (
@@ -108,7 +108,8 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         {operation.outUnits > 0 ? operation.outUnits : ""}
       </TableCell>
       <TableCell className="text-center text-sm bg-[#D3E4FD]">
-        {stockBalance}
+        {/* Display the calculated stock balance */}
+        {operation.stockBalance}
       </TableCell>
       <TableCell 
         style={{

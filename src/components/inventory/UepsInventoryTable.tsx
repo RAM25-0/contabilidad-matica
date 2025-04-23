@@ -21,6 +21,19 @@ interface UepsInventoryTableProps {
   onDeleteOperation: (operationId: string) => void;
 }
 
+// Helper to calculate the running stock balance at each point
+function calculateRunningStock(operations: UepsOperation[], currentIndex: number): number {
+  let stockBalance = 0;
+  
+  for (let i = 0; i <= currentIndex; i++) {
+    const op = operations[i];
+    stockBalance += op.inUnits; // Add entries
+    stockBalance -= op.outUnits; // Subtract outputs
+  }
+  
+  return stockBalance;
+}
+
 export function UepsInventoryTable({
   state,
   onAddInitialBalance,
@@ -38,6 +51,17 @@ export function UepsInventoryTable({
   const handleCloseDialog = () => {
     setSelectedOperationType(null);
   };
+
+  // Prepare operations with stock balance
+  const operationsWithStock = state.operations.map((op, index) => {
+    // Calculate running stock up to this operation
+    const stockBalance = calculateRunningStock(state.operations, index);
+    
+    return {
+      ...op,
+      stockBalance
+    };
+  });
 
   return (
     <div className="space-y-4">
@@ -96,14 +120,28 @@ export function UepsInventoryTable({
                 </td>
               </tr>
             ) : (
-              state.operations.map((operation) => (
-                <UepsTableRow
-                  key={operation.id}
-                  operation={operation}
-                  onEdit={onEditOperation}
-                  onDelete={onDeleteOperation}
-                />
-              ))
+              state.operations.map((operation, index) => {
+                // Calculate running stock up to this operation
+                const stockBalance = calculateRunningStock(state.operations, index);
+                
+                // Create a modified version of the operation with stock balance
+                const enhancedOperation = {
+                  ...operation,
+                  stockBalance
+                };
+                
+                return (
+                  <tr key={operation.id}>
+                    <td colSpan={12} className="p-0 border-none">
+                      <UepsTableRow
+                        operation={enhancedOperation}
+                        onEdit={onEditOperation}
+                        onDelete={onDeleteOperation}
+                      />
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </TableBody>
         </Table>
