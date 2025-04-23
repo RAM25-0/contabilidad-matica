@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -75,7 +74,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         width: "2px",
         background: "#403E43",
         padding: 0,
-        border: "none",
+        border: "none"
       }}
       aria-hidden
     />
@@ -86,7 +85,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
       <TableCell className="text-center text-sm border-r border-[#403E43] w-[120px]">
         {formattedDate}
       </TableCell>
-      <TableCell className="text-sm border-r border-[#403E43] w-[230px]">
+      <TableCell className="text-sm border-r border-[#403E43] w-[100px]">
         {operationTypeMap[operation.type]}
         {operation.type === "COMPRA" && operation.lots.length > 0 && (
           <span className="block text-xs text-gray-500">
@@ -100,27 +99,27 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         )}
       </TableCell>
       <DividerCell />
-      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43] w-[120px]">
+      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43] w-[90px]">
         {operation.inUnits > 0 ? operation.inUnits : ""}
       </TableCell>
-      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43] w-[120px]">
+      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43] w-[90px]">
         {operation.outUnits > 0 ? operation.outUnits : ""}
       </TableCell>
-      <TableCell className="text-center text-sm bg-[#D3E4FD] w-[120px]">
+      <TableCell className="text-center text-sm bg-[#D3E4FD] w-[90px]">
         {operation.stockBalance}
       </TableCell>
       <DividerCell />
-      <TableCell className="text-center text-sm bg-[#E1FBE1] w-[120px]">
+      <TableCell className="text-center text-sm bg-[#E1FBE1] w-[90px]">
         {operation.unitCost ? formatCurrency(operation.unitCost) : ""}
       </TableCell>
       <DividerCell />
-      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43] w-[120px]">
+      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43] w-[90px]">
         {debeValue > 0 ? formatCurrency(debeValue) : ""}
       </TableCell>
-      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43] w-[120px]">
+      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43] w-[90px]">
         {haberValue > 0 ? formatCurrency(haberValue) : ""}
       </TableCell>
-      <TableCell className="text-right text-sm bg-[#FFDEE2] w-[120px]">
+      <TableCell className="text-right text-sm bg-[#FFDEE2] w-[90px]">
         {formatCurrency(operation.balance)}
       </TableCell>
       <TableCell className="bg-[#F6F6F7] w-[80px]">
@@ -164,4 +163,3 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     </TableRow>
   );
 }
-

@@ -2,72 +2,90 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export function UepsTableHeader() {
-  const DividerCell = () => (
+  const divider = (
     <th
       style={{
         width: "2px",
         background: "#403E43",
         padding: 0,
-        border: "none"
+        border: "none",
       }}
       aria-hidden
-    ></th>
+    />
   );
 
   return (
-    <TableHeader className="bg-[#e0e0e0]">
+    <TableHeader>
       <TableRow>
-        <TableHead className="font-bold text-center border-r border-[#403E43] w-[120px]">
-          Fecha
+        <TableHead
+          className="w-[220px] bg-[#F6F6F7] text-[#403E43] border-b border-gray-200"
+          colSpan={2}
+        >
+          <div className="font-semibold text-center">
+            MÉTODO DE VALUACIÓN: UEPS
+          </div>
         </TableHead>
-        <TableHead className="font-bold border-r border-[#403E43] w-[230px]">
-          Operación
-        </TableHead>
-        <DividerCell />
-        <TableHead colSpan={3} className="font-bold text-center text-lg bg-[#D3E4FD] p-1">
+        {divider}
+        <TableHead
+          className="text-[#403E43] bg-[#D3E4FD] text-center border-r border-[#403E43]"
+          colSpan={3}
+        >
           UNIDADES
         </TableHead>
-        <DividerCell />
-        <TableHead className="font-bold text-center bg-[#E1FBE1] w-[120px]">
+        {divider}
+        <TableHead
+          className="text-[#403E43] bg-[#E1FBE1] text-center"
+          colSpan={1}
+        >
           COSTO
         </TableHead>
-        <DividerCell />
-        <TableHead colSpan={3} className="font-bold text-center text-lg bg-[#FFDEE2] p-1">
+        {divider}
+        <TableHead
+          className="text-[#403E43] bg-[#FFDEE2] text-center"
+          colSpan={3}
+        >
           VALORES
         </TableHead>
-        <TableHead className="w-[80px]">Acciones</TableHead>
+        <TableHead className="w-[80px]" />
       </TableRow>
-      
-      <TableRow>
-        <TableHead className="font-bold text-center border-r border-[#403E43]" />
-        <TableHead className="font-bold border-r border-[#403E43]" />
-        <DividerCell />
-        <TableHead className="font-bold text-center bg-[#D3E4FD] border-r border-[#403E43] w-[120px]">
+      <TableRow className="border-b border-[#403E43]">
+        <TableHead className="w-[120px] text-[#403E43] border-r border-[#403E43] bg-[#F6F6F7]">
+          Fecha
+        </TableHead>
+        <TableHead className="w-[100px] text-[#403E43] border-r border-[#403E43] bg-[#F6F6F7]">
+          Operación
+        </TableHead>
+        {divider}
+
+        <TableHead className="w-[90px] bg-[#D3E4FD] text-center text-[#403E43] border-r border-[#403E43]">
           Entrada
         </TableHead>
-        <TableHead className="font-bold text-center bg-[#D3E4FD] border-r border-[#403E43] w-[120px]">
+        <TableHead className="w-[90px] bg-[#D3E4FD] text-center text-[#403E43] border-r border-[#403E43]">
           Salida
         </TableHead>
-        <TableHead className="font-bold text-center bg-[#D3E4FD] w-[120px]">
+        <TableHead className="w-[90px] bg-[#D3E4FD] text-center text-[#403E43]">
           Existencia
         </TableHead>
-        <DividerCell />
-        <TableHead className="font-bold text-center bg-[#E1FBE1] w-[120px]">
+        {divider}
+
+        <TableHead className="w-[90px] bg-[#E1FBE1] text-center text-[#403E43]">
           Unitario
         </TableHead>
-        <DividerCell />
-        <TableHead className="font-bold text-center bg-[#FFDEE2] border-r border-[#403E43] w-[120px]">
+        {divider}
+
+        <TableHead className="w-[90px] bg-[#FFDEE2] text-center text-[#403E43] border-r border-[#403E43]">
           Debe
         </TableHead>
-        <TableHead className="font-bold text-center bg-[#FFDEE2] border-r border-[#403E43] w-[120px]">
+        <TableHead className="w-[90px] bg-[#FFDEE2] text-center text-[#403E43] border-r border-[#403E43]">
           Haber
         </TableHead>
-        <TableHead className="font-bold text-center bg-[#FFDEE2] w-[120px]">
+        <TableHead className="w-[90px] bg-[#FFDEE2] text-center text-[#403E43]">
           Saldo
         </TableHead>
-        <TableHead className="font-bold text-center w-[80px]">Acciones</TableHead>
+        <TableHead className="w-[80px] text-[#403E43] bg-[#F6F6F7]">
+          Acciones
+        </TableHead>
       </TableRow>
     </TableHeader>
   );
 }
-
