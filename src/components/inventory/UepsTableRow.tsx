@@ -135,7 +135,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
           open={showEditDialog}
           onOpenChange={setShowEditDialog}
           operation={adaptedOperation}
-          onEdit={(values) => {
+          onSubmit={(values) => {
             onEdit(operation.id, values);
             setShowEditDialog(false);
           }}
