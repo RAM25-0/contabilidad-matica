@@ -66,6 +66,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     unitCost: operation.unitCost,
     totalCost: operation.totalCost,
     averageCost: operation.unitCost,
+    balance: operation.balance, // Added the missing balance property
     stockBalance: operation.lots.reduce((total, lot) => total + lot.remainingUnits, 0)
   };
   
