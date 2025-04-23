@@ -8,6 +8,7 @@ import { EditOperationDialog } from "./EditOperationDialog";
 import { DeleteOperationDialog } from "./DeleteOperationDialog";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
+import { InventoryOperation } from "@/types/inventory";
 
 interface UepsTableRowProps {
   operation: UepsOperation;
@@ -54,6 +55,20 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     : 0;
   
   const haberValue = operation.type === "VENTA" ? operation.totalCost : 0;
+  
+  // Create a compatible inventory operation object for the EditOperationDialog
+  const adaptedOperation: InventoryOperation = {
+    id: operation.id,
+    date: operation.date,
+    type: operation.type,
+    description: operation.description,
+    units: operation.inUnits - operation.outUnits,
+    unitCost: operation.unitCost,
+    totalCost: operation.totalCost,
+    averageCost: operation.unitCost,  // Use unitCost as averageCost
+    balance: operation.balance,
+    stockBalance: operation.lots.reduce((total, lot) => total + lot.remainingUnits, 0)
+  };
   
   return (
     <TableRow className={`${bgColorClass} hover:bg-gray-100`}>
@@ -119,7 +134,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         <EditOperationDialog
           open={showEditDialog}
           onOpenChange={setShowEditDialog}
-          operation={operation}
+          operation={adaptedOperation}
           onEdit={(values) => {
             onEdit(operation.id, values);
             setShowEditDialog(false);
