@@ -3,7 +3,7 @@ import { useState } from "react";
 import { addInitialBalance } from "./uepsHandlers/addInitialBalance";
 import { addPurchase } from "./uepsHandlers/addPurchase";
 import { addSale } from "./uepsHandlers/addSale";
-import { addReturn } from "./uepsHandlers/addReturn";
+import { addPurchaseReturn } from "./uepsHandlers/addPurchaseReturn";
 import { editOperation } from "./uepsHandlers/editOperation";
 import { deleteOperation } from "./uepsHandlers/deleteOperation";
 import { getAvailableLots as getAvailableLotsUtil } from "./uepsHandlers/getAvailableLots";
@@ -43,15 +43,15 @@ export function useUepsInventory() {
     description: string
   ) => setState(prev => addSale(prev, date, units, description));
 
-  // Registro de devolución (devuelve al lote desde la última venta)
+  // Registro de devolución de compra
   const handleAddReturn = (
     date: Date,
     lotId: string,
     units: number,
     description: string
-  ) => setState(prev => addReturn(prev, date, lotId, units, description));
+  ) => setState(prev => addPurchaseReturn(prev, date, lotId, units, description));
 
-  // Edición de operación (solo metadatos, no relógica UEPS)
+  // Edición de operación (solo metadatos)
   const handleEditOperation = (
     operationId: string,
     values: Partial<Omit<UepsOperation, "id" | "balance">>
@@ -61,7 +61,7 @@ export function useUepsInventory() {
   const handleDeleteOperation = (operationId: string) =>
     setState(prev => deleteOperation(prev, operationId));
 
-  // Lot(es) disponibles para devolución (únicamente ventas)
+  // Lot(es) disponibles para devolución (lotes de compra/saldo inicial)
   const getAvailableLots = () => getAvailableLotsUtil(state);
 
   return {
