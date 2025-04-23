@@ -66,10 +66,6 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     : 0;
   
   const haberValue = operation.type === "VENTA" ? operation.totalCost : 0;
-
-  // Find current operation index to calculate existence
-  // We need access to all operations for accurate existence calculation, but we don't have it here
-  // Instead, we'll use the balance information which should account for all previous operations
   
   return (
     <TableRow className={`${bgColorClass} hover:bg-gray-100`}>
@@ -145,7 +141,8 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         <DeleteOperationDialog
           open={showDeleteDialog}
           onOpenChange={setShowDeleteDialog}
-          onDelete={() => {
+          operation={operation}
+          onConfirm={() => {
             onDelete(operation.id);
             setShowDeleteDialog(false);
           }}

@@ -12,7 +12,6 @@ import { usePepsInventory } from "@/hooks/usePepsInventory";
 import { PepsOperation } from "@/types/peps-inventory";
 import { UepsInventoryTable } from "@/components/inventory/UepsInventoryTable";
 import { useUepsInventory } from "@/hooks/useUepsInventory";
-import { UepsOperation } from "@/hooks/useUepsInventory";
 
 export function InventoryPage() {
   const {
@@ -47,23 +46,13 @@ export function InventoryPage() {
     pepsInventory.handleDeleteOperation(operation.id);
   };
 
-  // Adapter functions for UEPS
-  const handleUepsEdit = (operation: UepsOperation) => {
-    uepsInventory.handleEditOperation(operation.id, {
-      date: operation.date,
-      type: operation.type,
-      description: operation.description,
-      lots: operation.lots,
-      inUnits: operation.inUnits,
-      outUnits: operation.outUnits,
-      unitCost: operation.unitCost,
-      totalCost: operation.totalCost,
-      targetLotId: operation.targetLotId
-    });
+  // Updated adapter functions for UEPS to match expected types
+  const handleUepsEdit = (operationId: string, values: any) => {
+    uepsInventory.handleEditOperation(operationId, values);
   };
   
-  const handleUepsDelete = (operation: UepsOperation) => {
-    uepsInventory.handleDeleteOperation(operation.id);
+  const handleUepsDelete = (operationId: string) => {
+    uepsInventory.handleDeleteOperation(operationId);
   };
 
   return (

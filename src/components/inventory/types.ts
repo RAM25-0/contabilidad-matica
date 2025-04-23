@@ -14,6 +14,8 @@ export const inventoryOperationSchema = z.object({
     z.undefined()
   ]),
   description: z.string().max(200, "La descripción no puede exceder 200 caracteres"),
+  lotName: z.string().optional(),
+  lotId: z.string().optional()
 }).refine((data) => {
   // Only require unitCost for SALDO_INICIAL and COMPRA operations
   if (data.type === 'SALDO_INICIAL' || data.type === 'COMPRA') {

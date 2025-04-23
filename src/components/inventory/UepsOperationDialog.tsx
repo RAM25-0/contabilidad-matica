@@ -59,6 +59,8 @@ export function UepsOperationDialog({
       description: "",
       units: 0,
       unitCost: undefined,
+      lotName: "",
+      lotId: ""
     },
   });
 
