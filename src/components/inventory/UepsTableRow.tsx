@@ -15,18 +15,6 @@ interface UepsTableRowProps {
   onDelete: (operationId: string) => void;
 }
 
-// Helper function to calculate cumulative existence up to a specific operation
-function calculateExistenceAtOperation(operations: UepsOperation[], currentOpIndex: number): number {
-  let existence = 0;
-  
-  for (let i = 0; i <= currentOpIndex; i++) {
-    const op = operations[i];
-    existence += op.inUnits - op.outUnits;
-  }
-  
-  return existence;
-}
-
 export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps) {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -141,7 +129,6 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         <DeleteOperationDialog
           open={showDeleteDialog}
           onOpenChange={setShowDeleteDialog}
-          operation={operation}
           onConfirm={() => {
             onDelete(operation.id);
             setShowDeleteDialog(false);
