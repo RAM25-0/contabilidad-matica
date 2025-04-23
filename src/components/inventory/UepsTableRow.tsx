@@ -37,7 +37,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
       break;
   }
 
-  const formattedDate = format(new Date(operation.date), "dd/MM/yyyy", {
+  const formattedDate = format(new Date(operation.date), "dd MMM yyyy", {
     locale: es,
   });
 
@@ -69,12 +69,13 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     stockBalance: operation.stockBalance || 0
   };
   
-  const DividerCell = () => (
+  // Helper function to create vertical dividers
+  const renderDivider = () => (
     <TableCell 
       style={{
         width: "2px",
-        background: "#403E43",
         padding: 0,
+        background: "#403E43",
         border: "none"
       }}
       aria-hidden
@@ -99,7 +100,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
           </span>
         )}
       </TableCell>
-      <DividerCell />
+      {renderDivider()}
       <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43] w-[90px]">
         {operation.inUnits > 0 ? operation.inUnits : ""}
       </TableCell>
@@ -109,11 +110,11 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
       <TableCell className="text-center text-sm bg-[#D3E4FD] w-[90px]">
         {operation.stockBalance}
       </TableCell>
-      <DividerCell />
+      {renderDivider()}
       <TableCell className="text-center text-sm bg-[#E1FBE1] w-[90px]">
         {operation.unitCost ? formatCurrency(operation.unitCost) : ""}
       </TableCell>
-      <DividerCell />
+      {renderDivider()}
       <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43] w-[90px]">
         {debeValue > 0 ? formatCurrency(debeValue) : ""}
       </TableCell>

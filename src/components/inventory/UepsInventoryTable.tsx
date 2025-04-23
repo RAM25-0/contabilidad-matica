@@ -118,28 +118,14 @@ export function UepsInventoryTable({
                 </td>
               </tr>
             ) : (
-              state.operations.map((operation, index) => {
-                // Calculate running stock up to this operation
-                const stockBalance = calculateRunningStock(state.operations, index);
-                
-                // Create a modified version of the operation with stock balance
-                const enhancedOperation = {
-                  ...operation,
-                  stockBalance
-                };
-                
-                return (
-                  <tr key={operation.id}>
-                    <td colSpan={12} className="p-0 border-none">
-                      <UepsTableRow
-                        operation={enhancedOperation}
-                        onEdit={onEditOperation}
-                        onDelete={onDeleteOperation}
-                      />
-                    </td>
-                  </tr>
-                );
-              })
+              operationsWithStock.map((operation) => (
+                <UepsTableRow
+                  key={operation.id}
+                  operation={operation}
+                  onEdit={onEditOperation}
+                  onDelete={onDeleteOperation}
+                />
+              ))
             )}
           </TableBody>
         </Table>
