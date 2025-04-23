@@ -2,18 +2,6 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export function UepsTableHeader() {
-  const divider = (
-    <th
-      style={{
-        width: "2px",
-        background: "#403E43",
-        padding: 0,
-        border: "none",
-      }}
-      aria-hidden
-    />
-  );
-
   return (
     <TableHeader>
       <TableRow>
@@ -25,28 +13,45 @@ export function UepsTableHeader() {
             MÉTODO DE VALUACIÓN: UEPS
           </div>
         </TableHead>
-        {divider}
+        <TableHead 
+          style={{
+            width: "2px", 
+            padding: 0,
+            background: "#403E43",
+          }}
+        />
         <TableHead
           className="text-[#403E43] bg-[#D3E4FD] text-center border-r border-[#403E43]"
           colSpan={3}
         >
           UNIDADES
         </TableHead>
-        {divider}
+        <TableHead 
+          style={{
+            width: "2px", 
+            padding: 0,
+            background: "#403E43",
+          }}
+        />
         <TableHead
           className="text-[#403E43] bg-[#E1FBE1] text-center"
           colSpan={1}
         >
           COSTO
         </TableHead>
-        {divider}
+        <TableHead 
+          style={{
+            width: "2px", 
+            padding: 0,
+            background: "#403E43",
+          }}
+        />
         <TableHead
           className="text-[#403E43] bg-[#FFDEE2] text-center"
           colSpan={3}
         >
           VALORES
         </TableHead>
-        <TableHead className="w-[80px]" />
       </TableRow>
       <TableRow className="border-b border-[#403E43]">
         <TableHead className="w-[120px] text-[#403E43] border-r border-[#403E43] bg-[#F6F6F7]">
@@ -55,8 +60,13 @@ export function UepsTableHeader() {
         <TableHead className="w-[100px] text-[#403E43] border-r border-[#403E43] bg-[#F6F6F7]">
           Operación
         </TableHead>
-        {divider}
-
+        <TableHead 
+          style={{
+            width: "2px", 
+            padding: 0,
+            background: "#403E43",
+          }}
+        />
         <TableHead className="w-[90px] bg-[#D3E4FD] text-center text-[#403E43] border-r border-[#403E43]">
           Entrada
         </TableHead>
@@ -66,13 +76,23 @@ export function UepsTableHeader() {
         <TableHead className="w-[90px] bg-[#D3E4FD] text-center text-[#403E43]">
           Existencia
         </TableHead>
-        {divider}
-
+        <TableHead 
+          style={{
+            width: "2px", 
+            padding: 0,
+            background: "#403E43",
+          }}
+        />
         <TableHead className="w-[90px] bg-[#E1FBE1] text-center text-[#403E43]">
           Unitario
         </TableHead>
-        {divider}
-
+        <TableHead 
+          style={{
+            width: "2px", 
+            padding: 0,
+            background: "#403E43",
+          }}
+        />
         <TableHead className="w-[90px] bg-[#FFDEE2] text-center text-[#403E43] border-r border-[#403E43]">
           Debe
         </TableHead>

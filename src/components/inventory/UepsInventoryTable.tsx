@@ -7,8 +7,6 @@ import { UepsState, UepsOperation } from "@/hooks/useUepsInventory";
 import { UepsTableHeader } from "./UepsTableHeader";
 import { UepsTableRow } from "./UepsTableRow";
 import { UepsOperationDialog } from "./UepsOperationDialog";
-import { EditOperationDialog } from "./EditOperationDialog";
-import { DeleteOperationDialog } from "./DeleteOperationDialog";
 
 interface UepsInventoryTableProps {
   state: UepsState;
@@ -67,7 +65,7 @@ export function UepsInventoryTable({
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         <Button
-          className="gap-2 bg-[#586A84] hover:bg-[#465469]"
+          className="gap-2 bg-[#A9B4C2] hover:bg-[#96A0AD]"
           disabled={state.hasInitialBalance}
           onClick={() => setSelectedOperationType("SALDO_INICIAL")}
         >
@@ -76,7 +74,7 @@ export function UepsInventoryTable({
         </Button>
         
         <Button
-          className="gap-2 bg-[#8894A8] hover:bg-[#6A7487]"
+          className="gap-2 bg-[#A9B4C2] hover:bg-[#96A0AD]"
           disabled={!state.hasInitialBalance}
           onClick={() => setSelectedOperationType("COMPRA")}
         >
@@ -85,7 +83,7 @@ export function UepsInventoryTable({
         </Button>
         
         <Button
-          className="gap-2"
+          className="gap-2 bg-[#52525B] hover:bg-[#3F3F46]"
           disabled={!state.hasInitialBalance || state.lots.every(l => l.remainingUnits <= 0)}
           onClick={() => setSelectedOperationType("VENTA")}
         >
@@ -94,7 +92,7 @@ export function UepsInventoryTable({
         </Button>
         
         <Button
-          className="gap-2"
+          className="gap-2 bg-[#52525B] hover:bg-[#3F3F46]"
           disabled={!state.hasInitialBalance || !getAvailableLots().length}
           onClick={() => setSelectedOperationType("DEVOLUCION")}
         >
@@ -109,7 +107,7 @@ export function UepsInventoryTable({
           <TableBody>
             {state.operations.length === 0 ? (
               <tr>
-                <td colSpan={10} className="text-center py-4">
+                <td colSpan={13} className="text-center py-4">
                   <div className="flex flex-col items-center justify-center gap-2 py-8 text-muted-foreground">
                     <Package className="h-8 w-8" />
                     <p>No hay operaciones registradas</p>
