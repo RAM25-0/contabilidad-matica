@@ -10,8 +10,9 @@ import { useInventory } from "@/hooks/useInventory";
 import { PepsInventoryTable } from "@/components/inventory/PepsInventoryTable";
 import { usePepsInventory } from "@/hooks/usePepsInventory";
 import { PepsOperation } from "@/types/peps-inventory";
-import { UepsInventoryPlaceholder } from "@/components/inventory/UepsInventoryPlaceholder";
+import { UepsInventoryTable } from "@/components/inventory/UepsInventoryTable";
 import { useUepsInventory } from "@/hooks/useUepsInventory";
+import { UepsOperation } from "@/hooks/useUepsInventory";
 
 export function InventoryPage() {
   const {
@@ -44,6 +45,25 @@ export function InventoryPage() {
   
   const handlePepsDelete = (operation: PepsOperation) => {
     pepsInventory.handleDeleteOperation(operation.id);
+  };
+
+  // Adapter functions for UEPS
+  const handleUepsEdit = (operation: UepsOperation) => {
+    uepsInventory.handleEditOperation(operation.id, {
+      date: operation.date,
+      type: operation.type,
+      description: operation.description,
+      lots: operation.lots,
+      inUnits: operation.inUnits,
+      outUnits: operation.outUnits,
+      unitCost: operation.unitCost,
+      totalCost: operation.totalCost,
+      targetLotId: operation.targetLotId
+    });
+  };
+  
+  const handleUepsDelete = (operation: UepsOperation) => {
+    uepsInventory.handleDeleteOperation(operation.id);
   };
 
   return (
@@ -119,7 +139,16 @@ export function InventoryPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <UepsInventoryPlaceholder />
+              <UepsInventoryTable 
+                state={uepsInventory.state}
+                onAddInitialBalance={uepsInventory.handleAddInitialBalance}
+                onAddPurchase={uepsInventory.handleAddPurchase}
+                onAddSale={uepsInventory.handleAddSale}
+                onAddReturn={uepsInventory.handleAddReturn}
+                getAvailableLots={uepsInventory.getAvailableLots}
+                onEditOperation={handleUepsEdit}
+                onDeleteOperation={handleUepsDelete}
+              />
             </CardContent>
           </Card>
         </TabsContent>
