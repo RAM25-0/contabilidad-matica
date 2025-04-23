@@ -3,12 +3,13 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { UepsOperation } from "@/hooks/useUepsInventory";
+import { UepsOperation } from "@/types/ueps-inventory";
 import { EditOperationDialog } from "./EditOperationDialog";
 import { DeleteOperationDialog } from "./DeleteOperationDialog";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { InventoryOperation } from "@/types/inventory";
+import { formatCurrency } from "@/lib/utils";
 
 interface UepsTableRowProps {
   operation: UepsOperation;
@@ -56,6 +57,9 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
   
   const haberValue = operation.type === "VENTA" ? operation.totalCost : 0;
   
+  // Calcular el total de unidades existentes (para la columna de existencias)
+  const stockBalance = operation.lots.reduce((total, lot) => total + lot.remainingUnits, 0);
+  
   // Create a compatible inventory operation object for the EditOperationDialog
   const adaptedOperation: InventoryOperation = {
     id: operation.id,
@@ -66,8 +70,8 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     unitCost: operation.unitCost,
     totalCost: operation.totalCost,
     averageCost: operation.unitCost,
-    balance: operation.balance, // Added the missing balance property
-    stockBalance: operation.lots.reduce((total, lot) => total + lot.remainingUnits, 0)
+    balance: operation.balance,
+    stockBalance: stockBalance
   };
   
   return (
@@ -104,11 +108,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         {operation.outUnits > 0 ? operation.outUnits : ""}
       </TableCell>
       <TableCell className="text-center text-sm bg-[#D3E4FD]">
-        {operation.inUnits - operation.outUnits > 0
-          ? operation.inUnits
-          : operation.outUnits > 0
-          ? operation.lots.reduce((total, lot) => total + lot.units, 0)
-          : ""}
+        {stockBalance}
       </TableCell>
       <TableCell 
         style={{
@@ -120,7 +120,7 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         aria-hidden
       />
       <TableCell className="text-center text-sm bg-[#E1FBE1]">
-        {operation.unitCost ? `$${operation.unitCost.toLocaleString("es-MX")}` : ""}
+        {operation.unitCost ? formatCurrency(operation.unitCost) : ""}
       </TableCell>
       <TableCell 
         style={{
@@ -132,13 +132,13 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
         aria-hidden
       />
       <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43]">
-        {debeValue > 0 ? `$${debeValue.toLocaleString("es-MX")}` : ""}
+        {debeValue > 0 ? formatCurrency(debeValue) : ""}
       </TableCell>
       <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43]">
-        {haberValue > 0 ? `$${haberValue.toLocaleString("es-MX")}` : ""}
+        {haberValue > 0 ? formatCurrency(haberValue) : ""}
       </TableCell>
       <TableCell className="text-right text-sm bg-[#FFDEE2]">
-        {`$${operation.balance.toLocaleString("es-MX")}`}
+        {formatCurrency(operation.balance)}
       </TableCell>
       <TableCell className="bg-[#F6F6F7]">
         <div className="flex space-x-1 justify-center">
