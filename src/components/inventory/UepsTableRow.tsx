@@ -21,7 +21,6 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Determine operation row background color
   let bgColorClass = "";
   switch (operation.type) {
     case "SALDO_INICIAL":
@@ -38,7 +37,6 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
       break;
   }
 
-  // Format values for display
   const formattedDate = format(new Date(operation.date), "dd/MM/yyyy", {
     locale: es,
   });
@@ -50,8 +48,6 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     DEVOLUCION: "Devolución",
   };
 
-  // Determine values for debe/haber columns
-  // Changed: DEVOLUCION should now go in the haber (credit) column, not in debe
   const debeValue = operation.type === "SALDO_INICIAL" || operation.type === "COMPRA"
     ? operation.totalCost
     : 0;
@@ -60,7 +56,6 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     ? operation.totalCost 
     : 0;
   
-  // Create a compatible inventory operation object for the EditOperationDialog
   const adaptedOperation: InventoryOperation = {
     id: operation.id,
     date: operation.date,
@@ -71,15 +66,27 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     totalCost: operation.totalCost,
     averageCost: operation.unitCost,
     balance: operation.balance,
-    stockBalance: operation.stockBalance || 0  // Use the provided stock balance
+    stockBalance: operation.stockBalance || 0
   };
   
+  const DividerCell = () => (
+    <TableCell 
+      style={{
+        width: "2px",
+        background: "#403E43",
+        padding: 0,
+        border: "none",
+      }}
+      aria-hidden
+    />
+  );
+
   return (
     <TableRow className={`${bgColorClass} hover:bg-gray-100`}>
-      <TableCell className="text-center text-sm border-r border-[#403E43]">
+      <TableCell className="text-center text-sm border-r border-[#403E43] w-[120px]">
         {formattedDate}
       </TableCell>
-      <TableCell className="text-sm border-r border-[#403E43]">
+      <TableCell className="text-sm border-r border-[#403E43] w-[230px]">
         {operationTypeMap[operation.type]}
         {operation.type === "COMPRA" && operation.lots.length > 0 && (
           <span className="block text-xs text-gray-500">
@@ -92,56 +99,31 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
           </span>
         )}
       </TableCell>
-      <TableCell 
-        style={{
-          width: "2px",
-          background: "#403E43",
-          padding: 0,
-          border: "none",
-        }}
-        aria-hidden
-      />
-      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43]">
+      <DividerCell />
+      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43] w-[120px]">
         {operation.inUnits > 0 ? operation.inUnits : ""}
       </TableCell>
-      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43]">
+      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43] w-[120px]">
         {operation.outUnits > 0 ? operation.outUnits : ""}
       </TableCell>
-      <TableCell className="text-center text-sm bg-[#D3E4FD]">
-        {/* Display the calculated stock balance */}
+      <TableCell className="text-center text-sm bg-[#D3E4FD] w-[120px]">
         {operation.stockBalance}
       </TableCell>
-      <TableCell 
-        style={{
-          width: "2px",
-          background: "#403E43",
-          padding: 0,
-          border: "none",
-        }}
-        aria-hidden
-      />
-      <TableCell className="text-center text-sm bg-[#E1FBE1]">
+      <DividerCell />
+      <TableCell className="text-center text-sm bg-[#E1FBE1] w-[120px]">
         {operation.unitCost ? formatCurrency(operation.unitCost) : ""}
       </TableCell>
-      <TableCell 
-        style={{
-          width: "2px",
-          background: "#403E43",
-          padding: 0,
-          border: "none",
-        }}
-        aria-hidden
-      />
-      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43]">
+      <DividerCell />
+      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43] w-[120px]">
         {debeValue > 0 ? formatCurrency(debeValue) : ""}
       </TableCell>
-      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43]">
+      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43] w-[120px]">
         {haberValue > 0 ? formatCurrency(haberValue) : ""}
       </TableCell>
-      <TableCell className="text-right text-sm bg-[#FFDEE2]">
+      <TableCell className="text-right text-sm bg-[#FFDEE2] w-[120px]">
         {formatCurrency(operation.balance)}
       </TableCell>
-      <TableCell className="bg-[#F6F6F7]">
+      <TableCell className="bg-[#F6F6F7] w-[80px]">
         <div className="flex space-x-1 justify-center">
           <Button
             variant="ghost"
@@ -182,3 +164,4 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     </TableRow>
   );
 }
+
