@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, ChevronLeft } from "lucide-react";
+import { Package, ChevronLeft, Archive } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -10,6 +10,8 @@ import { useInventory } from "@/hooks/useInventory";
 import { PepsInventoryTable } from "@/components/inventory/PepsInventoryTable";
 import { usePepsInventory } from "@/hooks/usePepsInventory";
 import { PepsOperation } from "@/types/peps-inventory";
+import { UepsInventoryPlaceholder } from "@/components/inventory/UepsInventoryPlaceholder";
+import { useUepsInventory } from "@/hooks/useUepsInventory";
 
 export function InventoryPage() {
   const {
@@ -22,6 +24,7 @@ export function InventoryPage() {
   } = useInventory();
 
   const pepsInventory = usePepsInventory();
+  const uepsInventory = useUepsInventory();
   const [activeTab, setActiveTab] = useState<string>("promedio");
   
   // Adapter functions to match expected prop types
@@ -63,6 +66,10 @@ export function InventoryPage() {
         <TabsList className="w-full justify-start space-x-2">
           <TabsTrigger value="promedio">Promedio</TabsTrigger>
           <TabsTrigger value="peps">PEPS</TabsTrigger>
+          <TabsTrigger value="ueps">
+            <Archive className="h-4 w-4 mr-1 text-[#9b87f5]" />
+            UEPS
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="promedio">
           <Card>
@@ -100,6 +107,19 @@ export function InventoryPage() {
                 onEditOperation={handlePepsEdit}
                 onDeleteOperation={handlePepsDelete}
               />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="ueps">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Archive className="h-5 w-5 text-[#9b87f5]" />
+                <CardTitle>Método de Valuación - UEPS</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <UepsInventoryPlaceholder />
             </CardContent>
           </Card>
         </TabsContent>
