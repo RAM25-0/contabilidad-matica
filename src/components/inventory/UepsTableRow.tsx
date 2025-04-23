@@ -65,15 +65,16 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
     units: operation.inUnits - operation.outUnits,
     unitCost: operation.unitCost,
     totalCost: operation.totalCost,
-    averageCost: operation.unitCost,  // Use unitCost as averageCost
-    balance: operation.balance,
+    averageCost: operation.unitCost,
     stockBalance: operation.lots.reduce((total, lot) => total + lot.remainingUnits, 0)
   };
   
   return (
     <TableRow className={`${bgColorClass} hover:bg-gray-100`}>
-      <TableCell className="text-center">{formattedDate}</TableCell>
-      <TableCell>
+      <TableCell className="text-center text-sm border-r border-[#403E43]">
+        {formattedDate}
+      </TableCell>
+      <TableCell className="text-sm border-r border-[#403E43]">
         {operationTypeMap[operation.type]}
         {operation.type === "COMPRA" && operation.lots.length > 0 && (
           <span className="block text-xs text-gray-500">
@@ -86,33 +87,59 @@ export function UepsTableRow({ operation, onEdit, onDelete }: UepsTableRowProps)
           </span>
         )}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell 
+        style={{
+          width: "2px",
+          background: "#403E43",
+          padding: 0,
+          border: "none",
+        }}
+        aria-hidden
+      />
+      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43]">
         {operation.inUnits > 0 ? operation.inUnits : ""}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell className="text-center text-sm bg-[#D3E4FD] border-r border-[#403E43]">
         {operation.outUnits > 0 ? operation.outUnits : ""}
       </TableCell>
-      <TableCell className="text-center">
-        {/* Existence (stock balance) */}
+      <TableCell className="text-center text-sm bg-[#D3E4FD]">
         {operation.inUnits - operation.outUnits > 0
           ? operation.inUnits
           : operation.outUnits > 0
           ? operation.lots.reduce((total, lot) => total + lot.units, 0)
           : ""}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell 
+        style={{
+          width: "2px",
+          background: "#403E43",
+          padding: 0,
+          border: "none",
+        }}
+        aria-hidden
+      />
+      <TableCell className="text-center text-sm bg-[#E1FBE1]">
         {operation.unitCost ? `$${operation.unitCost.toLocaleString("es-MX")}` : ""}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell 
+        style={{
+          width: "2px",
+          background: "#403E43",
+          padding: 0,
+          border: "none",
+        }}
+        aria-hidden
+      />
+      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43]">
         {debeValue > 0 ? `$${debeValue.toLocaleString("es-MX")}` : ""}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell className="text-right text-sm bg-[#FFDEE2] border-r border-[#403E43]">
         {haberValue > 0 ? `$${haberValue.toLocaleString("es-MX")}` : ""}
       </TableCell>
-      <TableCell className="text-center">
+      <TableCell className="text-right text-sm bg-[#FFDEE2]">
         {`$${operation.balance.toLocaleString("es-MX")}`}
       </TableCell>
-      <TableCell>
+      <TableCell className="bg-[#F6F6F7]">
         <div className="flex space-x-1 justify-center">
           <Button
             variant="ghost"
