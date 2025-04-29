@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AccountingProvider } from "@/contexts/AccountingContext";
-import { ProfileProvider } from "@/contexts/ProfileContext";
+import { ProfileProvider } from "@/contexts/ProfileProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import IndexPage from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
