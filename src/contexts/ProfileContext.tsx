@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Profile } from "@/types/profile";
+import { Profile, ProfileData } from "@/types/profile";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ProfileContextType {
@@ -15,6 +15,8 @@ interface ProfileContextType {
   importProfileData: (data: string, profileId: string) => void;
   isProfileSelectorOpen: boolean;
   setProfileSelectorOpen: (open: boolean) => void;
+  saveProfileData: (profileId: string, dataKey: string, data: any) => void;
+  getProfileData: <T>(profileId: string, dataKey: string, defaultValue?: T) => T | undefined;
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -25,18 +27,50 @@ const defaultProfile: Profile = {
   name: "Mi Empresa",
   currency: "MXN",
   iconName: "building",
+  lastActive: new Date(),
+};
+
+// Storage utilities for profile data
+const STORAGE_PREFIX = "MotoBolt_";
+
+const saveProfileData = (profileId: string, dataKey: string, data: any) => {
+  const key = `${STORAGE_PREFIX}${profileId}_${dataKey}`;
+  localStorage.setItem(key, JSON.stringify(data));
+};
+
+const getProfileData = <T,>(profileId: string, dataKey: string, defaultValue?: T): T | undefined => {
+  const key = `${STORAGE_PREFIX}${profileId}_${dataKey}`;
+  const stored = localStorage.getItem(key);
+  if (stored) {
+    try {
+      return JSON.parse(stored) as T;
+    } catch (e) {
+      console.error(`Error parsing stored data for ${key}:`, e);
+      return defaultValue;
+    }
+  }
+  return defaultValue;
+};
+
+const cleanupProfileData = (profileId: string) => {
+  // Find and remove all localStorage items for this profile
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith(`${STORAGE_PREFIX}${profileId}_`)) {
+      localStorage.removeItem(key);
+    }
+  });
 };
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<Profile[]>(() => {
-    const storedProfiles = localStorage.getItem("accounting-profiles");
+    const storedProfiles = localStorage.getItem(`${STORAGE_PREFIX}profiles`);
     return storedProfiles ? JSON.parse(storedProfiles) : [defaultProfile];
   });
   
   const [currentProfile, setCurrentProfile] = useState<Profile | null>(() => {
-    const storedCurrentProfileId = localStorage.getItem("accounting-current-profile");
-    const storedProfiles = localStorage.getItem("accounting-profiles");
+    const storedCurrentProfileId = localStorage.getItem(`${STORAGE_PREFIX}currentProfileId`);
+    const storedProfiles = localStorage.getItem(`${STORAGE_PREFIX}profiles`);
     const parsedProfiles = storedProfiles ? JSON.parse(storedProfiles) : [defaultProfile];
     return parsedProfiles.find((p: Profile) => p.id === storedCurrentProfileId) || parsedProfiles[0];
   });
@@ -46,11 +80,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   // Save profiles and current profile to localStorage
   useEffect(() => {
     if (profiles.length > 0) {
-      localStorage.setItem("accounting-profiles", JSON.stringify(profiles));
+      localStorage.setItem(`${STORAGE_PREFIX}profiles`, JSON.stringify(profiles));
     }
     
     if (currentProfile) {
-      localStorage.setItem("accounting-current-profile", currentProfile.id);
+      localStorage.setItem(`${STORAGE_PREFIX}currentProfileId`, currentProfile.id);
     }
   }, [profiles, currentProfile]);
   
@@ -58,6 +92,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const newProfile = {
       ...profileData,
       id: uuidv4(),
+      lastActive: new Date(),
     };
     
     setProfiles([...profiles, newProfile]);
@@ -91,7 +126,17 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       return false;
     }
     
-    setCurrentProfile(profile);
+    // Update last active timestamp
+    const updatedProfile = {
+      ...profile,
+      lastActive: new Date()
+    };
+    
+    setProfiles(profiles.map(p => 
+      p.id === profileId ? updatedProfile : p
+    ));
+    
+    setCurrentProfile(updatedProfile);
     toast({
       title: "Perfil cambiado",
       description: `Ahora estás usando el perfil "${profile.name}".`
@@ -138,6 +183,9 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const profileToDelete = profiles.find(p => p.id === profileId);
     setProfiles(profiles.filter(p => p.id !== profileId));
     
+    // Clean up all profile data from localStorage
+    cleanupProfileData(profileId);
+    
     toast({
       title: "Perfil eliminado",
       description: profileToDelete 
@@ -147,19 +195,58 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   };
   
   const exportProfileData = (profileId: string) => {
-    // This would need to be implemented with actual data export logic
+    // Find all localStorage items for this profile
+    const exportData: Record<string, any> = {};
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith(`${STORAGE_PREFIX}${profileId}_`)) {
+        const dataKey = key.replace(`${STORAGE_PREFIX}${profileId}_`, "");
+        try {
+          exportData[dataKey] = JSON.parse(localStorage.getItem(key) || "null");
+        } catch (e) {
+          console.error(`Error parsing data for export (${key}):`, e);
+        }
+      }
+    });
+    
+    // Create a download link for the exported data
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+    
+    const profileName = profiles.find(p => p.id === profileId)?.name || "perfil";
+    const exportFileName = `${profileName.replace(/\s+/g, '_')}_export_${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileName);
+    linkElement.click();
+    
     toast({
-      title: "Exportación",
-      description: "Funcionalidad de exportación no implementada aún."
+      title: "Exportación completada",
+      description: `Los datos del perfil "${profileName}" han sido exportados.`
     });
   };
   
   const importProfileData = (data: string, profileId: string) => {
-    // This would need to be implemented with actual data import logic
-    toast({
-      title: "Importación",
-      description: "Funcionalidad de importación no implementada aún."
-    });
+    try {
+      const importData = JSON.parse(data);
+      
+      // Store each key in the imported data
+      Object.entries(importData).forEach(([key, value]) => {
+        saveProfileData(profileId, key, value);
+      });
+      
+      toast({
+        title: "Importación completada",
+        description: "Los datos han sido importados correctamente."
+      });
+    } catch (e) {
+      console.error("Error importing data:", e);
+      toast({
+        title: "Error de importación",
+        description: "El formato del archivo no es válido.",
+        variant: "destructive"
+      });
+    }
   };
   
   return (
@@ -174,7 +261,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         exportProfileData,
         importProfileData,
         isProfileSelectorOpen,
-        setProfileSelectorOpen
+        setProfileSelectorOpen,
+        saveProfileData: (profileId, dataKey, data) => saveProfileData(profileId, dataKey, data),
+        getProfileData: <T,>(profileId: string, dataKey: string, defaultValue?: T) => 
+          getProfileData<T>(profileId, dataKey, defaultValue)
       }}
     >
       {children}

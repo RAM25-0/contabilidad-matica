@@ -3,10 +3,11 @@ import React, { useState } from "react";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Plus, Settings } from "lucide-react";
+import { Plus, Settings, Download, Upload } from "lucide-react";
 import { ProfileCard } from "./ProfileCard";
 import { ProfileForm } from "./ProfileForm";
 import { PasswordDialog } from "./PasswordDialog";
+import { format } from "date-fns";
 
 export function ProfileSelector() {
   const { 
@@ -14,7 +15,9 @@ export function ProfileSelector() {
     currentProfile, 
     selectProfile,
     isProfileSelectorOpen, 
-    setProfileSelectorOpen 
+    setProfileSelectorOpen,
+    exportProfileData,
+    importProfileData 
   } = useProfile();
 
   const [showNewProfileForm, setShowNewProfileForm] = useState(false);
@@ -40,6 +43,26 @@ export function ProfileSelector() {
     }
   };
 
+  const handleImportClick = (profileId: string) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        if (content) {
+          importProfileData(content, profileId);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   return (
     <>
       <Dialog open={isProfileSelectorOpen} onOpenChange={setProfileSelectorOpen}>
@@ -52,14 +75,41 @@ export function ProfileSelector() {
             <ProfileForm onCancel={() => setShowNewProfileForm(false)} />
           ) : (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {profiles.map(profile => (
-                  <ProfileCard
-                    key={profile.id}
-                    profile={profile}
-                    isActive={currentProfile?.id === profile.id}
-                    onClick={() => handleProfileSelect(profile.id)}
-                  />
+                  <div key={profile.id} className="space-y-1">
+                    <ProfileCard
+                      profile={profile}
+                      isActive={currentProfile?.id === profile.id}
+                      onClick={() => handleProfileSelect(profile.id)}
+                    />
+                    {profile.lastActive && (
+                      <div className="text-xs text-muted-foreground px-2">
+                        Último acceso: {format(new Date(profile.lastActive), 'dd/MM/yyyy HH:mm')}
+                      </div>
+                    )}
+                    
+                    <div className="flex gap-2 px-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="flex-1 text-xs h-7"
+                        onClick={() => exportProfileData(profile.id)}
+                      >
+                        <Download className="h-3 w-3 mr-1" />
+                        Exportar
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="flex-1 text-xs h-7"
+                        onClick={() => handleImportClick(profile.id)}
+                      >
+                        <Upload className="h-3 w-3 mr-1" />
+                        Importar
+                      </Button>
+                    </div>
+                  </div>
                 ))}
                 
                 <Button
