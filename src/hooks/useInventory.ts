@@ -1,16 +1,63 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { InventoryOperation, InventoryState } from "@/types/inventory";
 import { toast } from "@/components/ui/use-toast";
 import { calculateOperation } from "@/utils/inventory-utils";
+import { useProfile } from "@/contexts/ProfileContext";
 
 export function useInventory() {
-  const [state, setState] = useState<InventoryState>({
-    operations: [],
-    currentAverageCost: 0,
-    currentStock: 0,
-    currentBalance: 0,
+  const { currentProfile, saveProfileData, getProfileData } = useProfile();
+  const profileId = currentProfile?.id || "default";
+  
+  const [state, setState] = useState<InventoryState>(() => {
+    // Carga los datos del inventario del perfil actual
+    return getProfileData<InventoryState>(profileId, "inventory", {
+      operations: [],
+      currentAverageCost: 0,
+      currentStock: 0,
+      currentBalance: 0,
+    }) || {
+      operations: [],
+      currentAverageCost: 0,
+      currentStock: 0,
+      currentBalance: 0,
+    };
   });
+
+  // Escucha eventos de cambio de perfil para recargar datos
+  useEffect(() => {
+    const handleProfileChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail.newProfileId === profileId) {
+        // Recarga datos para el nuevo perfil
+        const loadedState = getProfileData<InventoryState>(profileId, "inventory", {
+          operations: [],
+          currentAverageCost: 0,
+          currentStock: 0,
+          currentBalance: 0,
+        });
+        
+        setState(loadedState || {
+          operations: [],
+          currentAverageCost: 0,
+          currentStock: 0,
+          currentBalance: 0,
+        });
+      }
+    };
+
+    window.addEventListener('profile-changed', handleProfileChange);
+    return () => {
+      window.removeEventListener('profile-changed', handleProfileChange);
+    };
+  }, [profileId, getProfileData]);
+
+  // Guarda los cambios de estado en el perfil
+  useEffect(() => {
+    if (currentProfile) {
+      saveProfileData(profileId, "inventory", state);
+    }
+  }, [state, profileId, saveProfileData, currentProfile]);
 
   const handleAddOperation = (
     newOperation: Omit<
@@ -21,13 +68,17 @@ export function useInventory() {
     const operation = calculateOperation(newOperation, state.operations, toast);
     if (!operation) return;
 
-    setState((prevState) => ({
-      ...prevState,
-      operations: [...prevState.operations, operation],
-      currentAverageCost: operation.averageCost,
-      currentStock: operation.stockBalance,
-      currentBalance: operation.balance,
-    }));
+    setState((prevState) => {
+      const newState = {
+        ...prevState,
+        operations: [...prevState.operations, operation],
+        currentAverageCost: operation.averageCost,
+        currentStock: operation.stockBalance,
+        currentBalance: operation.balance,
+      };
+      
+      return newState;
+    });
 
     toast({
       title: "Operación agregada",

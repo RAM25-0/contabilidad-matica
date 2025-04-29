@@ -17,6 +17,7 @@ interface ProfileContextType {
   setProfileSelectorOpen: (open: boolean) => void;
   saveProfileData: (profileId: string, dataKey: string, data: any) => void;
   getProfileData: <T>(profileId: string, dataKey: string, defaultValue?: T) => T | undefined;
+  resetAllProfileDataOnLoad: (excludeProfileId?: string) => void; // Nueva función para limpiar datos
 }
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -88,6 +89,19 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     }
   }, [profiles, currentProfile]);
   
+  // Nueva función para eliminar todos los datos en memoria excepto los del perfil seleccionado
+  const resetAllProfileDataOnLoad = (excludeProfileId?: string) => {
+    // Limpiar todos los datos del contexto de contabilidad e inventarios
+    // Esta función se llama cuando se cambia de perfil para evitar mezclar datos
+    console.log("Resetting all data for profile switch, preserving profile:", excludeProfileId);
+
+    // Aquí no eliminamos nada de localStorage, solo notificamos que se debe reiniciar los estados
+    // Cada hook debería escuchar este evento para reiniciar su estado
+    window.dispatchEvent(new CustomEvent('profile-changed', { 
+      detail: { newProfileId: excludeProfileId }
+    }));
+  };
+  
   const addProfile = (profileData: Omit<Profile, "id">) => {
     const newProfile = {
       ...profileData,
@@ -125,6 +139,9 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       });
       return false;
     }
+    
+    // Importante: Primero limpiar los datos actuales antes de cambiar de perfil
+    resetAllProfileDataOnLoad(profileId);
     
     // Update last active timestamp
     const updatedProfile = {
@@ -239,6 +256,11 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         title: "Importación completada",
         description: "Los datos han sido importados correctamente."
       });
+      
+      // Recargar los datos del perfil actual si es el mismo
+      if (currentProfile?.id === profileId) {
+        resetAllProfileDataOnLoad(profileId);
+      }
     } catch (e) {
       console.error("Error importing data:", e);
       toast({
@@ -264,7 +286,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         setProfileSelectorOpen,
         saveProfileData: (profileId, dataKey, data) => saveProfileData(profileId, dataKey, data),
         getProfileData: <T,>(profileId: string, dataKey: string, defaultValue?: T) => 
-          getProfileData<T>(profileId, dataKey, defaultValue)
+          getProfileData<T>(profileId, dataKey, defaultValue),
+        resetAllProfileDataOnLoad
       }}
     >
       {children}

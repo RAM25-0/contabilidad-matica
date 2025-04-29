@@ -1,19 +1,61 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PepsLot, PepsOperation, PepsState } from "@/types/peps-inventory";
 import { addInitialBalance } from "./pepsHandlers/addInitialBalance";
 import { addPurchase } from "./pepsHandlers/addPurchase";
 import { addSale } from "./pepsHandlers/addSale";
 import { addReturn } from "./pepsHandlers/addReturn";
 import { toast } from "@/components/ui/use-toast";
+import { useProfile } from "@/contexts/ProfileContext";
 
 export function usePepsInventory() {
-  const [state, setState] = useState<PepsState>({
-    operations: [],
-    lots: [],
-    hasInitialBalance: false,
-    currentBalance: 0,
+  const { currentProfile, saveProfileData, getProfileData } = useProfile();
+  const profileId = currentProfile?.id || "default";
+  
+  const [state, setState] = useState<PepsState>(() => {
+    return getProfileData<PepsState>(profileId, "pepsInventory", {
+      operations: [],
+      lots: [],
+      hasInitialBalance: false,
+      currentBalance: 0,
+    }) || {
+      operations: [],
+      lots: [],
+      hasInitialBalance: false,
+      currentBalance: 0,
+    };
   });
+
+  useEffect(() => {
+    const handleProfileChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail.newProfileId === profileId) {
+        const loadedState = getProfileData<PepsState>(profileId, "pepsInventory", {
+          operations: [],
+          lots: [],
+          hasInitialBalance: false,
+          currentBalance: 0,
+        });
+        
+        setState(loadedState || {
+          operations: [],
+          lots: [],
+          hasInitialBalance: false,
+          currentBalance: 0,
+        });
+      }
+    };
+
+    window.addEventListener('profile-changed', handleProfileChange);
+    return () => {
+      window.removeEventListener('profile-changed', handleProfileChange);
+    };
+  }, [profileId, getProfileData]);
+
+  useEffect(() => {
+    if (currentProfile) {
+      saveProfileData(profileId, "pepsInventory", state);
+    }
+  }, [state, profileId, saveProfileData, currentProfile]);
 
   const handleAddInitialBalance = (
     date: Date,
@@ -21,9 +63,10 @@ export function usePepsInventory() {
     unitCost: number,
     description: string
   ) => {
-    setState((prev) =>
-      addInitialBalance(prev, date, units, unitCost, description)
-    );
+    setState((prev) => {
+      const newState = addInitialBalance(prev, date, units, unitCost, description);
+      return newState;
+    });
   };
 
   const handleAddPurchase = (
@@ -33,13 +76,17 @@ export function usePepsInventory() {
     unitCost: number,
     description: string
   ) => {
-    setState((prev) =>
-      addPurchase(prev, date, lotName, units, unitCost, description)
-    );
+    setState((prev) => {
+      const newState = addPurchase(prev, date, lotName, units, unitCost, description);
+      return newState;
+    });
   };
 
   const handleAddSale = (date: Date, units: number, description: string) => {
-    setState((prev) => addSale(prev, date, units, description));
+    setState((prev) => {
+      const newState = addSale(prev, date, units, description);
+      return newState;
+    });
   };
 
   const handleAddReturn = (
@@ -48,7 +95,10 @@ export function usePepsInventory() {
     units: number,
     description: string
   ) => {
-    setState((prev) => addReturn(prev, date, lotId, units, description));
+    setState((prev) => {
+      const newState = addReturn(prev, date, lotId, units, description);
+      return newState;
+    });
   };
 
   const handleEditOperation = (

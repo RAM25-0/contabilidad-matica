@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addInitialBalance } from "./uepsHandlers/addInitialBalance";
 import { addPurchase } from "./uepsHandlers/addPurchase";
 import { addSale } from "./uepsHandlers/addSale";
@@ -7,17 +7,64 @@ import { addPurchaseReturn } from "./uepsHandlers/addPurchaseReturn";
 import { editOperation } from "./uepsHandlers/editOperation";
 import { deleteOperation } from "./uepsHandlers/deleteOperation";
 import { getAvailableLots as getAvailableLotsUtil } from "./uepsHandlers/getAvailableLots";
+import { useProfile } from "@/contexts/ProfileContext";
 import type { UepsLot, UepsOperation, UepsState } from "@/types/ueps-inventory";
 
 export type { UepsLot, UepsOperation, UepsState };
 
 export function useUepsInventory() {
-  const [state, setState] = useState<UepsState>({
-    operations: [],
-    lots: [],
-    hasInitialBalance: false,
-    currentBalance: 0,
+  const { currentProfile, saveProfileData, getProfileData } = useProfile();
+  const profileId = currentProfile?.id || "default";
+  
+  const [state, setState] = useState<UepsState>(() => {
+    // Carga los datos del inventario UEPS del perfil actual
+    return getProfileData<UepsState>(profileId, "uepsInventory", {
+      operations: [],
+      lots: [],
+      hasInitialBalance: false,
+      currentBalance: 0,
+    }) || {
+      operations: [],
+      lots: [],
+      hasInitialBalance: false,
+      currentBalance: 0,
+    };
   });
+
+  // Escucha eventos de cambio de perfil para recargar datos
+  useEffect(() => {
+    const handleProfileChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail.newProfileId === profileId) {
+        // Recarga datos para el nuevo perfil
+        const loadedState = getProfileData<UepsState>(profileId, "uepsInventory", {
+          operations: [],
+          lots: [],
+          hasInitialBalance: false,
+          currentBalance: 0,
+        });
+        
+        setState(loadedState || {
+          operations: [],
+          lots: [],
+          hasInitialBalance: false,
+          currentBalance: 0,
+        });
+      }
+    };
+
+    window.addEventListener('profile-changed', handleProfileChange);
+    return () => {
+      window.removeEventListener('profile-changed', handleProfileChange);
+    };
+  }, [profileId, getProfileData]);
+
+  // Guarda los cambios de estado en el perfil
+  useEffect(() => {
+    if (currentProfile) {
+      saveProfileData(profileId, "uepsInventory", state);
+    }
+  }, [state, profileId, saveProfileData, currentProfile]);
 
   // Registro de saldo inicial
   const handleAddInitialBalance = (

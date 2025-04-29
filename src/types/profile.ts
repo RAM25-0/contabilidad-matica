@@ -9,10 +9,30 @@ export interface Profile {
   lastActive?: Date;
 }
 
-// Profile data is separated from profile metadata
+// ProfileData almacena todos los datos específicos de cada perfil
 export interface ProfileData {
-  transactions?: any[];
+  // Datos de contabilidad
   accounts?: any[];
-  inventory?: any[];
+  transactions?: any[];
+  // Datos de inventario
+  inventory?: {
+    operations?: any[];
+    currentAverageCost?: number;
+    currentStock?: number;
+    currentBalance?: number;
+  };
+  pepsInventory?: {
+    operations?: any[];
+    lots?: any[];
+    hasInitialBalance?: boolean;
+    currentBalance?: number;
+  };
+  uepsInventory?: {
+    operations?: any[];
+    lots?: any[];
+    hasInitialBalance?: boolean;
+    currentBalance?: number;
+  };
+  // Otras configuraciones específicas del perfil
   settings?: any;
 }
