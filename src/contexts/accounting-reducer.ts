@@ -5,6 +5,10 @@ import { toast } from "@/components/ui/use-toast";
 
 export const accountingReducer = (state: AccountingState, action: AccountingAction): AccountingState => {
   switch (action.type) {
+    // Acción para establecer el estado completo (usado al cargar desde localStorage)
+    case "SET_FULL_STATE": {
+      return action.payload;
+    }
     case "ADD_ACCOUNT": {
       const newAccount = {
         ...action.payload,
