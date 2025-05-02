@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { PepsState } from "@/types/peps-inventory";
+import { PepsState, PepsOperation } from "@/types/peps-inventory";
 import { addInitialBalance } from "./pepsHandlers/addInitialBalance";
 import { addPurchase } from "./pepsHandlers/addPurchase";
 import { addSale } from "./pepsHandlers/addSale";
