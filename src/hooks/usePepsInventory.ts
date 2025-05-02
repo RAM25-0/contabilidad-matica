@@ -1,13 +1,17 @@
+
 import { useState, useEffect } from "react";
-import { PepsLot, PepsOperation, PepsState } from "@/types/peps-inventory";
+import { PepsState } from "@/types/peps-inventory";
 import { addInitialBalance } from "./pepsHandlers/addInitialBalance";
 import { addPurchase } from "./pepsHandlers/addPurchase";
 import { addSale } from "./pepsHandlers/addSale";
 import { addReturn } from "./pepsHandlers/addReturn";
-import { toast } from "@/components/ui/use-toast";
+import { editOperation } from "./pepsInventory/editOperation";
+import { deleteOperation } from "./pepsInventory/deleteOperation";
+import { getAvailableLots } from "./pepsInventory/utilFunctions";
 import { useProfile } from "@/contexts/ProfileContext";
+import { PepsInventoryHookResult } from "./pepsInventory/types";
 
-export function usePepsInventory() {
+export function usePepsInventory(): PepsInventoryHookResult {
   const { currentProfile, saveProfileData, getProfileData } = useProfile();
   const profileId = currentProfile?.id || "default";
   
@@ -105,64 +109,15 @@ export function usePepsInventory() {
     operationId: string,
     values: Partial<Omit<PepsOperation, "id" | "balance">>
   ) => {
-    setState((prev) => {
-      const opIndex = prev.operations.findIndex((op) => op.id === operationId);
-      if (opIndex === -1) return prev;
-
-      const updatedOperations = [...prev.operations];
-      const oldOp = updatedOperations[opIndex];
-      const updatedOp = {
-        ...oldOp,
-        ...values,
-      };
-      updatedOperations[opIndex] = updatedOp;
-
-      toast({
-        title: "Operación actualizada",
-        description: "Los datos de la operación han sido actualizados.",
-      });
-
-      return {
-        ...prev,
-        operations: updatedOperations,
-      };
-    });
+    setState((prev) => editOperation(prev, operationId, values));
   };
 
   const handleDeleteOperation = (operationId: string) => {
-    setState((prev) => {
-      const opToDelete = prev.operations.find((op) => op.id === operationId);
-      if (!opToDelete) return prev;
-
-      if (opToDelete.type === "SALDO_INICIAL") {
-        toast({
-          title: "No permitido",
-          description: "No se puede eliminar el Saldo Inicial.",
-          variant: "destructive",
-        });
-        return prev;
-      }
-
-      const updatedOperations = prev.operations.filter(
-        (op) => op.id !== operationId
-      );
-
-      toast({
-        title: "Operación borrada",
-        description: "La operación ha sido borrada.",
-      });
-
-      return {
-        ...prev,
-        operations: updatedOperations,
-      };
-    });
+    setState((prev) => deleteOperation(prev, operationId));
   };
 
-  const getAvailableLots = () => {
-    return state.lots.filter(
-      (lot) => lot.type !== "VENTA" && lot.remainingUnits > 0
-    );
+  const getAvailableLotsHandler = () => {
+    return getAvailableLots(state);
   };
 
   return {
@@ -171,7 +126,7 @@ export function usePepsInventory() {
     handleAddPurchase,
     handleAddSale,
     handleAddReturn,
-    getAvailableLots,
+    getAvailableLots: getAvailableLotsHandler,
     handleEditOperation,
     handleDeleteOperation,
   };
