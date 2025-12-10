@@ -16,6 +16,7 @@ import { BalanceSheetPage } from "@/pages/BalanceSheetPage";
 import { ProfileSelector } from "@/components/profile/ProfileSelector";
 import "./App.css";
 import { InventoryPage } from "@/pages/InventoryPage";
+import { ProductionLinePage } from "@/pages/ProductionLinePage";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               <Route path="/balanza" element={<BalancePage />} />
               <Route path="/resultados" element={<IncomeStatementPage />} />
               <Route path="/balance" element={<BalanceSheetPage />} />
+              <Route path="/linea-produccion" element={<ProductionLinePage />} />
               <Route path="/inventarios" element={<InventoryPage />} />
               <Route path="/404" element={<NotFound />} />
               <Route path="*" element={<Navigate replace to="/404" />} />

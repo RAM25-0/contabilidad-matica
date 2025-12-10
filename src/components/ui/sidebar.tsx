@@ -63,6 +63,11 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       title: "Estado de Situación Financiera",
     },
     {
+      href: "/linea-produccion",
+      icon: <ClipboardList className="h-5 w-5" />,
+      title: "Línea de Producción",
+    },
+    {
       href: "/inventarios",
       icon: <Package className="h-5 w-5" />,
       title: "Inventarios",
