@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Package, ChevronLeft, Boxes, PackageCheck } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { InventoryMethodTabs } from "@/components/inventory/InventoryMethodTabs";
+import { InventoryManager } from "@/components/inventory/InventoryManager";
 
 export function InventoryPage() {
   return (
@@ -32,16 +31,20 @@ export function InventoryPage() {
         </TabsList>
         
         <TabsContent value="materia-prima">
-          <InventoryMethodTabs 
-            inventoryKey="materia-prima" 
-            title="Inventario de Materia Prima" 
+          <InventoryManager
+            type="materia-prima"
+            title="Inventarios de Materia Prima"
+            icon={<Boxes className="h-5 w-5 text-blue-500" />}
+            maxItems={10}
           />
         </TabsContent>
         
         <TabsContent value="articulos-terminados">
-          <InventoryMethodTabs 
-            inventoryKey="articulos-terminados" 
-            title="Inventario de Artículos Terminados" 
+          <InventoryManager
+            type="articulos-terminados"
+            title="Inventarios de Artículos Terminados"
+            icon={<PackageCheck className="h-5 w-5 text-green-500" />}
+            maxItems={10}
           />
         </TabsContent>
       </Tabs>
