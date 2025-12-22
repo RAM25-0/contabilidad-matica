@@ -12,7 +12,6 @@ export function RawMaterialBlock() {
   const { currentProfile } = useProfile();
   const [state, setState] = useState<RawMaterialState>(initialRawMaterialState);
 
-  // Load state from storage
   useEffect(() => {
     if (currentProfile?.id) {
       const savedState = getProfileData<RawMaterialState>(
@@ -25,7 +24,6 @@ export function RawMaterialBlock() {
     }
   }, [currentProfile?.id]);
 
-  // Save state to storage
   useEffect(() => {
     if (currentProfile?.id) {
       saveProfileData(currentProfile.id, 'production-raw-material', state);
@@ -37,14 +35,16 @@ export function RawMaterialBlock() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Layers className="h-5 w-5 text-primary" />
-          Materia Prima (M.P.)
+    <Card className="overflow-hidden border-border/60 shadow-sm transition-shadow duration-200 hover:shadow-md">
+      <CardHeader className="border-b border-border/40 bg-card pb-4">
+        <CardTitle className="flex items-center gap-3 text-lg font-medium">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+            <Layers className="h-4.5 w-4.5 text-primary" />
+          </div>
+          <span>Materia Prima (M.P.)</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 p-6">
         <InitialInventorySection state={state} onChange={handleChange} />
         <PurchasesSection state={state} onChange={handleChange} />
         <RawMaterialSummary state={state} />

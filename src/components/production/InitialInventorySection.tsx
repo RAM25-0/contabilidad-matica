@@ -27,37 +27,42 @@ export function InitialInventorySection({ state, onChange }: InitialInventorySec
       : 0;
 
   return (
-    <Card className="border-primary/20">
+    <Card className="border-border/50 bg-card/50 shadow-none transition-colors duration-200 hover:bg-card">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Package className="h-4 w-4 text-primary" />
+        <CardTitle className="flex items-center gap-2.5 text-sm font-medium text-foreground">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10">
+            <Package className="h-3.5 w-3.5 text-primary" />
+          </div>
           A) Inventario Inicial de Materia Prima
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Tipo de valor</Label>
+          <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Tipo de valor
+          </Label>
           <ValueTypeToggle 
             value={state.initialInventoryType} 
             onChange={(v) => handleTypeChange(v as ValueType)} 
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {state.initialInventoryType === 'units' ? (
             <>
               <div className="space-y-2">
-                <Label>Unidades</Label>
+                <Label className="text-sm font-medium">Unidades</Label>
                 <Input
                   type="number"
                   min={0}
                   value={state.initialInventoryUnits || ''}
                   onChange={(e) => onChange({ initialInventoryUnits: Number(e.target.value) })}
                   placeholder="0"
+                  className="h-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Costo Unitario ($)</Label>
+                <Label className="text-sm font-medium">Costo Unitario ($)</Label>
                 <Input
                   type="number"
                   min={0}
@@ -65,13 +70,14 @@ export function InitialInventorySection({ state, onChange }: InitialInventorySec
                   value={state.initialInventoryUnitCost || ''}
                   onChange={(e) => onChange({ initialInventoryUnitCost: Number(e.target.value) })}
                   placeholder="0.00"
+                  className="h-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                 />
               </div>
             </>
           ) : (
             <>
               <div className="space-y-2">
-                <Label>Valor Total ($)</Label>
+                <Label className="text-sm font-medium">Valor Total ($)</Label>
                 <Input
                   type="number"
                   min={0}
@@ -79,10 +85,11 @@ export function InitialInventorySection({ state, onChange }: InitialInventorySec
                   value={state.initialInventoryMoney || ''}
                   onChange={(e) => onChange({ initialInventoryMoney: Number(e.target.value) })}
                   placeholder="0.00"
+                  className="h-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Costo Unitario ($)</Label>
+                <Label className="text-sm font-medium">Costo Unitario ($)</Label>
                 <Input
                   type="number"
                   min={0}
@@ -90,6 +97,7 @@ export function InitialInventorySection({ state, onChange }: InitialInventorySec
                   value={state.initialInventoryUnitCost || ''}
                   onChange={(e) => onChange({ initialInventoryUnitCost: Number(e.target.value) })}
                   placeholder="0.00"
+                  className="h-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                 />
               </div>
             </>
@@ -97,12 +105,14 @@ export function InitialInventorySection({ state, onChange }: InitialInventorySec
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm text-muted-foreground">Método de Inventario (Output)</Label>
+          <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Método de Inventario (Output)
+          </Label>
           <Select 
             value={state.inventoryMethod} 
             onValueChange={(v) => onChange({ inventoryMethod: v as 'promedio' | 'peps' | 'ueps' })}
           >
-            <SelectTrigger className="w-full md:w-64">
+            <SelectTrigger className="h-10 w-full transition-all duration-200 focus:ring-2 focus:ring-primary/20 sm:w-72">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -113,10 +123,10 @@ export function InitialInventorySection({ state, onChange }: InitialInventorySec
           </Select>
         </div>
 
-        <div className="pt-2 border-t">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Total Inventario Inicial:</span>
-            <span className="font-medium">
+        <div className="rounded-lg border border-border/50 bg-muted/30 p-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-medium text-muted-foreground">Total Inventario Inicial:</span>
+            <span className="font-semibold text-foreground tabular-nums">
               {totalUnits.toFixed(2)} U / ${totalValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
             </span>
           </div>
