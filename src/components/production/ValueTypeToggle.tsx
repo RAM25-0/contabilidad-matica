@@ -20,13 +20,13 @@ export function ValueTypeToggle({
       type="single" 
       value={value} 
       onValueChange={(v) => v && onChange(v as ValueType | DiscountType)}
-      className="justify-start"
+      className="inline-flex gap-1 rounded-lg bg-muted/50 p-1"
     >
       {options.map((option) => (
         <ToggleGroupItem 
           key={option.value} 
           value={option.value}
-          className="text-xs px-3 py-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          className="rounded-md px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all duration-200 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm hover:text-foreground"
         >
           {option.label}
         </ToggleGroupItem>
