@@ -1,12 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RawMaterialState } from "./types";
-import { Calculator, ArrowRight } from "lucide-react";
+import { Calculator } from "lucide-react";
 
 interface RawMaterialSummaryProps {
   state: RawMaterialState;
 }
 
 export function RawMaterialSummary({ state }: RawMaterialSummaryProps) {
+  // Calculate Initial Inventory values
   const initialInventoryValue = state.initialInventoryType === 'units'
     ? state.initialInventoryUnits * state.initialInventoryUnitCost
     : state.initialInventoryMoney;
@@ -17,6 +18,7 @@ export function RawMaterialSummary({ state }: RawMaterialSummaryProps) {
       ? state.initialInventoryMoney / state.initialInventoryUnitCost 
       : 0;
 
+  // Calculate purchase value
   const purchaseValue = state.purchaseType === 'units'
     ? state.purchaseUnits * state.purchaseUnitCost
     : state.purchaseMoney;
@@ -27,6 +29,7 @@ export function RawMaterialSummary({ state }: RawMaterialSummaryProps) {
       ? state.purchaseMoney / state.purchaseUnitCost 
       : 0;
 
+  // Calculate returns value
   const returnsValue = state.purchaseReturnsType === 'units'
     ? state.purchaseReturnsUnits * state.purchaseReturnsUnitCost
     : state.purchaseReturnsMoney;
@@ -37,13 +40,16 @@ export function RawMaterialSummary({ state }: RawMaterialSummaryProps) {
       ? state.purchaseReturnsMoney / state.purchaseReturnsUnitCost 
       : 0;
 
+  // Calculate discounts value
   const discountsValue = state.purchaseDiscountsType === 'percentage'
     ? (purchaseValue * state.purchaseDiscountsPercentage) / 100
     : state.purchaseDiscountsMoney;
 
+  // Net Purchases
   const netPurchasesValue = purchaseValue + state.purchaseExpenses - returnsValue - discountsValue;
   const netPurchasesUnits = purchaseUnits - returnsUnits;
 
+  // Available Raw Material
   const availableValue = initialInventoryValue + netPurchasesValue;
   const availableUnits = initialInventoryUnits + netPurchasesUnits;
 
@@ -54,77 +60,48 @@ export function RawMaterialSummary({ state }: RawMaterialSummaryProps) {
   };
 
   return (
-    <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-transparent shadow-none">
+    <Card className="border-accent/30 bg-accent/5">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2.5 text-sm font-medium text-foreground">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/15">
-            <Calculator className="h-3.5 w-3.5 text-primary" />
-          </div>
+        <CardTitle className="text-base flex items-center gap-2">
+          <Calculator className="h-4 w-4 text-accent" />
           Resumen: Materia Prima Disponible
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {/* Summary grid */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {/* Initial Inventory */}
-            <div className="rounded-lg bg-background/80 p-4 backdrop-blur-sm">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Inventario Inicial M.P.
+        <div className="bg-background rounded-lg p-4 space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="space-y-1">
+              <p className="text-muted-foreground">Inventario Inicial M.P.</p>
+              <p className="font-medium">
+                {initialInventoryUnits.toFixed(2)} U
               </p>
-              <p className="mt-2 text-lg font-semibold tabular-nums text-foreground">
-                {initialInventoryUnits.toFixed(2)} <span className="text-sm font-normal text-muted-foreground">U</span>
-              </p>
-              <p className="text-sm font-medium tabular-nums text-muted-foreground">
+              <p className="text-primary font-semibold">
                 ${initialInventoryValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
               </p>
             </div>
-
-            {/* Net Purchases */}
-            <div className="relative rounded-lg bg-background/80 p-4 backdrop-blur-sm">
-              <div className="absolute -left-2 top-1/2 hidden -translate-y-1/2 sm:flex">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-success/20 text-success">
-                  <span className="text-xs font-bold">+</span>
-                </div>
-              </div>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Compras Netas
+            <div className="space-y-1">
+              <p className="text-muted-foreground">+ Compras Netas</p>
+              <p className="font-medium">
+                {netPurchasesUnits.toFixed(2)} U
               </p>
-              <p className="mt-2 text-lg font-semibold tabular-nums text-foreground">
-                {netPurchasesUnits.toFixed(2)} <span className="text-sm font-normal text-muted-foreground">U</span>
-              </p>
-              <p className="text-sm font-medium tabular-nums text-success">
+              <p className="text-green-600 font-semibold">
                 ${netPurchasesValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
               </p>
             </div>
-
-            {/* Available Material */}
-            <div className="relative rounded-lg border-2 border-primary/30 bg-primary/5 p-4">
-              <div className="absolute -left-2 top-1/2 hidden -translate-y-1/2 sm:flex">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20 text-primary">
-                  <ArrowRight className="h-3 w-3" />
-                </div>
-              </div>
-              <p className="text-xs font-medium uppercase tracking-wide text-primary">
-                M.P. Disponible
+            <div className="space-y-1 border-l-2 border-primary pl-4">
+              <p className="text-muted-foreground">= M.P. Disponible</p>
+              <p className="font-bold text-lg">
+                {availableUnits.toFixed(2)} U
               </p>
-              <p className="mt-2 text-xl font-bold tabular-nums text-foreground">
-                {availableUnits.toFixed(2)} <span className="text-sm font-normal text-muted-foreground">U</span>
-              </p>
-              <p className="text-base font-semibold tabular-nums text-primary">
+              <p className="text-primary font-bold text-lg">
                 ${availableValue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
               </p>
             </div>
           </div>
 
-          {/* Inventory method badge */}
-          <div className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3">
-            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Método de inventario
-            </span>
-            <span className="inline-flex items-center rounded-full bg-background px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
-              {methodLabels[state.inventoryMethod]}
-            </span>
+          <div className="pt-3 border-t text-sm text-muted-foreground">
+            <span>Método de inventario seleccionado: </span>
+            <span className="font-medium text-foreground">{methodLabels[state.inventoryMethod]}</span>
           </div>
         </div>
       </CardContent>
