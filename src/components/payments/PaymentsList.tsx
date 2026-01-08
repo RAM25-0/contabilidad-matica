@@ -49,6 +49,12 @@ export function PaymentsList({ payments, onDelete, simulatedDate }: PaymentsList
            (!payment.lastExecutedDate || parseISO(payment.lastExecutedDate) < simulatedDate);
   };
 
+  const getTotalAmount = (payment: ScheduledPayment) => {
+    return payment.entries
+      .filter((e) => e.type === "cargo")
+      .reduce((sum, e) => sum + e.amount, 0);
+  };
+
   if (payments.length === 0) {
     return (
       <Card>
@@ -97,7 +103,7 @@ export function PaymentsList({ payments, onDelete, simulatedDate }: PaymentsList
           <CardContent className="space-y-2">
             <div className="flex items-center gap-2 text-lg font-semibold text-primary">
               <DollarSign className="h-5 w-5" />
-              {formatCurrency(payment.amount)}
+              {formatCurrency(getTotalAmount(payment))}
             </div>
             
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -110,10 +116,20 @@ export function PaymentsList({ payments, onDelete, simulatedDate }: PaymentsList
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-sm">
-              <span className="font-medium text-red-600">{getAccountName(payment.debitAccountId)}</span>
-              <ArrowRight className="h-4 w-4" />
-              <span className="font-medium text-green-600">{getAccountName(payment.creditAccountId)}</span>
+            <div className="text-sm space-y-1">
+              {payment.entries.map((entry, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <Badge variant={entry.type === "cargo" ? "destructive" : "default"} className="text-xs">
+                    {entry.type === "cargo" ? "Cargo" : "Abono"}
+                  </Badge>
+                  <span className={entry.type === "cargo" ? "text-red-600" : "text-green-600"}>
+                    {getAccountName(entry.accountId)}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {formatCurrency(entry.amount)}
+                  </span>
+                </div>
+              ))}
             </div>
 
             {payment.description && (

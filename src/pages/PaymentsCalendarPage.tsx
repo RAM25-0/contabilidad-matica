@@ -116,40 +116,24 @@ export function PaymentsCalendarPage() {
     }
 
     pending.forEach((payment) => {
-      const debitAccount = state.accounts.find((a) => a.id === payment.debitAccountId);
-      const creditAccount = state.accounts.find((a) => a.id === payment.creditAccountId);
-
-      if (!debitAccount || !creditAccount) {
-        toast({
-          title: "Error",
-          description: `No se encontraron las cuentas para el pago "${payment.name}"`,
-          variant: "destructive",
-        });
-        return;
-      }
+      // Build entries from the payment's entries array
+      const transactionEntries = payment.entries.map((entry) => {
+        const account = state.accounts.find((a) => a.id === entry.accountId);
+        return {
+          id: uuidv4(),
+          accountId: entry.accountId,
+          accountName: account?.name || "Cuenta no encontrada",
+          accountType: account?.type || "activo",
+          debit: entry.type === "cargo" ? entry.amount : 0,
+          credit: entry.type === "abono" ? entry.amount : 0,
+        };
+      });
 
       // Create transaction with full entry data
       addTransaction({
         date: simulatedDate,
         description: `Pago programado: ${payment.name}`,
-        entries: [
-          {
-            id: uuidv4(),
-            accountId: payment.debitAccountId,
-            accountName: debitAccount.name,
-            accountType: debitAccount.type,
-            debit: payment.amount,
-            credit: 0,
-          },
-          {
-            id: uuidv4(),
-            accountId: payment.creditAccountId,
-            accountName: creditAccount.name,
-            accountType: creditAccount.type,
-            debit: 0,
-            credit: payment.amount,
-          },
-        ],
+        entries: transactionEntries,
       });
 
       // Update payment lastExecutedDate

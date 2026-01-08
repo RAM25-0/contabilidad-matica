@@ -1,11 +1,11 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Plus, Trash2 } from "lucide-react";
 import { useAccounting } from "@/contexts/AccountingContext";
 import { ScheduledPayment, PaymentFrequency } from "@/types/scheduled-payment";
 import {
@@ -40,16 +40,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+
+const entrySchema = z.object({
+  accountId: z.string().min(1, "Selecciona una cuenta"),
+  type: z.enum(["cargo", "abono"]),
+  amount: z.number().min(0.01, "El monto debe ser mayor a 0"),
+});
 
 const formSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
-  amount: z.number().min(0.01, "El monto debe ser mayor a 0"),
   frequency: z.enum(["once", "weekly", "biweekly", "monthly", "quarterly", "yearly"]),
   startDate: z.date({ required_error: "La fecha de inicio es requerida" }),
   endDate: z.date().optional(),
-  debitAccountId: z.string().min(1, "Selecciona una cuenta de cargo"),
-  creditAccountId: z.string().min(1, "Selecciona una cuenta de abono"),
+  entries: z.array(entrySchema).min(2, "Debe tener al menos 2 entradas"),
   description: z.string(),
 });
 
@@ -76,22 +80,69 @@ export function PaymentForm({ onSave }: PaymentFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      amount: 0,
       frequency: "monthly",
       description: "",
+      entries: [
+        { accountId: "", type: "cargo", amount: 0 },
+        { accountId: "", type: "abono", amount: 0 },
+      ],
     },
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "entries",
+  });
+
+  const entries = form.watch("entries");
+
+  const totalCargos = entries
+    .filter((e) => e.type === "cargo")
+    .reduce((sum, e) => sum + (e.amount || 0), 0);
+  
+  const totalAbonos = entries
+    .filter((e) => e.type === "abono")
+    .reduce((sum, e) => sum + (e.amount || 0), 0);
+
+  const isBalanced = Math.abs(totalCargos - totalAbonos) < 0.01;
+
+  const addEntry = () => {
+    append({ accountId: "", type: "cargo", amount: 0 });
+  };
+
+  const removeEntry = (index: number) => {
+    if (fields.length <= 2) {
+      toast({
+        title: "Error",
+        description: "Debe tener al menos 2 entradas contables.",
+        variant: "destructive",
+      });
+      return;
+    }
+    remove(index);
+  };
+
   const onSubmit = (data: FormData) => {
+    if (!isBalanced) {
+      toast({
+        title: "Error",
+        description: "Los cargos y abonos deben estar balanceados.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const payment: ScheduledPayment = {
       id: uuidv4(),
       name: data.name,
-      amount: data.amount,
       frequency: data.frequency,
       startDate: data.startDate.toISOString(),
       endDate: data.endDate?.toISOString(),
-      debitAccountId: data.debitAccountId,
-      creditAccountId: data.creditAccountId,
+      entries: data.entries.map((e) => ({
+        accountId: e.accountId!,
+        type: e.type!,
+        amount: e.amount!,
+      })),
       description: data.description,
       isActive: true,
     };
@@ -108,7 +159,7 @@ export function PaymentForm({ onSave }: PaymentFormProps) {
           Nuevo Pago Programado
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Programar Nuevo Pago</DialogTitle>
         </DialogHeader>
@@ -122,26 +173,6 @@ export function PaymentForm({ onSave }: PaymentFormProps) {
                   <FormLabel>Nombre del pago</FormLabel>
                   <FormControl>
                     <Input placeholder="Ej: Pago de electricidad" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Monto</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -255,55 +286,115 @@ export function PaymentForm({ onSave }: PaymentFormProps) {
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="debitAccountId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cuenta de Cargo (Débito)</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona cuenta" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {state.accounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id}>
-                          {account.code} - {account.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Entries Section */}
+            <div className="space-y-3">
+              <FormLabel>Entradas Contables</FormLabel>
+              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
+                    <FormField
+                      control={form.control}
+                      name={`entries.${index}.accountId`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-8 text-sm">
+                                <SelectValue placeholder="Cuenta" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {state.accounts.map((account) => (
+                                <SelectItem key={account.id} value={account.id}>
+                                  {account.code} - {account.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name={`entries.${index}.type`}
+                      render={({ field }) => (
+                        <FormItem className="w-24">
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="h-8 text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="cargo">Cargo</SelectItem>
+                              <SelectItem value="abono">Abono</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name={`entries.${index}.amount`}
+                      render={({ field }) => (
+                        <FormItem className="w-28">
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="Monto"
+                              className="h-8 text-sm"
+                              {...field}
+                              onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={() => removeEntry(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addEntry}
+                className="gap-1 h-8 text-sm"
+              >
+                <Plus className="h-3 w-3" />
+                Agregar entrada
+              </Button>
 
-            <FormField
-              control={form.control}
-              name="creditAccountId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cuenta de Abono (Crédito)</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona cuenta" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {state.accounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id}>
-                          {account.code} - {account.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* Balance Summary */}
+              <div className="flex justify-between text-sm p-2 rounded-md bg-muted">
+                <div>
+                  <span className="text-muted-foreground">Cargos: </span>
+                  <span className="font-medium">${totalCargos.toFixed(2)}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Abonos: </span>
+                  <span className="font-medium">${totalAbonos.toFixed(2)}</span>
+                </div>
+                <div className={cn(
+                  "font-medium",
+                  isBalanced ? "text-green-600" : "text-destructive"
+                )}>
+                  {isBalanced ? "✓ Balanceado" : "✗ Desbalanceado"}
+                </div>
+              </div>
+            </div>
 
             <FormField
               control={form.control}
@@ -326,7 +417,9 @@ export function PaymentForm({ onSave }: PaymentFormProps) {
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancelar
               </Button>
-              <Button type="submit">Guardar Pago</Button>
+              <Button type="submit" disabled={!isBalanced}>
+                Guardar Pago
+              </Button>
             </div>
           </form>
         </Form>
