@@ -9,7 +9,8 @@ import {
   ClipboardList, 
   FileText, 
   Users,
-  Package 
+  Package,
+  CalendarDays 
 } from "lucide-react";
 import { useProfile } from "@/contexts/ProfileContext";
 
@@ -71,6 +72,11 @@ export function Sidebar({ className, ...props }: SidebarProps) {
       href: "/inventarios",
       icon: <Package className="h-5 w-5" />,
       title: "Inventarios",
+    },
+    {
+      href: "/calendario-pagos",
+      icon: <CalendarDays className="h-5 w-5" />,
+      title: "Calendario de Pagos",
     }
   ];
 
