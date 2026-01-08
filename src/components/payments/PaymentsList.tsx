@@ -50,6 +50,10 @@ export function PaymentsList({ payments, onDelete, simulatedDate }: PaymentsList
   };
 
   const getTotalAmount = (payment: ScheduledPayment) => {
+    if (!payment.entries || !Array.isArray(payment.entries)) {
+      // Legacy payment format - return 0 or migrate
+      return 0;
+    }
     return payment.entries
       .filter((e) => e.type === "cargo")
       .reduce((sum, e) => sum + e.amount, 0);
@@ -117,7 +121,7 @@ export function PaymentsList({ payments, onDelete, simulatedDate }: PaymentsList
             </div>
 
             <div className="text-sm space-y-1">
-              {payment.entries.map((entry, idx) => (
+              {payment.entries && payment.entries.map((entry, idx) => (
                 <div key={idx} className="flex items-center gap-2">
                   <Badge variant={entry.type === "cargo" ? "destructive" : "default"} className="text-xs">
                     {entry.type === "cargo" ? "Cargo" : "Abono"}
